@@ -195,3 +195,27 @@ The reflective-library trap is the failure mode unique to this stack. A dependen
 The reactive-versus-blocking decision deserves a clear answer. Both frameworks default to a non-blocking event loop, but most CRUD services do blocking JDBC work, and forcing them into a reactive `Uni`/`Multi` pipeline adds real cognitive cost (harder stack traces, harder debugging, easy event-loop stalls) for little gain when the bottleneck is the database, not the thread count. On Java 21 the cleaner answer for I/O-bound blocking work is often virtual threads: keep the readable blocking style and let Loom handle concurrency. Reach for full reactive only when you genuinely need streaming, backpressure, or massive fan-out concurrency that even virtual threads strain on.
 
 Close the loop on framework choice. Quarkus leans on familiar standards (CDI, JAX-RS, Hibernate) with an exceptional dev-mode experience and the broadest extension catalog of the two, which lowers the ramp for a team coming from Jakarta EE. Micronaut's purpose-built compile-time DI gives the cleanest reflection-free story and turns wiring mistakes into compile errors, which some teams prize. Both are correct choices; the wrong move in an interview is to claim one is universally superior. The senior framing is: same core thesis (build-time over runtime), pick on ecosystem fit and team familiarity, and reach for native image only when the workload's lifecycle actually rewards it.
+
+---
+
+## Common interview questions
+
+These recur whenever a role mentions Quarkus, Micronaut, or "cloud-native JVM." Lead with the mechanism, then the trade-off.
+
+**Why do Quarkus and Micronaut move work to build time?** The classic stacks do dependency injection, proxying, and configuration at runtime through reflection and classpath scanning, which runs on every startup, keeps metadata resident, and is invisible to ahead-of-time compilers. Doing that wiring at build time instead yields fast startup, a small memory floor, and code that GraalVM can compile to a native image.
+
+**What is the closed-world assumption in native image, and why does it break reflection?** GraalVM statically analyzes everything reachable from `main` and discards the rest, so anything reached only reflectively, by dynamic proxy, or by loading a resource by name is invisible to the analysis, gets pruned, and fails at runtime. This is exactly why these frameworks exist in their current form: because they wire everything at build time, they know what is reflectively reachable and generate the native metadata for you.
+
+**Will a native image always be faster than the JVM?** No. It starts in milliseconds and uses far less memory, but at steady state a JIT-warmed JVM can match or beat it on peak throughput, because the JIT profiles the running code and optimizes hot paths that ahead-of-time compilation must guess at. Native wins on cold start and density; the warmed JVM can win on sustained throughput.
+
+**Quarkus or Micronaut, what is the real difference?** Both share the build-time thesis. Quarkus builds on familiar standards (CDI, JAX-RS, Hibernate) with an exceptional live-reload dev mode and the broader extension catalog. Micronaut wrote its own compile-time DI from scratch, giving the cleanest reflection-free story and turning missing-bean errors into compile errors. Neither is universally superior; pick on ecosystem fit and team familiarity.
+
+**Explain the threading contract.** A handler returning a reactive type (`Uni`/`Multi` on Quarkus) is assumed non-blocking and runs on the I/O event loop, where you must never block; a handler returning a plain value runs on a worker thread where blocking is allowed. Override the inference with `@Blocking`/`@NonBlocking` on Quarkus or `@ExecuteOn` on Micronaut, and remember Quarkus detects many blocking calls on the I/O thread at runtime and throws, which is a guardrail.
+
+**Uni versus Multi (or Mono versus Flux)?** `Uni` carries a single asynchronous value or failure; `Multi` carries a stream of zero-to-many items with backpressure. Reactor's equivalents are `Mono` and `Flux`. Use `Uni` for one result (a lookup), `Multi` for a stream (server-sent events, a paged feed).
+
+**What is the most common reactive bug?** Forgetting that a `Uni`/`Multi` is lazy and cold: it describes a pipeline and does nothing until subscribed. A `Uni` you create but forget to return or subscribe to is a silent no-op, with no exception and no execution, which has no analogue in blocking code.
+
+**How do you keep a reactive endpoint actually non-blocking?** Use non-blocking data access end to end (Hibernate Reactive, the Vert.x reactive SQL client, or R2DBC) so nothing on the path blocks the event loop. A reactive endpoint that calls a blocking JDBC driver stalls every request on that loop and performs worse than plain blocking would; if you only have a blocking driver, mark the work `@Blocking` so it runs off the loop.
+
+**When is full reactive worth it over virtual threads?** Reach for reactive when you genuinely need streaming responses, real backpressure against an unsteerable firehose, or massive fan-out concurrency. For ordinary CRUD bottlenecked on the database, the reactive tax (cold-stream bugs, context loss, opaque stack traces) buys little, and on Java 21 virtual threads deliver the same I/O concurrency in readable blocking style.

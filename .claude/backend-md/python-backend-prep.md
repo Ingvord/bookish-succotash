@@ -173,3 +173,32 @@ Offload heavy work, do not host it in the web process. CPU-bound tasks (image pr
 Three more caveats that read as senior. Typing is a discipline, not decoration: FastAPI leans on type hints for correctness, so run mypy or pyright in CI, because a wrong annotation produces a wrong schema and a wrong client. Dependency and environment management has consolidated on faster tooling (uv, Poetry) and pinned lockfiles; reproducible builds matter more in Python than in compiled ecosystems because so much is resolved at runtime. And observability should include OpenTelemetry traces plus a metric that catches the blocking-the-loop failure, since standard latency graphs alone will not tell you the loop is starved.
 
 Close on framework framing. FastAPI is the right default for new Python APIs: async-native, type-driven, OpenAPI for free, excellent for I/O-bound microservices and as a serving layer in front of ML models. Reach for Django when you want a batteries-included monolith with an ORM, admin, and auth out of the box and your workload is request-response CRUD. Reach for a heavier or different runtime entirely when you are CPU-bound at the core and Python's per-request overhead and GIL make it the wrong tool, in which case the senior move is to push that hot path to a compiled service and keep FastAPI as the typed, well-documented edge.
+
+---
+
+## Common interview questions
+
+These recur for any FastAPI or async-Python role. Most answers come back to the event loop and the GIL.
+
+**WSGI versus ASGI?** WSGI is the synchronous interface (Flask, classic Django): one request occupies one worker until it returns, and concurrency comes from many workers or threads. ASGI is the async successor: it supports `async def` and an event loop, so one worker holds thousands of in-flight requests as long as each spends its time awaiting I/O rather than burning CPU. FastAPI is ASGI, run under Uvicorn.
+
+**Explain the GIL and how it shapes scaling.** CPython's Global Interpreter Lock lets only one thread execute Python bytecode at a time, so threads give no parallel speedup for pure-Python CPU work; that is why you scale CPU across processes, one worker per core-ish. The nuance: the GIL is released during blocking I/O and inside many C extensions, so threads do help I/O-bound and native-compute work, and async sidesteps the GIL for I/O concurrency by using one thread and an event loop.
+
+**When does FastAPI run a handler in a thread pool?** When you define it as plain `def` rather than `async def`, FastAPI runs it in a thread pool, off the event loop, so blocking calls inside it cannot stall the loop. An `async def` handler runs directly on the loop, so a blocking call inside it freezes every concurrent request.
+
+**Describe the blocking-the-loop trap and how to fix it.** A synchronous blocking call (`requests.get`, `time.sleep`, a sync DB driver, heavy CPU) inside an `async def` handler blocks the whole event loop, so latency that is fine at low load collapses under concurrency. Three fixes: use async-native libraries (`httpx.AsyncClient`, `asyncpg`, `asyncio.sleep`) inside `async def`; or make the handler plain `def` so FastAPI threads it off the loop; or offload genuine CPU work to a thread/process pool or a task queue.
+
+```python
+# CPU work pushed off the loop instead of blocking it
+result = await anyio.to_thread.run_sync(heavy_cpu_transform, data)
+```
+
+**What changed in Pydantic v2?** The core was rewritten in Rust, making validation 5 to 50 times faster. The API shifted too: `BaseSettings` moved to `pydantic-settings`, validators became `@field_validator`/`@model_validator`, `.dict()` became `.model_dump()`, and the inner `Config` class became `model_config`.
+
+**How do you share an application-scoped resource like a connection pool?** Create it once in a `lifespan` context manager at startup and store it on `app.state`, then close it on shutdown; do not build it per request, or you exhaust connections under load. The `lifespan` manager replaces the deprecated `@app.on_event` hooks.
+
+**How do you size worker count?** Because the GIL caps pure-Python CPU parallelism per process, run roughly one worker per core (a common start is `2 * cores + 1`, fewer for memory-heavy apps), and remember each worker carries the full memory footprint, so an ML-laden app times eight workers can be gigabytes before serving a request. The real throughput ceiling is usually the database pool, by Little's Law, not the worker count.
+
+**How do you handle CPU-bound or slow background work?** Push it out of the web process onto a task queue (Celery, Dramatiq, ARQ) with separate workers, so the web tier stays responsive and scales independently. A request that does 30 seconds of CPU work is an architecture mistake no amount of async fixes; it should enqueue the job and return immediately.
+
+**Contract-first or code-first OpenAPI?** FastAPI generates the OpenAPI schema from your type hints and Pydantic models, so code-first is the default and the docs never drift. For contract-first shops, keep a hand-authored spec as the agreed contract and verify the implementation against it in CI (schemathesis can fuzz the API against the spec). Either way the contract is enforced mechanically, and consumers generate typed clients from the published schema.

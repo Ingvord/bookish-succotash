@@ -361,3 +361,31 @@ The classloader hierarchy is the source of the platform's most confusing errors.
 Deploy-time safety is the rest of the answer. The application-server model historically encouraged hot redeploy into a running server, which leaks classloaders and slowly poisons the JVM until a restart. In a container world, do not hot-redeploy: bake one war into one immutable image and roll instances. This converts the server's weakness (slow, leaky redeploy) into a non-issue.
 
 Know when to walk away from this stack. Choose Jakarta EE or TomEE when you have an existing EE estate, a team fluent in it, standards-portability requirements, or container-managed JTA across multiple datasources that you do not want to hand-roll. Reach for the cloud-native JVM stacks (Quarkus, Micronaut) when startup time and memory footprint are first-class concerns, typically for serverless or aggressive horizontal autoscaling, where a 5-second startup and a 512 MB floor are liabilities. Being able to draw that line, with numbers, is the difference between knowing the framework and owning the decision.
+
+---
+
+## Common interview questions
+
+These are the questions that recur for this stack. Answer them in a sentence or two, lead with the mechanism, and finish with the catch.
+
+**What actually changed between Java EE and Jakarta EE?** Governance moved from Oracle to the Eclipse Foundation, and because Oracle kept the `javax` trademark, Jakarta EE 9 renamed every API package from `javax.*` to `jakarta.*`. That namespace switch is a hard, compile-breaking change, so any code or tutorial using `javax.servlet` or `javax.persistence` predates 2020.
+
+**When would you choose an application server over Spring Boot or a cloud-native framework?** When you have an existing EE estate and team fluency, a hard requirement for standards portability across vendors, or container-managed JTA spanning multiple datasources that you would otherwise hand-roll. Reach for Quarkus or Micronaut instead when startup time and memory footprint are first-class concerns, because a classic server's multi-second startup and large memory floor are liabilities under serverless or aggressive autoscaling.
+
+**Explain CDI scopes.** `@ApplicationScoped` is one instance for the whole app (the default for stateless services), `@RequestScoped` is one per HTTP request, `@SessionScoped` is one per user session and must be `Serializable`, and `@Dependent` binds the bean's life to whatever injected it. The subtlety is that injecting a narrower scope into a wider one works only because CDI injects a client proxy that resolves the real instance per call.
+
+**Why can't a CDI bean be `final`?** Because the container injects a client proxy that subclasses the bean to do scope resolution and interception, and you cannot subclass a `final` class. The same proxying is why beans need a no-arg constructor.
+
+**What is the N+1 problem and how do you fix it?** You load a list, then touch a lazy association per element, triggering one query per row on top of the original. Fix it with a `join fetch` or an entity graph that loads the association in the first query; do not make everything `EAGER`, which reintroduces N+1 globally.
+
+**Why does `@Transactional` sometimes not start a transaction?** Self-invocation: when a method calls another `@Transactional` method on `this`, the call bypasses the proxy that applies the transaction interceptor, so no new transaction starts. Cross-bean calls go through the proxy and work; same-bean calls silently do not.
+
+**TomEE versus plain Tomcat?** Plain Tomcat is a servlet container (Servlets, JSP, WebSocket). TomEE adds the Jakarta EE Web Profile on top: CDI, JPA, JAX-RS, JTA, and JMS, so you get container-managed transactions and datasources on Tomcat's small, fast base without assembling a framework yourself.
+
+**What breaks when you move work off the request thread?** Everything thread-bound: the security principal, the JTA transaction, the CDI request scope, and the SLF4J MDC correlation ID all live in `ThreadLocal` and do not follow the work to another thread. You either propagate context explicitly or accept null principals, broken request-scoped lookups, and logs that lose their request ID.
+
+**How do virtual threads change the application-server model?** A blocking call on a virtual thread parks the virtual thread and frees its carrier OS thread, so the readable thread-per-request style scales to high concurrency without the ~200-thread pool ceiling. The catch is pinning: inside a `synchronized` block or a native call the virtual thread pins its carrier, so a hot `synchronized` path negates the benefit and should become a `ReentrantLock`.
+
+**What is the difference between non-blocking I/O and a non-blocking algorithm?** Non-blocking I/O is about throughput: one thread multiplexes many connections through a selector so it never parks waiting on a socket. A non-blocking algorithm is about coordination: threads cooperate through compare-and-swap retry loops instead of locks, so no thread can block the others. Same adjective, unrelated problems.
+
+**What is the ABA problem?** A compare-and-swap checks the current value, not its history, so if another thread changes a slot from A to B and back to A, your CAS succeeds even though the world moved underneath you. It is harmless for a counter but corrupts pointer-based lock-free structures; the fix is to version the reference with `AtomicStampedReference` so the stamp, not just the value, must match.
