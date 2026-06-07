@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scaling Foundations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink: #1c1b19; --muted: #5f5c55; --paper: #ffffff;
+  --accent: #7a5500; --accent-soft: #7a550014;
+  --rule: #e7e3da; --code-bg: #f6f8fa; --code-border: #e1e6ea; --code-tag: #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px; line-height: 1.72;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+.doc-header { border-bottom: 3px solid var(--ink); padding-bottom: 1.4rem; margin-bottom: 2.6rem; }
+.kicker { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .7rem;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 2.7rem;
+  line-height: 1.08; margin: .5rem 0 0; letter-spacing: -.015em; }
+.doc-header .sub { color: var(--muted); font-size: 1.02rem; margin-top: .85rem; line-height: 1.55; }
+h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.72rem;
+  margin: 3.2rem 0 1rem; padding-bottom: .42rem; border-bottom: 1px solid var(--rule); letter-spacing: -.01em; }
+h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.22rem; margin: 2.1rem 0 .55rem; }
+p { margin: 0 0 1rem; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+code { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em; background: var(--code-bg); border: 1px solid var(--code-border);
+  border-radius: 4px; padding: .06em .34em; color: var(--ink); }
+pre { position: relative; margin: 1.1rem 0 1.5rem; background: var(--code-bg);
+  border: 1px solid var(--code-border); border-left: 3px solid var(--accent);
+  border-radius: 8px; padding: 1rem 1.15rem; overflow-x: auto; }
+pre code.hljs { background: transparent; border: none; padding: 0; color: #24292e;
+  font-size: .8rem; line-height: 1.6; display: block; }
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang); position: absolute; top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace; font-size: .58rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted); background: var(--code-tag);
+  border: 1px solid var(--code-border); border-top: none; border-right: none;
+  border-bottom-left-radius: 6px; padding: .22em .6em; }
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td { border: 1px solid var(--rule); padding: .5rem .68rem; text-align: left; vertical-align: top; }
+th { background: var(--accent); color: #fff; font-family: "JetBrains Mono", monospace;
+  font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; font-weight: 500; }
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Scaling Foundations</h1>
+    <div class="sub">Load balancing, caching, security, and authentication for distributed systems: the shared reliability vocabulary (RPS, nines, percentiles) every backend round assumes.</div>
+  </header>
+  <main>
+<h2>How to use this guide</h2>
+<p>The four language guides in this set each end with a metrics section that gestures at load balancing, caching, the availability &quot;nines,&quot; and request percentiles. This is the shared reference those sections point to. It is deliberately framework-agnostic: an interviewer probing a Kotlin/Spring shop, a Node fleet, or a Python service expects the same vocabulary here, because these concerns live in the architecture, not the language. Treat it as the system-design backbone behind every backend round.</p>
+<hr>
+<h2>Load balancing: L4 versus L7</h2>
+<p>A load balancer spreads requests across many instances so that no one instance is a bottleneck or a single point of failure. The first distinction to state cleanly is the layer it operates at. A Layer 4 load balancer works at the TCP/UDP level: it forwards packets based on IP and port without reading the payload, so it is fast and protocol-agnostic but cannot make decisions based on the HTTP request. A Layer 7 load balancer terminates the connection, reads the HTTP request, and can route on path, header, host, or cookie, at the cost of more work per request. Most application traffic uses L7 (AWS ALB, Nginx, Envoy, HAProxy in HTTP mode); L4 (AWS NLB, HAProxy in TCP mode) is for raw throughput, non-HTTP protocols, or when you want TLS to pass through untouched.</p>
+<p>The balancing algorithm is the next layer of the answer. Round-robin rotates through instances evenly and is the sensible default when instances are uniform and requests are cheap. Least-connections routes to the instance with the fewest active connections, which is better when request durations vary widely, because it avoids piling long requests onto an already-busy node. Consistent hashing maps a key (a user ID, a cache key) to an instance so the same key reliably hits the same node, which is essential for cache locality and sticky routing; its virtue is that adding or removing one node remaps only a small fraction of keys instead of reshuffling everything.</p>
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th>Routes by</th>
+<th>Best when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Round-robin</td>
+<td>Rotation</td>
+<td>Uniform instances, cheap uniform requests</td>
+</tr>
+<tr>
+<td>Least-connections</td>
+<td>Fewest active conns</td>
+<td>Highly variable request durations</td>
+</tr>
+<tr>
+<td>Weighted</td>
+<td>Capacity weights</td>
+<td>Heterogeneous instance sizes</td>
+</tr>
+<tr>
+<td>Consistent hashing</td>
+<td>Hash of a key</td>
+<td>Cache locality, sticky routing, sharding</td>
+</tr>
+</tbody>
+</table>
+<p>Two operational pieces complete the picture. Health checks let the balancer stop routing to a sick instance: an active check periodically probes a <code>/health</code> endpoint and ejects failing nodes, which is what actually delivers availability, since a balancer that keeps sending traffic to a dead node provides no redundancy. Distinguish liveness (is the process up) from readiness (is it ready to serve, with warm caches and live dependencies), and only route to ready instances. Sticky sessions (session affinity) pin a user to one instance, usually via a cookie; treat them as a smell, because they undermine even balancing and make a node's failure lose those users' state. The better design is stateless instances with shared session state in Redis, so any instance can serve any request and you can roll deploys freely.</p>
+<p>TLS termination is the last decision: terminate at the load balancer (simplest, lets the LB inspect and route on L7, but traffic is plaintext inside the network) or re-encrypt to the backend (mTLS for zero-trust internal networks). State where you terminate and why, because it determines what the balancer can see and what your internal threat model assumes.</p>
+<hr>
+<h2>Caching: the layers and the hard parts</h2>
+<p>Caching trades freshness for speed and load reduction by keeping a copy of expensive-to-produce data close to where it is needed. The senior framing is to name the layers, because caching is not one thing: the browser cache (client-side, controlled by HTTP headers), the CDN (edge cache for static and cacheable responses near the user), the application cache (an in-process or shared cache like Redis for computed results and hot rows), and the database's own buffer cache. Each layer absorbs load the layers below it never see; a request served from CDN never touches your origin at all.</p>
+<p>The application-cache pattern interviewers probe most is cache-aside (lazy loading): the application checks the cache, and on a miss reads the database, populates the cache, and returns. It is simple and resilient (a cache outage degrades to slower direct reads, not an error), which is why it is the default.</p>
+<pre><code class="hljs" data-lang="text">read(key):
+  v = cache.get(key)
+  if v is not None: return v          # hit
+  v = db.read(key)                    # miss: go to source
+  cache.set(key, v, ttl=300)          # populate for next time
+  return v
+</code></pre>
+<p>The alternatives trade simplicity for consistency. Write-through writes to cache and database together on every write, keeping the cache always fresh at the cost of write latency. Write-back (write-behind) writes to cache immediately and flushes to the database asynchronously, which is fast but risks data loss if the cache dies before the flush. Choose cache-aside for read-heavy workloads that tolerate slightly stale data; reach for write-through only when reads must never see stale values and you accept slower writes.</p>
+<p>The hard part of caching, and the staff-level content, is invalidation and the failure modes. Stale data: the cache holds a value the database has since changed. The blunt fix is a short TTL so staleness is time-bounded; the precise fix is explicit invalidation on write (delete or update the key when the underlying row changes), which is correct but couples writes to cache knowledge. The classic failure modes each have a name worth knowing:</p>
+<ul>
+<li><strong>Cache stampede (thundering herd)</strong>: a hot key expires and thousands of concurrent requests all miss and hit the database at once, possibly toppling it. Defend with a short lock or &quot;single-flight&quot; so only one request recomputes while others wait, with request coalescing, or with probabilistic early expiration that refreshes a hot key slightly before it expires.</li>
+<li><strong>Cache penetration</strong>: requests for keys that do not exist bypass the cache and always hit the database (often a scraping or attack pattern). Defend by caching the negative result (a &quot;not found&quot; marker with a short TTL) or with a Bloom filter of known keys.</li>
+<li><strong>Cache avalanche</strong>: many keys expire simultaneously (for example, all set with the same TTL at deploy), flooding the database. Defend by jittering TTLs so expirations spread out.</li>
+</ul>
+<p>Eviction is the last piece: when a fixed-size cache fills, it evicts by a policy, usually LRU (least recently used) or LFU (least frequently used). Sizing and eviction policy directly set your hit rate, and hit rate is the metric that determines whether the cache is earning its place; a cache below roughly 80 to 90 percent hit rate on hot data is often more operational risk than benefit.</p>
+<hr>
+<h2>Security: the baseline that is assumed, not asked</h2>
+<p>Security questions at staff level assume a working baseline and probe whether you build it in by default. Encrypt in transit with TLS everywhere, including internal service-to-service traffic in a zero-trust model; terminate or re-encrypt deliberately (see load balancing). Manage secrets in a dedicated store (AWS Secrets Manager, Vault, cloud KMS), injected at runtime, never committed to source or baked into images; rotation should be possible without a code change.</p>
+<p>The OWASP Top 10 is the checklist interviewers expect you to internalize rather than recite. The high-frequency items: injection (SQL and command), prevented by parameterized queries and never string-concatenating untrusted input; broken access control, the most common serious flaw, where authorization is checked inconsistently or missing on an endpoint; cryptographic failures, like storing passwords unhashed or using weak algorithms; and security misconfiguration, like permissive CORS, verbose error pages, or default credentials. The unifying principle is to validate and encode at trust boundaries: validate input on the way in (reject malformed data at the edge), encode output on the way out (so data cannot be interpreted as code by the next consumer).</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># Injection defense: parameterized query, never string interpolation</span>
+<span class="hljs-comment"># WRONG: f&quot;SELECT * FROM orders WHERE id = {user_input}&quot;   &lt;- SQL injection</span>
+cur.execute(<span class="hljs-string">&quot;SELECT * FROM orders WHERE id = %s&quot;</span>, (user_input,))   <span class="hljs-comment"># safe</span>
+</code></pre>
+<p>Rate limiting is both a security and a reliability control: it caps how fast any client can hit you, blunting brute-force, scraping, and accidental floods. The common algorithm is a token bucket (each client gets tokens that refill at a fixed rate; a request spends one, and an empty bucket means rejection with HTTP 429), usually enforced at the gateway or load balancer so abusive traffic dies before it reaches application capacity. Pair it with sensible request timeouts and payload-size limits so a single slow or huge request cannot exhaust resources.</p>
+<hr>
+<h2>Authentication versus authorization</h2>
+<p>Keep the two words distinct, because conflating them is an instant tell. Authentication (authn) establishes <em>who</em> you are; authorization (authz) determines <em>what</em> you may do. They are separate stages, and a request passes authn first, then authz.</p>
+<p>For authentication, the central design choice is server-side sessions versus tokens. A session stores state on the server (or in a shared store like Redis) and hands the client an opaque session ID in a cookie; every request looks up the session. Tokens, typically a JWT, are self-contained: the server signs a token carrying the user's identity and claims, and the client presents it on each request, so the server validates the signature without a lookup. The trade-off is the heart of the question: sessions are trivially revocable (delete the server record) but require shared session storage to scale horizontally; JWTs are stateless and scale without shared storage but are hard to revoke before they expire, because anyone holding a valid signed token is trusted until expiry.</p>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Server-side sessions</th>
+<th>JWT (stateless)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>State</td>
+<td>Stored server-side</td>
+<td>Carried by the client</td>
+</tr>
+<tr>
+<td>Revocation</td>
+<td>Immediate (delete record)</td>
+<td>Hard until expiry</td>
+</tr>
+<tr>
+<td>Horizontal scaling</td>
+<td>Needs shared session store</td>
+<td>No shared state needed</td>
+</tr>
+<tr>
+<td>Payload visibility</td>
+<td>Opaque ID only</td>
+<td>Claims readable (signed, not encrypted)</td>
+</tr>
+</tbody>
+</table>
+<p>The standard resolution to JWT's revocation weakness is the short-lived access token plus a long-lived refresh token: the access token expires in minutes (so a leaked one is useless quickly), and the client exchanges a refresh token for a new access token, with the refresh token revocable server-side. Two correctness notes that read as senior: a JWT is signed, not encrypted, so never put secrets in its claims (anyone can decode them); and store tokens carefully (an HttpOnly, Secure, SameSite cookie resists XSS theft better than <code>localStorage</code>).</p>
+<p>For delegated authentication you reach for OAuth2 and OIDC, and stating their relationship correctly matters. OAuth2 is an <em>authorization</em> framework for granting a third party scoped access to resources without sharing the password (the access-token grant). OpenID Connect (OIDC) is a thin identity layer on top of OAuth2 that adds an ID token, turning it into <em>authentication</em> (&quot;log in with Google&quot;). The flow to know is Authorization Code with PKCE, now the recommended flow for web and mobile apps, where the client redirects to the identity provider, receives a short-lived code, and exchanges it server-side for tokens, with PKCE preventing code interception.</p>
+<p>Authorization models split into RBAC and ABAC. Role-Based Access Control grants permissions to roles and roles to users (admin, editor, viewer); it is simple and audit-friendly and covers most needs. Attribute-Based Access Control decides from attributes of the user, resource, and context (department equals owner, time is business hours, region matches), which is far more expressive but harder to reason about and test. The pragmatic answer is RBAC by default, ABAC where the rules genuinely depend on data relationships. The architectural question that follows is <em>where</em> authorization lives: coarse checks (is this caller authenticated, does it hold this scope) belong at the API gateway, while fine-grained checks (may <em>this</em> user edit <em>this specific</em> order) must live in the service, because only the service knows the resource's ownership. Putting all authz at the gateway leaks domain rules out of the service; putting all of it in the service duplicates coarse checks everywhere. Split by granularity.</p>
+<hr>
+<h2>The reliability vocabulary: nines, percentiles, RPS</h2>
+<p>This is the shared numeric language the language guides defer to. Three quantities recur, and you should be near-instantly fluent in each.</p>
+<p>Throughput (requests per second, RPS) is how much load the system serves. Its ceiling is rarely the web framework; it is usually a downstream resource, and Little's Law gives the bound: concurrency equals throughput times latency. If each request holds one of a 50-connection database pool for 10 milliseconds, the ceiling is 50 / 0.010 = 5000 RPS regardless of how many app instances you run, because the pool, not the CPU, is the constraint. This is why &quot;just add instances&quot; stops helping past a point, and naming the real bottleneck (the pool, the database, a downstream service) is the staff-level move.</p>
+<p>Latency must be reported as percentiles, never as an average, because the average hides the tail and the tail is what users feel. p50 (median) is the typical experience, p99 is the unlucky one-in-a-hundred, p99.9 is the rare but real worst case. The compounding effect is the insight to volunteer: in a request that fans out to several backends, the slowest one sets the latency, so tail latencies multiply. If each of five parallel calls is slow 1 percent of the time, roughly 1 in 20 requests (1 minus 0.99 to the fifth) hits at least one slow call, so the overall p95 is governed by each dependency's p99. Reducing tail latency is therefore worth more than reducing the median at scale.</p>
+<p>The availability &quot;nines&quot; convert an uptime target into a concrete downtime budget, and the common rows should be instant recall.</p>
+<table>
+<thead>
+<tr>
+<th>Availability</th>
+<th>Downtime per year</th>
+<th>Downtime per 30 days</th>
+<th>Per day</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>99% (two nines)</td>
+<td>3.65 days</td>
+<td>7.2 hours</td>
+<td>14.4 min</td>
+</tr>
+<tr>
+<td>99.9% (three nines)</td>
+<td>8.77 hours</td>
+<td>43.2 minutes</td>
+<td>1.44 min</td>
+</tr>
+<tr>
+<td>99.95%</td>
+<td>4.38 hours</td>
+<td>21.6 minutes</td>
+<td>43 s</td>
+</tr>
+<tr>
+<td>99.99% (four nines)</td>
+<td>52.6 minutes</td>
+<td>4.32 minutes</td>
+<td>8.6 s</td>
+</tr>
+<tr>
+<td>99.999% (five nines)</td>
+<td>5.26 minutes</td>
+<td>25.9 seconds</td>
+<td>0.86 s</td>
+</tr>
+</tbody>
+</table>
+<p>The point to make with this table is that high availability is an architecture property, not a setting. A single instance cannot reach three nines, because one deploy, one crash, or one bad release exceeds a 43-minute monthly budget. Each added nine costs disproportionately more (redundancy across zones, automated failover, progressive rollouts, fast rollback), so the senior question is never &quot;how do we get five nines&quot; but &quot;what availability does this service actually need, and what does the next nine cost.&quot; Many internal services are fine at three nines; only the critical path warrants four.</p>
+<hr>
+<h2>SLI, SLO, and the error budget</h2>
+<p>The framework that ties throughput, latency, and availability into a decision tool is the SLI/SLO/error-budget model, and it is the natural close to a system-design round. A Service Level Indicator (SLI) is a measured signal of health: request success rate, p99 latency, availability. A Service Level Objective (SLO) is the target for an SLI over a window: &quot;99.9 percent of requests succeed within 200 milliseconds, measured over 28 days.&quot; A Service Level Agreement (SLA) is the contractual version with consequences, and it is always looser than the internal SLO so you have headroom before breaching the contract.</p>
+<p>The error budget is the operational payoff, and explaining it signals real production maturity. If the SLO is 99.9 percent, then 0.1 percent of requests are <em>allowed</em> to fail; that allowance is the error budget, and it is a resource you spend deliberately. When the budget is healthy, you ship faster and take more risk, because you have room to absorb a bad deploy. When you have burned the budget, you freeze risky changes and pour effort into reliability until it recovers. This reframes the eternal tension between shipping features and keeping things stable as a number both sides can see: reliability is not infinite and not free, the budget says exactly how much risk this period can afford, and a deploy that would blow the remaining budget waits. That is the staff-level synthesis the whole metrics conversation is building toward.</p>
+
+  </main>
+</div>
+</body>
+</html>

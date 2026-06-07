@@ -1,0 +1,24 @@
+{
+  "name": "bookish-succotash",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ingvord/bookish-succotash.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ingvord/bookish-succotash/issues"
+  },
+  "homepage": "https://github.com/Ingvord/bookish-succotash#readme",
+  "dependencies": {
+    "highlight.js": "^11.11.1",
+    "markdown-it": "^14.2.0"
+  }
+}

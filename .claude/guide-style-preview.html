@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>House Style Preview</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- highlight.js (github light theme) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<style>
+/* =====================================================
+   HOUSE STYLE SYSTEM
+   Swap --accent to change the whole document colour.
+   ===================================================== */
+:root {
+  --ink:         #1c1b19;
+  --muted:       #5f5c55;
+  --paper:       #ffffff;
+  --accent:      #0a6b82;       /* deep cyan — demo colour */
+  --accent-soft: #0a6b8214;
+  --rule:        #e7e3da;
+  --code-bg:     #f6f8fa;
+  --code-border: #e1e6ea;
+  --code-tag:    #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* header */
+.doc-header { border-bottom: 3px solid var(--ink); padding-bottom: 1.4rem; margin-bottom: 2.6rem; }
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600; font-size: 2.7rem; line-height: 1.08;
+  margin: .5rem 0 0; letter-spacing: -.015em;
+}
+.doc-header .sub { color: var(--muted); font-size: 1.02rem; margin-top: .85rem; line-height: 1.55; }
+
+/* headings */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600; font-size: 1.72rem;
+  margin: 3.2rem 0 1rem; padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule); letter-spacing: -.01em;
+}
+h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.22rem; margin: 2.1rem 0 .55rem; }
+
+/* body */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* inline code */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em; background: var(--code-bg); border: 1px solid var(--code-border);
+  border-radius: 4px; padding: .06em .34em; color: var(--ink);
+}
+
+/* code blocks — the JS build pipeline produces these; the script below mimics it from CDN */
+pre {
+  position: relative; margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg); border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent); border-radius: 8px;
+  padding: 1rem 1.15rem; overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent; border: none; padding: 0;
+  color: #24292e; font-size: .8rem; line-height: 1.6; display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute; top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace; font-size: .58rem;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+  background: var(--code-tag); border: 1px solid var(--code-border);
+  border-top: none; border-right: none; border-bottom-left-radius: 6px; padding: .22em .6em;
+}
+
+/* tables */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td { border: 1px solid var(--rule); padding: .5rem .68rem; text-align: left; vertical-align: top; }
+th {
+  background: var(--accent); color: #fff;
+  font-family: "JetBrains Mono", monospace; font-size: .66rem;
+  letter-spacing: .04em; text-transform: uppercase; font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* colour swatches */
+.swatch {
+  display: inline-block; width: .9em; height: .9em;
+  border-radius: 50%; vertical-align: middle; margin-right: .4em;
+  border: 1px solid rgba(0,0,0,.12);
+}
+
+/* print */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc-header">
+    <div class="kicker">Template Reference &middot; Technical Reference Series</div>
+    <h1>House Style Guide</h1>
+    <div class="sub">
+      A living demo of the visual system used across the interview preparation guides.
+      Open this file in a browser to verify how the style looks; print to PDF to check
+      that syntax colours and code backgrounds survive the conversion.
+      The accent shown here is deep cyan. See section 4 to pick a different one.
+    </div>
+  </header>
+
+  <main>
+
+    <h2>1. Typography system</h2>
+
+    <p>
+      Body text is set in <strong>Newsreader</strong>, an editorial Old-Style serif
+      that reads comfortably at length on both screen and paper. Headings use
+      <strong>Fraunces</strong>, an optical-size serif with character. Code uses
+      <strong>JetBrains Mono</strong> at every size.
+    </p>
+    <p>
+      Inline <code>code</code> shares the same monospace family, distinguished by
+      a tinted background and a subtle border. <strong>Bold text</strong> is set
+      slightly heavier and slightly darker for emphasis within a paragraph.
+    </p>
+
+    <h3>Sub-section heading (h3)</h3>
+
+    <p>
+      Sub-sections use h3, set in Fraunces at a smaller size. Use them to organise
+      content within a major section. Do not go deeper than h3 in this system.
+    </p>
+
+    <p>A short list to show list styling:</p>
+    <ul>
+      <li>First item with some <code>inline code</code> in it.</li>
+      <li>Second item with a <strong>bold phrase</strong> mid-sentence.</li>
+      <li>Third item, plain text, normal weight.</li>
+    </ul>
+
+    <hr>
+
+    <h2>2. Code blocks</h2>
+
+    <p>
+      Code blocks have a tinted background, a rounded border, and a three-pixel left rule
+      in the accent colour. A small language badge appears in the top-right corner.
+      In the built guides the highlighting is pre-rendered server-side; in this preview
+      it is applied by highlight.js from CDN.
+    </p>
+
+    <h3>JavaScript</h3>
+<pre><code class="language-js">// Debounce: delay execution until activity stops
+function debounce(fn, delay) {
+  let timer
+  return function (...args) {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn.apply(this, args), delay)
+  }
+}
+
+const search = debounce(query => fetch(`/api?q=${query}`), 300)
+</code></pre>
+
+    <h3>Vue SFC</h3>
+<pre><code class="language-xml">&lt;script setup&gt;
+import { ref, computed } from 'vue'
+const query = ref('')
+const items = ref(['apple', 'banana', 'cherry'])
+const filtered = computed(() =&gt;
+  items.value.filter(i =&gt; i.includes(query.value))
+)
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;input v-model="query" placeholder="Filter" /&gt;
+  &lt;ul&gt;&lt;li v-for="item in filtered" :key="item"&gt;{{ item }}&lt;/li&gt;&lt;/ul&gt;
+&lt;/template&gt;
+</code></pre>
+
+    <h3>Nginx config</h3>
+<pre><code class="language-nginx">server {
+  listen 80;
+  root /usr/share/nginx/html;
+  location / { try_files $uri $uri/ /index.html; }
+  location ~* \.(js|css|png|woff2)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+  }
+}
+</code></pre>
+
+    <hr>
+
+    <h2>3. Tables</h2>
+
+    <p>
+      Tables use the accent colour for the header row, a faint stripe on even rows,
+      and the same monospace font for header labels. They collapse cleanly in print.
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>Element</th><th>Font</th><th>Weight</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Body copy</td><td>Newsreader</td><td>400</td><td>18px / 1.72 line-height</td></tr>
+        <tr><td>h1</td><td>Fraunces</td><td>600</td><td>2.7rem, tight tracking</td></tr>
+        <tr><td>h2</td><td>Fraunces</td><td>600</td><td>1.72rem, bottom border</td></tr>
+        <tr><td>h3</td><td>Fraunces</td><td>600</td><td>1.22rem, no border</td></tr>
+        <tr><td>Inline code</td><td>JetBrains Mono</td><td>400</td><td>0.84em, tinted bg</td></tr>
+        <tr><td>Code block</td><td>JetBrains Mono</td><td>400</td><td>0.8rem, accent left rule</td></tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <h2>4. Accent colour palette</h2>
+
+    <p>
+      Every guide in the series uses one accent that drives the left code-block rule,
+      heading underline on hover, inline-code tint, kicker text, and table header.
+      Pick a colour not yet in your set and set it as <code>META.accent</code> in
+      <code>build-guide.js</code>.
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Hex</th><th>Status</th><th>Used for</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Teal</td>
+          <td><span class="swatch" style="background:#0f6e62"></span><code>#0f6e62</code></td>
+          <td>Used</td><td>Vue guide</td>
+        </tr>
+        <tr>
+          <td>Terracotta</td>
+          <td><span class="swatch" style="background:#b0502f"></span><code>#b0502f</code></td>
+          <td>Used</td><td>JavaScript deep-dive</td>
+        </tr>
+        <tr>
+          <td>Indigo</td>
+          <td><span class="swatch" style="background:#33408c"></span><code>#33408c</code></td>
+          <td>Used</td><td>Question bank</td>
+        </tr>
+        <tr>
+          <td>Deep cyan</td>
+          <td><span class="swatch" style="background:#0a6b82"></span><code>#0a6b82</code></td>
+          <td>Free</td><td></td>
+        </tr>
+        <tr>
+          <td>Plum</td>
+          <td><span class="swatch" style="background:#6b3585"></span><code>#6b3585</code></td>
+          <td>Free</td><td></td>
+        </tr>
+        <tr>
+          <td>Forest</td>
+          <td><span class="swatch" style="background:#2d6a44"></span><code>#2d6a44</code></td>
+          <td>Free</td><td></td>
+        </tr>
+        <tr>
+          <td>Burgundy</td>
+          <td><span class="swatch" style="background:#8a2436"></span><code>#8a2436</code></td>
+          <td>Free</td><td></td>
+        </tr>
+        <tr>
+          <td>Slate</td>
+          <td><span class="swatch" style="background:#2e5280"></span><code>#2e5280</code></td>
+          <td>Free</td><td></td>
+        </tr>
+        <tr>
+          <td>Amber</td>
+          <td><span class="swatch" style="background:#7a5500"></span><code>#7a5500</code></td>
+          <td>Free</td><td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <h2>5. Printing to PDF</h2>
+
+    <p>
+      Print from a modern browser (Chrome or Edge). The stylesheet sets
+      <code>print-color-adjust: exact</code>, so syntax-highlighted backgrounds
+      and token colours carry into the PDF without any extra settings. If colours
+      still drop, enable <strong>Background graphics</strong> in the browser print dialog.
+    </p>
+    <p>
+      Long code lines wrap on paper (<code>white-space: pre-wrap</code> is applied
+      in the print stylesheet) so nothing clips at the page edge. Tables and headings
+      avoid awkward page breaks where possible. The page margin is 16mm on all sides.
+    </p>
+
+  </main>
+</div>
+
+<script>
+  // Attach language badge from class name, then highlight
+  document.querySelectorAll('pre code[class]').forEach(block => {
+    const lang = block.className.replace('language-', '')
+    if (lang) block.dataset.lang = lang
+  })
+  hljs.highlightAll()
+</script>
+</body>
+</html>

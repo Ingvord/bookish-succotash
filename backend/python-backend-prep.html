@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Python Backend: FastAPI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink: #1c1b19; --muted: #5f5c55; --paper: #ffffff;
+  --accent: #2e5280; --accent-soft: #2e528014;
+  --rule: #e7e3da; --code-bg: #f6f8fa; --code-border: #e1e6ea; --code-tag: #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px; line-height: 1.72;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+.doc-header { border-bottom: 3px solid var(--ink); padding-bottom: 1.4rem; margin-bottom: 2.6rem; }
+.kicker { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .7rem;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 2.7rem;
+  line-height: 1.08; margin: .5rem 0 0; letter-spacing: -.015em; }
+.doc-header .sub { color: var(--muted); font-size: 1.02rem; margin-top: .85rem; line-height: 1.55; }
+h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.72rem;
+  margin: 3.2rem 0 1rem; padding-bottom: .42rem; border-bottom: 1px solid var(--rule); letter-spacing: -.01em; }
+h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.22rem; margin: 2.1rem 0 .55rem; }
+p { margin: 0 0 1rem; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+code { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em; background: var(--code-bg); border: 1px solid var(--code-border);
+  border-radius: 4px; padding: .06em .34em; color: var(--ink); }
+pre { position: relative; margin: 1.1rem 0 1.5rem; background: var(--code-bg);
+  border: 1px solid var(--code-border); border-left: 3px solid var(--accent);
+  border-radius: 8px; padding: 1rem 1.15rem; overflow-x: auto; }
+pre code.hljs { background: transparent; border: none; padding: 0; color: #24292e;
+  font-size: .8rem; line-height: 1.6; display: block; }
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang); position: absolute; top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace; font-size: .58rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted); background: var(--code-tag);
+  border: 1px solid var(--code-border); border-top: none; border-right: none;
+  border-bottom-left-radius: 6px; padding: .22em .6em; }
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td { border: 1px solid var(--rule); padding: .5rem .68rem; text-align: left; vertical-align: top; }
+th { background: var(--accent); color: #fff; font-family: "JetBrains Mono", monospace;
+  font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; font-weight: 500; }
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Python Backend: FastAPI</h1>
+    <div class="sub">ASGI, Pydantic v2, async done right, and contract-first APIs, plus the GIL realities and worker-tuning numbers you defend in a system-design round.</div>
+  </header>
+  <main>
+<h2>ASGI, WSGI, and why FastAPI exists</h2>
+<p>The first thing to get right is the runtime model, because every FastAPI design decision flows from it. Traditional Python web frameworks (Flask, Django's classic path) speak WSGI, a synchronous interface: one request occupies one worker until it returns, and concurrency comes from running many worker processes or threads. ASGI is the asynchronous successor: it supports <code>async def</code> handlers and an event loop, so a single worker can hold thousands of in-flight requests as long as each one spends its time awaiting I/O rather than burning CPU. FastAPI is an ASGI framework built on Starlette (the ASGI toolkit) and Pydantic (validation), and you run it under an ASGI server, usually Uvicorn.</p>
+<p>That async model is the same event-loop story as Node, with the same defining rule: the event loop is a single thread, and any synchronous CPU-bound or blocking call inside an <code>async def</code> freezes every concurrent request on that loop. The difference from Node is that Python lets you mix sync and async freely, which is exactly where the footguns live, so the framework gives you escape hatches (covered below) that you must use correctly.</p>
+<p>FastAPI's headline feature is that types drive everything. You declare request and response shapes as Python type hints and Pydantic models, and the framework derives validation, serialization, and an OpenAPI schema from them automatically. The contract is the code; the documentation is generated, not maintained by hand, which is a real answer to the contract-first API question.</p>
+<hr>
+<h2>The GIL: the constraint behind every scaling decision</h2>
+<p>The Global Interpreter Lock is the Python fact every staff interview expects you to handle correctly. In CPython, one lock allows only one thread to execute Python bytecode at a time, so threads do not give you parallel CPU execution; a multithreaded pure-Python computation runs no faster than single-threaded. This is why Python web apps scale CPU work across <em>processes</em>, not threads, and why the production deployment is &quot;N worker processes,&quot; one per core or so.</p>
+<p>State the nuance, because it is what separates a memorized answer from understanding. The GIL is released during blocking I/O (socket reads, file reads) and inside many C extensions (NumPy, database drivers), so threads <em>do</em> help I/O-bound and native-compute workloads even though they never help pure-Python CPU loops. And the landscape is shifting: Python 3.13 ships an experimental free-threaded build (PEP 703) that can disable the GIL, and the async model sidesteps the GIL for I/O concurrency entirely by using one thread and an event loop instead of many threads. The senior framing: the GIL caps pure-Python CPU parallelism within a process, so you scale CPU with processes and scale I/O with async, and you offload heavy CPU work out of the web process altogether.</p>
+<hr>
+<h2>Project bootstrap: a typed FastAPI service</h2>
+<p>A clean bootstrap demonstrates the type-driven model end to end. Pydantic models define the contract, path operations declare their inputs and outputs, and FastAPI validates, serializes, and documents from those declarations.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">from</span> fastapi <span class="hljs-keyword">import</span> FastAPI, HTTPException
+<span class="hljs-keyword">from</span> pydantic <span class="hljs-keyword">import</span> BaseModel, Field
+
+app = FastAPI(title=<span class="hljs-string">&quot;orders&quot;</span>, version=<span class="hljs-string">&quot;1.0.0&quot;</span>)
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Order</span>(<span class="hljs-title class_ inherited__">BaseModel</span>):
+    <span class="hljs-built_in">id</span>: <span class="hljs-built_in">int</span>
+    customer: <span class="hljs-built_in">str</span> = Field(min_length=<span class="hljs-number">1</span>)
+    total: <span class="hljs-built_in">float</span> = Field(ge=<span class="hljs-number">0</span>)
+
+<span class="hljs-meta">@app.get(<span class="hljs-params"><span class="hljs-string">&quot;/orders/{order_id}&quot;</span>, response_model=Order</span>)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">get_order</span>(<span class="hljs-params">order_id: <span class="hljs-built_in">int</span></span>) -&gt; Order:
+    order = <span class="hljs-keyword">await</span> repo.find(order_id)
+    <span class="hljs-keyword">if</span> order <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+        <span class="hljs-keyword">raise</span> HTTPException(status_code=<span class="hljs-number">404</span>, detail=<span class="hljs-string">&quot;not_found&quot;</span>)
+    <span class="hljs-keyword">return</span> order
+</code></pre>
+<p>Several things happen for free here and are worth naming in an interview. The <code>order_id</code> path parameter is validated and coerced to <code>int</code> (a non-numeric value yields a 422 automatically). The request body, where present, is validated against the Pydantic model with precise per-field errors. <code>response_model</code> filters and validates the output, so internal fields never leak. And the whole thing produces an OpenAPI document at <code>/openapi.json</code> with interactive docs at <code>/docs</code>, generated from the same types, never drifting from the implementation.</p>
+<p>You run it under Uvicorn, and in production you front Uvicorn workers with Gunicorn (or run Uvicorn with <code>--workers</code>) to use multiple cores.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Development: one process, auto-reload</span>
+uvicorn app:app --reload
+
+<span class="hljs-comment"># Production: Gunicorn managing Uvicorn workers, one per core-ish</span>
+gunicorn app:app -k uvicorn.workers.UvicornWorker -w 4 --<span class="hljs-built_in">bind</span> 0.0.0.0:8080
+</code></pre>
+<hr>
+<h2>Dependency injection and lifetimes</h2>
+<p>FastAPI's dependency-injection system is one of its best features and a common source of subtle bugs, so know it precisely. A dependency is a callable declared with <code>Depends()</code>; FastAPI resolves it per request, caches it within that request (so the same dependency requested twice yields one instance per request), and supports <code>yield</code> dependencies that run setup before the handler and teardown after, which is the idiomatic place for database sessions.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">from</span> fastapi <span class="hljs-keyword">import</span> Depends
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">get_db</span>():
+    session = SessionLocal()
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">yield</span> session            <span class="hljs-comment"># injected into the handler</span>
+    <span class="hljs-keyword">finally</span>:
+        <span class="hljs-keyword">await</span> session.close()    <span class="hljs-comment"># teardown runs after the response</span>
+
+<span class="hljs-meta">@app.get(<span class="hljs-params"><span class="hljs-string">&quot;/orders/{order_id}&quot;</span></span>)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">get_order</span>(<span class="hljs-params">order_id: <span class="hljs-built_in">int</span>, db = Depends(<span class="hljs-params">get_db</span>)</span>):
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> db.get(Order, order_id)
+</code></pre>
+<p>The lifetime caveat: dependencies are request-scoped by default, which is correct for sessions and per-request context. Application-scoped resources (a connection pool, an HTTP client, a cache client) must be created once at startup and shared, not built per request, or you exhaust connections under load. The modern idiom is the <code>lifespan</code> context manager, which replaces the deprecated <code>@app.on_event</code> startup/shutdown hooks.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">from</span> contextlib <span class="hljs-keyword">import</span> asynccontextmanager
+
+<span class="hljs-meta">@asynccontextmanager</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">lifespan</span>(<span class="hljs-params">app: FastAPI</span>):
+    app.state.http = httpx.AsyncClient()   <span class="hljs-comment"># one shared client for the whole app</span>
+    <span class="hljs-keyword">yield</span>
+    <span class="hljs-keyword">await</span> app.state.http.aclose()          <span class="hljs-comment"># clean shutdown</span>
+
+app = FastAPI(lifespan=lifespan)
+</code></pre>
+<hr>
+<h2>Async done right: the blocking trap</h2>
+<p>The single most common FastAPI production bug is blocking the event loop, and explaining it crisply is a strong staff signal. If you declare a handler <code>async def</code>, it runs <em>on the event loop</em>, and any synchronous blocking call inside it (a synchronous database driver, <code>requests.get</code>, <code>time.sleep</code>, a heavy CPU computation) blocks the entire loop, stalling every other concurrent request. The symptom is brutal: latency that is fine at low load collapses under concurrency, because requests that should interleave are serialized behind blocking calls.</p>
+<p>There are three correct responses, and choosing among them is the skill. First, use async-native libraries inside <code>async def</code>: an async database driver (<code>asyncpg</code>, <code>databases</code>, SQLAlchemy's async engine), <code>httpx.AsyncClient</code> instead of <code>requests</code>, <code>asyncio.sleep</code> instead of <code>time.sleep</code>. Second, if you only have a synchronous library, define the handler as plain <code>def</code> (not <code>async def</code>): FastAPI automatically runs <code>def</code> handlers in a thread pool, off the event loop, so they cannot block it. Third, for genuine CPU-bound work, offload it explicitly to a thread or process pool, or better, to a task queue outside the web process entirely.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> anyio
+
+<span class="hljs-comment"># WRONG: blocking call on the event loop, stalls all concurrent requests</span>
+<span class="hljs-meta">@app.get(<span class="hljs-params"><span class="hljs-string">&quot;/report&quot;</span></span>)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">report</span>():
+    data = requests.get(<span class="hljs-string">&quot;https://slow&quot;</span>)     <span class="hljs-comment"># blocks the loop</span>
+    <span class="hljs-keyword">return</span> heavy_cpu_transform(data.json())  <span class="hljs-comment"># also blocks the loop</span>
+
+<span class="hljs-comment"># RIGHT: async I/O, and CPU work pushed to a worker thread</span>
+<span class="hljs-meta">@app.get(<span class="hljs-params"><span class="hljs-string">&quot;/report&quot;</span></span>)</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">report</span>():
+    resp = <span class="hljs-keyword">await</span> http.get(<span class="hljs-string">&quot;https://slow&quot;</span>)            <span class="hljs-comment"># non-blocking I/O</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> anyio.to_thread.run_sync(            <span class="hljs-comment"># CPU work off the loop</span>
+        heavy_cpu_transform, resp.json()
+    )
+</code></pre>
+<p>The counterintuitive rule worth stating outright: a <em>synchronous</em> <code>def</code> handler can be safer than a badly written <code>async def</code> one, because FastAPI threads the sync handler off the loop, whereas a blocking call in an async handler poisons the whole worker. &quot;Async everywhere&quot; is not the goal; &quot;never block the loop&quot; is.</p>
+<hr>
+<h2>Pydantic v2, validation, and contract-first APIs</h2>
+<p>Pydantic is the validation and serialization engine, and the v1-to-v2 migration is a frequent interview topic because the rewrite was substantial. Pydantic v2's core is implemented in Rust (<code>pydantic-core</code>), making validation 5 to 50 times faster, which matters because in a typical FastAPI request, validation and serialization are a real slice of the CPU budget. The API changed: <code>BaseSettings</code> moved to a separate <code>pydantic-settings</code> package, validators use the new <code>@field_validator</code>/<code>@model_validator</code> decorators, <code>.dict()</code> became <code>.model_dump()</code>, and config moved from an inner <code>Config</code> class to <code>model_config</code>. Knowing these names signals you have actually done the migration.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">from</span> pydantic <span class="hljs-keyword">import</span> BaseModel, field_validator
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">NewOrder</span>(<span class="hljs-title class_ inherited__">BaseModel</span>):
+    customer: <span class="hljs-built_in">str</span>
+    items: <span class="hljs-built_in">list</span>[<span class="hljs-built_in">str</span>]
+
+<span class="hljs-meta">    @field_validator(<span class="hljs-params"><span class="hljs-string">&quot;items&quot;</span></span>)     </span><span class="hljs-comment"># v2 syntax; v1 used @validator</span>
+<span class="hljs-meta">    @classmethod</span>
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">non_empty</span>(<span class="hljs-params">cls, v: <span class="hljs-built_in">list</span>[<span class="hljs-built_in">str</span>]</span>) -&gt; <span class="hljs-built_in">list</span>[<span class="hljs-built_in">str</span>]:
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> v:
+            <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">&quot;order must have items&quot;</span>)
+        <span class="hljs-keyword">return</span> v
+</code></pre>
+<p>Because the OpenAPI schema is generated from these models, FastAPI supports a contract-verified workflow that answers the JD's API-design point directly. You either let the code be the source of truth and generate the spec, or, for contract-first shops, you keep a hand-authored OpenAPI document as the agreed contract and verify the implementation against it in CI (schemathesis can fuzz the API against the spec). Either way the discipline is that the contract is enforced mechanically, not by convention, and consumers can generate typed clients from the published schema.</p>
+<hr>
+<h2>Production metrics: RPS, latency, and the nines</h2>
+<p>Quote numbers as order-of-magnitude defaults for one Uvicorn worker on one modern core, to be measured rather than trusted. Python's per-request overhead is higher than the JVM's or Node's, so absolute RPS is lower, and the deployment leans on multiple workers.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Typical figure (one worker, one core)</th>
+<th>What moves it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Throughput, trivial JSON</td>
+<td>3k to 15k RPS</td>
+<td>Pydantic version (v2 is much faster), payload size</td>
+</tr>
+<tr>
+<td>Throughput, one async DB call</td>
+<td>1k to 5k RPS</td>
+<td>DB latency, pool size, async driver</td>
+</tr>
+<tr>
+<td>Latency p50</td>
+<td>2 to 15 ms</td>
+<td>In-process work, validation cost</td>
+</tr>
+<tr>
+<td>Latency p99</td>
+<td>30 to 200 ms</td>
+<td>Blocking calls leaking onto the loop, GC, downstream tails</td>
+</tr>
+<tr>
+<td>Memory per worker</td>
+<td>80 to 300 MB</td>
+<td>Loaded libraries (ML stacks balloon this), caches</td>
+</tr>
+</tbody>
+</table>
+<p>Report percentiles, not the mean: the average hides the tail, and a request that fans out to several services compounds the tail, so p99 and p99.9 are where users feel pain. The Python-specific latency killer to watch for is a blocking call sneaking onto the event loop; it shows up as p99 latency that explodes under concurrency while p50 stays fine, a fingerprint distinct from a uniformly slow dependency.</p>
+<p>Sizing the worker count is the core Python deployment decision. Because the GIL caps pure-Python CPU parallelism per process, you run roughly one worker per core (a common starting point is <code>2 x cores + 1</code> for mixed workloads, fewer for memory-heavy apps), and each worker carries the full memory footprint, so a 300 MB ML-laden app times eight workers is 2.4 GB before serving a request. Little's Law still bounds throughput (concurrency = throughput x latency): a 20-connection async pool with 10 ms hold time ceilings around 2000 RPS per pool regardless of worker count, so the database, not Python, is usually the real limit.</p>
+<table>
+<thead>
+<tr>
+<th>Availability</th>
+<th>Downtime per year</th>
+<th>Downtime per 30 days</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>99%</td>
+<td>3.65 days</td>
+<td>7.2 hours</td>
+</tr>
+<tr>
+<td>99.9%</td>
+<td>8.77 hours</td>
+<td>43.2 minutes</td>
+</tr>
+<tr>
+<td>99.99%</td>
+<td>52.6 minutes</td>
+<td>4.32 minutes</td>
+</tr>
+<tr>
+<td>99.999%</td>
+<td>5.26 minutes</td>
+<td>25.9 seconds</td>
+</tr>
+</tbody>
+</table>
+<p>As elsewhere, no single worker or process reaches three or four nines on its own; high availability comes from multiple replicas behind a load balancer with health-checked routing and zero-downtime rolling deploys, and the error budget (detailed in the scaling-foundations guide) is the number that governs how much risk each deploy may spend.</p>
+<hr>
+<h2>Staff-level caveats and when to reach elsewhere</h2>
+<p>Offload heavy work, do not host it in the web process. CPU-bound tasks (image processing, report generation, ML inference) and slow background jobs belong on a task queue (Celery, Dramatiq, ARQ, or RQ) with separate worker processes, so the web tier stays responsive and scales independently. A web request that does 30 seconds of CPU work is an architecture mistake no amount of async fixes; the request should enqueue the job and return immediately, and the client polls or receives a webhook.</p>
+<p>Three more caveats that read as senior. Typing is a discipline, not decoration: FastAPI leans on type hints for correctness, so run mypy or pyright in CI, because a wrong annotation produces a wrong schema and a wrong client. Dependency and environment management has consolidated on faster tooling (uv, Poetry) and pinned lockfiles; reproducible builds matter more in Python than in compiled ecosystems because so much is resolved at runtime. And observability should include OpenTelemetry traces plus a metric that catches the blocking-the-loop failure, since standard latency graphs alone will not tell you the loop is starved.</p>
+<p>Close on framework framing. FastAPI is the right default for new Python APIs: async-native, type-driven, OpenAPI for free, excellent for I/O-bound microservices and as a serving layer in front of ML models. Reach for Django when you want a batteries-included monolith with an ORM, admin, and auth out of the box and your workload is request-response CRUD. Reach for a heavier or different runtime entirely when you are CPU-bound at the core and Python's per-request overhead and GIL make it the wrong tool, in which case the senior move is to push that hot path to a compiled service and keep FastAPI as the typed, well-documented edge.</p>
+
+  </main>
+</div>
+</body>
+</html>

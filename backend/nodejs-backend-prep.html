@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Node.js Backend: Express & NestJS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink: #1c1b19; --muted: #5f5c55; --paper: #ffffff;
+  --accent: #2d6a44; --accent-soft: #2d6a4414;
+  --rule: #e7e3da; --code-bg: #f6f8fa; --code-border: #e1e6ea; --code-tag: #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px; line-height: 1.72;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+.doc-header { border-bottom: 3px solid var(--ink); padding-bottom: 1.4rem; margin-bottom: 2.6rem; }
+.kicker { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .7rem;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 2.7rem;
+  line-height: 1.08; margin: .5rem 0 0; letter-spacing: -.015em; }
+.doc-header .sub { color: var(--muted); font-size: 1.02rem; margin-top: .85rem; line-height: 1.55; }
+h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.72rem;
+  margin: 3.2rem 0 1rem; padding-bottom: .42rem; border-bottom: 1px solid var(--rule); letter-spacing: -.01em; }
+h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.22rem; margin: 2.1rem 0 .55rem; }
+p { margin: 0 0 1rem; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+code { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em; background: var(--code-bg); border: 1px solid var(--code-border);
+  border-radius: 4px; padding: .06em .34em; color: var(--ink); }
+pre { position: relative; margin: 1.1rem 0 1.5rem; background: var(--code-bg);
+  border: 1px solid var(--code-border); border-left: 3px solid var(--accent);
+  border-radius: 8px; padding: 1rem 1.15rem; overflow-x: auto; }
+pre code.hljs { background: transparent; border: none; padding: 0; color: #24292e;
+  font-size: .8rem; line-height: 1.6; display: block; }
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang); position: absolute; top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace; font-size: .58rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted); background: var(--code-tag);
+  border: 1px solid var(--code-border); border-top: none; border-right: none;
+  border-bottom-left-radius: 6px; padding: .22em .6em; }
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td { border: 1px solid var(--rule); padding: .5rem .68rem; text-align: left; vertical-align: top; }
+th { background: var(--accent); color: #fff; font-family: "JetBrains Mono", monospace;
+  font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; font-weight: 500; }
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Node.js Backend: Express & NestJS</h1>
+    <div class="sub">The event loop as a throughput budget: middleware, dependency injection, graceful shutdown, and the latency metrics that separate senior from staff.</div>
+  </header>
+  <main>
+<h2>The event loop is your throughput budget</h2>
+<p>Every Node.js interview at staff level circles back to one model, so internalize it first. Node runs your JavaScript on a single thread driven by an event loop. When your code calls a non-blocking I/O API (a database query, an HTTP request, a file read), Node hands the work to libuv, which uses the OS's async facilities or a small background thread pool, and your thread moves on to the next event. When the I/O completes, its callback is queued and the loop runs it. One thread serves thousands of concurrent connections because almost no time is spent waiting; the thread is only ever doing CPU work or dispatching completed I/O.</p>
+<p>The consequence that defines good Node code: the single thread is a shared budget, and any synchronous CPU work blocks <em>every</em> connection until it finishes. A 200-millisecond JSON transform or a synchronous crypto call does not slow one request, it freezes the whole process for 200 milliseconds, so every concurrent request's latency jumps. This is why &quot;Node is fast for I/O-bound work and bad for CPU-bound work&quot; is the canonical summary. The metric that makes it visible is event-loop lag: the delay between when a timer should fire and when it does. Rising lag means the loop is starved, and it is the single most important Node-specific health signal.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">import</span> { monitorEventLoopDelay } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;node:perf_hooks&#x27;</span>
+
+<span class="hljs-keyword">const</span> h = <span class="hljs-title function_">monitorEventLoopDelay</span>({ <span class="hljs-attr">resolution</span>: <span class="hljs-number">20</span> })
+h.<span class="hljs-title function_">enable</span>()
+<span class="hljs-built_in">setInterval</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-comment">// p99 loop lag in ms; alert when this climbs above a few ms</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;loop p99 ms:&#x27;</span>, (h.<span class="hljs-title function_">percentile</span>(<span class="hljs-number">99</span>) / <span class="hljs-number">1e6</span>).<span class="hljs-title function_">toFixed</span>(<span class="hljs-number">1</span>))
+  h.<span class="hljs-title function_">reset</span>()
+}, <span class="hljs-number">5000</span>)
+</code></pre>
+<p>The libuv thread pool (default size 4, set by <code>UV_THREADPOOL_SIZE</code>) backs a specific set of operations: file system calls, DNS lookups via <code>getaddrinfo</code>, and the <code>crypto</code> and <code>zlib</code> async functions. Network sockets do <em>not</em> use it; they use the OS event mechanism directly. A common production surprise is that heavy <code>bcrypt</code> or <code>zlib</code> usage saturates the 4-thread pool and serializes work that looked async, and the fix is to raise <code>UV_THREADPOOL_SIZE</code> to match the core count.</p>
+<hr>
+<h2>Express: minimal core, and the structure tax</h2>
+<p>Express is a thin, unopinionated layer over Node's HTTP server. Its entire model is a chain of middleware functions, each receiving <code>(req, res, next)</code>, that either respond or call <code>next()</code> to pass control along. That minimalism is the appeal and the liability: Express gives you routing and middleware, and nothing else (no DI, no project structure, no validation, no config), so every team invents its own conventions, and large Express codebases drift toward inconsistency. Naming that tax is a senior signal.</p>
+<p>A correct Express bootstrap is unremarkable, which is the point.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">import</span> express <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;express&#x27;</span>
+
+<span class="hljs-keyword">const</span> app = <span class="hljs-title function_">express</span>()
+app.<span class="hljs-title function_">use</span>(express.<span class="hljs-title function_">json</span>())                       <span class="hljs-comment">// body parser middleware</span>
+
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/orders/:id&#x27;</span>, <span class="hljs-title function_">async</span> (req, res, next) =&gt; {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> order = <span class="hljs-keyword">await</span> orderService.<span class="hljs-title function_">find</span>(req.<span class="hljs-property">params</span>.<span class="hljs-property">id</span>)
+    <span class="hljs-keyword">if</span> (!order) <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">404</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&#x27;not_found&#x27;</span> })
+    res.<span class="hljs-title function_">json</span>(order)
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-title function_">next</span>(err)                                  <span class="hljs-comment">// forward to the error handler</span>
+  }
+})
+</code></pre>
+<p>Two Express-specific traps appear constantly in interviews. First, middleware order is semantic: <code>express.json()</code> must run before any handler reading <code>req.body</code>, and a catch-all 404 handler must be registered <em>last</em>, because the chain is evaluated top to bottom. Second, error handling. An async handler that throws (or rejects) does not automatically reach Express's error middleware in Express 4; you must <code>catch</code> and call <code>next(err)</code>, or the request hangs until timeout. The error handler itself is identified purely by its four-argument signature, which is easy to get subtly wrong.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// The error handler MUST take four args, or Express treats it as normal middleware.</span>
+app.<span class="hljs-title function_">use</span>(<span class="hljs-function">(<span class="hljs-params">err, req, res, next</span>) =&gt;</span> {
+  req.<span class="hljs-property">log</span>.<span class="hljs-title function_">error</span>({ err }, <span class="hljs-string">&#x27;unhandled&#x27;</span>)
+  res.<span class="hljs-title function_">status</span>(err.<span class="hljs-property">status</span> ?? <span class="hljs-number">500</span>).<span class="hljs-title function_">json</span>({ <span class="hljs-attr">error</span>: <span class="hljs-string">&#x27;internal&#x27;</span> })
+})
+</code></pre>
+<p>Express 5 (now the default major) improves this: rejected promises from async handlers are forwarded to the error handler automatically, removing the most common footgun. Knowing which major you target, and that this changed, is the kind of detail that reads as current.</p>
+<hr>
+<h2>NestJS: structure, DI, and the decorator model</h2>
+<p>NestJS is the answer to Express's structure problem. It is an opinionated framework (TypeScript-first, Angular-inspired) that runs on top of Express or Fastify and adds a real dependency-injection container, a module system, and a layered request pipeline. The mental model is modules that group related providers, providers (services) that are injected by type, and controllers that map routes to provider methods. For a team or a long-lived codebase, the imposed structure is the value.</p>
+<pre><code class="hljs" data-lang="ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Controller</span>, <span class="hljs-title class_">Get</span>, <span class="hljs-title class_">Param</span>, <span class="hljs-title class_">Injectable</span>, <span class="hljs-title class_">Module</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@nestjs/common&#x27;</span>
+
+<span class="hljs-meta">@Injectable</span>()
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-attr">repo</span>: <span class="hljs-title class_">OrderRepository</span></span>) {}   <span class="hljs-comment">// injected by type</span>
+  <span class="hljs-title function_">find</span>(<span class="hljs-params"><span class="hljs-attr">id</span>: <span class="hljs-built_in">string</span></span>) { <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">repo</span>.<span class="hljs-title function_">findOne</span>(id) }
+}
+
+<span class="hljs-meta">@Controller</span>(<span class="hljs-string">&#x27;orders&#x27;</span>)
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderController</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-attr">orders</span>: <span class="hljs-title class_">OrderService</span></span>) {}
+  <span class="hljs-meta">@Get</span>(<span class="hljs-string">&#x27;:id&#x27;</span>)
+  <span class="hljs-title function_">get</span>(<span class="hljs-params"><span class="hljs-meta">@Param</span>(<span class="hljs-string">&#x27;id&#x27;</span>) <span class="hljs-attr">id</span>: <span class="hljs-built_in">string</span></span>) { <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">orders</span>.<span class="hljs-title function_">find</span>(id) }
+}
+
+<span class="hljs-meta">@Module</span>({ <span class="hljs-attr">controllers</span>: [<span class="hljs-title class_">OrderController</span>], <span class="hljs-attr">providers</span>: [<span class="hljs-title class_">OrderService</span>, <span class="hljs-title class_">OrderRepository</span>] })
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderModule</span> {}
+</code></pre>
+<p>The request pipeline is Nest's structured replacement for ad-hoc Express middleware, and knowing the order and purpose of each stage is a frequent interview question. A request flows through middleware, then guards (authn/authz: return a boolean to allow or deny), then interceptors (wrap the handler for logging, caching, response shaping), then pipes (validate and transform inputs), then the handler, then interceptors again on the way out, with exception filters catching anything thrown.</p>
+<pre><code class="hljs" data-lang="ts"><span class="hljs-comment">// A guard: the canonical place for authorization, evaluated before the handler.</span>
+<span class="hljs-meta">@Injectable</span>()
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RolesGuard</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">CanActivate</span> {
+  <span class="hljs-title function_">canActivate</span>(<span class="hljs-attr">ctx</span>: <span class="hljs-title class_">ExecutionContext</span>): <span class="hljs-built_in">boolean</span> {
+    <span class="hljs-keyword">const</span> req = ctx.<span class="hljs-title function_">switchToHttp</span>().<span class="hljs-title function_">getRequest</span>()
+    <span class="hljs-keyword">return</span> req.<span class="hljs-property">user</span>?.<span class="hljs-property">roles</span>?.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&#x27;admin&#x27;</span>) ?? <span class="hljs-literal">false</span>
+  }
+}
+</code></pre>
+<p>The DI caveats that catch people: provider scope and circular dependencies. Nest providers are singletons by default (one instance for the app), which is what you want; switching to <code>REQUEST</code> scope creates one per request and quietly makes the whole dependency chain request-scoped, which costs performance, so reach for it only when you truly need per-request state. Circular dependencies between two providers fail at startup unless you break them with <code>forwardRef()</code>, but a circular dependency is usually a design smell signaling a missing third module. Pipes are where you enforce input validation centrally: wiring a global <code>ValidationPipe</code> with class-validator decorators on your DTOs gives you contract enforcement without per-handler checks.</p>
+<hr>
+<h2>Async correctness: the bugs that cause real outages</h2>
+<p>Most Node production incidents trace to a handful of async mistakes, and articulating them separates senior from staff.</p>
+<p>The unhandled promise rejection: a promise rejects with no <code>catch</code>. In modern Node this terminates the process by default. The defenses are to always <code>await</code> inside a <code>try/catch</code> (or use a framework that forwards rejections), and to install a last-resort handler that logs and <em>crashes deliberately</em> rather than limping on in an unknown state.</p>
+<pre><code class="hljs" data-lang="js">process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;unhandledRejection&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">reason</span>) =&gt;</span> {
+  logger.<span class="hljs-title function_">fatal</span>({ reason }, <span class="hljs-string">&#x27;unhandled rejection, shutting down&#x27;</span>)
+  process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>)             <span class="hljs-comment">// fail fast; let the orchestrator restart a clean process</span>
+})
+</code></pre>
+<p>Blocking the loop: any synchronous CPU-heavy call (a big <code>JSON.parse</code>, synchronous crypto, a tight loop) freezes all requests. Offload genuine CPU work to a <code>worker_thread</code> or a separate service; never solve it by &quot;making it async&quot; with a <code>setTimeout</code>, which does not add parallelism. Lost concurrency: awaiting independent operations in sequence when they could run together. <code>await a(); await b()</code> runs serially; <code>await Promise.all([a(), b()])</code> runs them concurrently and halves the latency when they are independent.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// Serial: total latency = a + b</span>
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getUser</span>(id)
+<span class="hljs-keyword">const</span> cart = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getCart</span>(id)
+<span class="hljs-comment">// Concurrent: total latency = max(a, b)</span>
+<span class="hljs-keyword">const</span> [user, cart] = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>([<span class="hljs-title function_">getUser</span>(id), <span class="hljs-title function_">getCart</span>(id)])
+</code></pre>
+<p>Memory leaks: the staff-level differentiator in Node, because the single long-lived process accumulates them. The usual culprits are event listeners added per request without removal (watch for the <code>MaxListenersExceededWarning</code>), unbounded in-memory caches or arrays that only grow, and closures that capture large objects and outlive their usefulness. Diagnose with heap snapshots (<code>--inspect</code> plus Chrome DevTools, or <code>--heapsnapshot-near-heap-limit</code>) and look for retained growth across snapshots, not absolute size.</p>
+<hr>
+<h2>Scaling and production hardening</h2>
+<p>A single Node process uses one CPU core. To use a multi-core box you run multiple processes: the built-in <code>cluster</code> module forks workers sharing a port, or you run N container replicas behind a load balancer (the cloud-native default). Prefer replicas in Kubernetes, because the orchestrator already handles restart, scaling, and health, making <code>cluster</code> redundant inside a pod. Either way, Node scales horizontally by process count, not by threads.</p>
+<p>Graceful shutdown is non-negotiable for zero-downtime deploys and a frequent &quot;have you actually run this in production&quot; probe. On <code>SIGTERM</code> you must stop accepting new connections, finish in-flight requests, close database pools, then exit, all within the orchestrator's grace period before it sends <code>SIGKILL</code>.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> server = app.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8080</span>)
+process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;SIGTERM&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  server.<span class="hljs-title function_">close</span>(<span class="hljs-title function_">async</span> () =&gt; {            <span class="hljs-comment">// stop accepting, drain in-flight</span>
+    <span class="hljs-keyword">await</span> pool.<span class="hljs-title function_">end</span>()                    <span class="hljs-comment">// close DB connections</span>
+    process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">0</span>)
+  })
+  <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>), <span class="hljs-number">10_000</span>).<span class="hljs-title function_">unref</span>()   <span class="hljs-comment">// hard cap so we never hang</span>
+})
+</code></pre>
+<p>The rest of the hardening checklist: structured JSON logging (pino) so logs are queryable, OpenTelemetry for traces and metrics including the event-loop-lag gauge, a <code>/health</code> (liveness) and <code>/ready</code> (readiness) split wired to orchestrator probes, request timeouts and an HTTP client with sane keep-alive and connection limits so a slow downstream cannot exhaust sockets, and a body-size limit on the JSON parser so a large payload cannot blow up memory. Validate input at the edge (class-validator in Nest, zod in Express) so malformed data never reaches business logic.</p>
+<hr>
+<h2>Production metrics: RPS, latency, and the nines</h2>
+<p>Attach numbers to your claims; these are order-of-magnitude defaults for a single Node process on one modern core, to be measured not trusted.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Typical figure (one process, one core)</th>
+<th>What moves it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Throughput, trivial JSON</td>
+<td>10k to 40k RPS</td>
+<td>Framework overhead (Fastify &gt; Express), payload size</td>
+</tr>
+<tr>
+<td>Throughput, one DB call/request</td>
+<td>2k to 8k RPS</td>
+<td>DB latency, pool size, serialization</td>
+</tr>
+<tr>
+<td>Latency p50</td>
+<td>1 to 10 ms</td>
+<td>In-process work, cache hits</td>
+</tr>
+<tr>
+<td>Latency p99</td>
+<td>20 to 150 ms</td>
+<td>GC, loop lag spikes, downstream tails</td>
+</tr>
+<tr>
+<td>Event-loop lag p99 (healthy)</td>
+<td>under 10 ms</td>
+<td>CPU work on the main thread</td>
+</tr>
+<tr>
+<td>Resident memory</td>
+<td>60 to 250 MB</td>
+<td>Cache sizes, concurrency, leaks</td>
+</tr>
+</tbody>
+</table>
+<p>Report latency as percentiles, never as a mean: the average hides the tail, and in a request that fans out to several services the tail compounds, so p99 and p99.9 are where users actually feel slowness. The Node-specific SLI to graph alongside latency is event-loop lag; when lag climbs, latency follows, and it points at CPU starvation rather than a slow dependency, which a plain latency graph cannot distinguish.</p>
+<p>The throughput ceiling is usually downstream, not Node itself. Little's Law (concurrency = throughput x latency) gives the sizing: if each request holds one of a 20-connection pool for 10 ms, the ceiling is 20 / 0.010 = 2000 RPS per process regardless of how fast Node is, so the database pool, not the event loop, sets the limit. Scale by adding processes only after the pool and the downstream can absorb the extra load.</p>
+<p>The availability &quot;nines&quot; translate a target into a downtime budget you must design for.</p>
+<table>
+<thead>
+<tr>
+<th>Availability</th>
+<th>Downtime per year</th>
+<th>Downtime per 30 days</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>99%</td>
+<td>3.65 days</td>
+<td>7.2 hours</td>
+</tr>
+<tr>
+<td>99.9%</td>
+<td>8.77 hours</td>
+<td>43.2 minutes</td>
+</tr>
+<tr>
+<td>99.99%</td>
+<td>52.6 minutes</td>
+<td>4.32 minutes</td>
+</tr>
+<tr>
+<td>99.999%</td>
+<td>5.26 minutes</td>
+<td>25.9 seconds</td>
+</tr>
+</tbody>
+</table>
+<p>The staff point: a single Node process cannot reach three or four nines, because one unhandled rejection or one deploy exceeds the budget. High availability is an architecture property (multiple replicas behind a load balancer, graceful shutdown for zero-downtime rolling deploys, health-checked routing, fail-fast-and-restart on corruption), and the metric that protects it is the error budget, which the next guide ties together with SLI and SLO.</p>
+<hr>
+<h2>Staff-level caveats and framework choice</h2>
+<p>Pick the framework on the codebase's lifecycle and the team, not on benchmarks. Express (or Fastify, when raw throughput matters) suits small services, a single owner, or a team that wants full control and will supply its own conventions; its cost is that, without discipline, large Express apps become inconsistent. NestJS suits larger teams and long-lived codebases where the imposed module/DI structure pays for its learning curve and slightly higher overhead by keeping a big codebase coherent and testable. The wrong interview answer is &quot;Nest is better&quot; or &quot;Express is faster&quot; without that lifecycle framing.</p>
+<p>Three caveats that read as genuinely senior. TypeScript is effectively mandatory at scale: it catches the shape errors that dynamic JavaScript ships to production, and Nest is built around it. The ecosystem's depth is a double-edged sword: npm has a package for everything, but each dependency is supply-chain surface and resident memory, so audit and minimize rather than reaching for a library per problem. And the single-threaded model means observability must include the event loop: a service that graphs CPU and latency but not loop lag is blind to its most common Node failure mode, where the process is pegged not because the box is busy but because one synchronous call is starving the loop.</p>
+
+  </main>
+</div>
+</body>
+</html>

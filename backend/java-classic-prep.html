@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Java Classic: Jakarta EE & TomEE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink: #1c1b19; --muted: #5f5c55; --paper: #ffffff;
+  --accent: #8a2436; --accent-soft: #8a243614;
+  --rule: #e7e3da; --code-bg: #f6f8fa; --code-border: #e1e6ea; --code-tag: #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px; line-height: 1.72;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+.doc-header { border-bottom: 3px solid var(--ink); padding-bottom: 1.4rem; margin-bottom: 2.6rem; }
+.kicker { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .7rem;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 2.7rem;
+  line-height: 1.08; margin: .5rem 0 0; letter-spacing: -.015em; }
+.doc-header .sub { color: var(--muted); font-size: 1.02rem; margin-top: .85rem; line-height: 1.55; }
+h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.72rem;
+  margin: 3.2rem 0 1rem; padding-bottom: .42rem; border-bottom: 1px solid var(--rule); letter-spacing: -.01em; }
+h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.22rem; margin: 2.1rem 0 .55rem; }
+p { margin: 0 0 1rem; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+code { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em; background: var(--code-bg); border: 1px solid var(--code-border);
+  border-radius: 4px; padding: .06em .34em; color: var(--ink); }
+pre { position: relative; margin: 1.1rem 0 1.5rem; background: var(--code-bg);
+  border: 1px solid var(--code-border); border-left: 3px solid var(--accent);
+  border-radius: 8px; padding: 1rem 1.15rem; overflow-x: auto; }
+pre code.hljs { background: transparent; border: none; padding: 0; color: #24292e;
+  font-size: .8rem; line-height: 1.6; display: block; }
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang); position: absolute; top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace; font-size: .58rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted); background: var(--code-tag);
+  border: 1px solid var(--code-border); border-top: none; border-right: none;
+  border-bottom-left-radius: 6px; padding: .22em .6em; }
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td { border: 1px solid var(--rule); padding: .5rem .68rem; text-align: left; vertical-align: top; }
+th { background: var(--accent); color: #fff; font-family: "JetBrains Mono", monospace;
+  font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; font-weight: 500; }
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Java Classic: Jakarta EE & TomEE</h1>
+    <div class="sub">The application-server model at staff level: Servlets, CDI, JAX-RS, JPA, and TomEE packaging, with the bootstrap, caveats, and production metrics interviewers probe.</div>
+  </header>
+  <main>
+<h2>The application-server model, and when to still choose it</h2>
+<p>Jakarta EE (formerly Java EE, before Oracle handed the platform to the Eclipse Foundation) is a set of specifications, not a product. You write against the API, and a compliant runtime supplies the implementation. That indirection is the whole philosophy: your war file should run on TomEE, Payara, WildFly, or Open Liberty without code changes, because every server ships vendor implementations of the same <code>jakarta.*</code> interfaces.</p>
+<p>At staff level the interviewer wants to hear <em>why</em> this model exists and <em>when</em> it stops paying off. The application server centralizes cross-cutting infrastructure (connection pools, transaction managers, security realms, thread pools) so that many deployed applications share one tuned runtime. That was a strong fit when one server hosted dozens of internal apps. It is a weaker fit when you ship one service per container, because the container already gives you isolation and the orchestrator already gives you scaling, so the server's multi-tenancy is dead weight.</p>
+<p>The single most important fact to state cleanly: as of Jakarta EE 9 the namespace migrated from <code>javax.*</code> to <code>jakarta.*</code>. This was a hard break caused by Oracle retaining the <code>javax</code> trademark. Any library, any tutorial, any Stack Overflow answer using <code>javax.servlet</code> or <code>javax.persistence</code> is pre-2020 and will not compile against a modern server. Jakarta EE 10 and 11 build on that namespace and add records support, CDI Lite, and alignment with newer Java LTS releases.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Pre-Jakarta EE 9 (will NOT compile on a modern server)</span>
+<span class="hljs-keyword">import</span> javax.ws.rs.GET;
+<span class="hljs-keyword">import</span> javax.persistence.Entity;
+
+<span class="hljs-comment">// Jakarta EE 9+ (the only correct form today)</span>
+<span class="hljs-keyword">import</span> jakarta.ws.rs.GET;
+<span class="hljs-keyword">import</span> jakarta.persistence.Entity;
+</code></pre>
+<hr>
+<h2>Project bootstrap: a Jakarta EE web profile app</h2>
+<p>A clean bootstrap signals that you understand the platform without a framework holding your hand. The Maven <code>war</code> packaging plus the <code>jakartaee-api</code> dependency in <code>provided</code> scope is the canonical setup. <code>provided</code> matters: the server supplies the implementation at runtime, so bundling it into the war causes classloader conflicts.</p>
+<pre><code class="hljs" data-lang="xml"><span class="hljs-tag">&lt;<span class="hljs-name">project</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">packaging</span>&gt;</span>war<span class="hljs-tag">&lt;/<span class="hljs-name">packaging</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">dependencies</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>jakarta.platform<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>jakarta.jakartaee-api<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>10.0.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>provided<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">project</span>&gt;</span>
+</code></pre>
+<p>The application bootstraps through a single JAX-RS activator class. No <code>web.xml</code> is required in the modern model; the annotation registers the REST application and its base path.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">import</span> jakarta.ws.rs.ApplicationPath;
+<span class="hljs-keyword">import</span> jakarta.ws.rs.core.Application;
+
+<span class="hljs-meta">@ApplicationPath(&quot;/api&quot;)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">RestActivator</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Application</span> {
+    <span class="hljs-comment">// Empty body: the server scans for @Path and @Provider classes.</span>
+}
+</code></pre>
+<p>A health endpoint and a simple resource complete the skeleton. Notice there is no <code>main</code> method: the server owns the lifecycle, your code is a set of managed components it discovers and wires.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">import</span> jakarta.ws.rs.*;
+<span class="hljs-keyword">import</span> jakarta.ws.rs.core.MediaType;
+
+<span class="hljs-meta">@Path(&quot;/orders&quot;)</span>
+<span class="hljs-meta">@Produces(MediaType.APPLICATION_JSON)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderResource</span> {
+
+    <span class="hljs-meta">@Inject</span> OrderService service;
+
+    <span class="hljs-meta">@GET</span> <span class="hljs-meta">@Path(&quot;/{id}&quot;)</span>
+    <span class="hljs-keyword">public</span> Order <span class="hljs-title function_">get</span><span class="hljs-params">(<span class="hljs-meta">@PathParam(&quot;id&quot;)</span> <span class="hljs-type">long</span> id)</span> {
+        <span class="hljs-keyword">return</span> service.findOrThrow(id);
+    }
+}
+</code></pre>
+<hr>
+<h2>CDI: the dependency-injection core</h2>
+<p>Contexts and Dependency Injection (CDI) is the spine of modern Jakarta EE. Everything composes through it: you annotate a class with a scope, inject it elsewhere with <code>@Inject</code>, and the container manages instantiation and lifecycle. The scopes are the part people fumble in interviews, so be precise.</p>
+<p><code>@ApplicationScoped</code> is one instance for the whole application (the default choice for stateless services). <code>@RequestScoped</code> is one instance per HTTP request. <code>@SessionScoped</code> is one per user session and requires <code>Serializable</code>. <code>@Dependent</code> (the default if you annotate nothing) means the bean's lifecycle is bound to whatever injected it.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">import</span> jakarta.enterprise.context.ApplicationScoped;
+<span class="hljs-keyword">import</span> jakarta.inject.Inject;
+
+<span class="hljs-meta">@ApplicationScoped</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+
+    <span class="hljs-meta">@Inject</span> OrderRepository repo;   <span class="hljs-comment">// field injection: convenient, hard to unit test</span>
+
+    <span class="hljs-keyword">public</span> Order <span class="hljs-title function_">findOrThrow</span><span class="hljs-params">(<span class="hljs-type">long</span> id)</span> {
+        <span class="hljs-keyword">return</span> repo.find(id)
+            .orElseThrow(() -&gt; <span class="hljs-keyword">new</span> <span class="hljs-title class_">NotFoundException</span>(<span class="hljs-string">&quot;order &quot;</span> + id));
+    }
+}
+</code></pre>
+<p>The staff-level trap is scope mismatch. Injecting a <code>@RequestScoped</code> bean into an <code>@ApplicationScoped</code> one looks broken, because the application-scoped bean outlives every request. CDI solves this with a client proxy: the injected reference is a thin proxy that resolves the real request-scoped instance per call. This works but it is invisible, and it is why CDI beans cannot be <code>final</code> and need a no-arg constructor. If someone marks a bean <code>final</code> and injection mysteriously fails, this is why.</p>
+<p>Prefer constructor injection over field injection. It makes dependencies explicit, allows <code>final</code> fields, and lets you instantiate the class in a unit test without a CDI container.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-meta">@ApplicationScoped</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> OrderRepository repo;
+
+    <span class="hljs-meta">@Inject</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">OrderService</span><span class="hljs-params">(OrderRepository repo)</span> {   <span class="hljs-comment">// testable without a container</span>
+        <span class="hljs-built_in">this</span>.repo = repo;
+    }
+}
+</code></pre>
+<hr>
+<h2>JAX-RS: REST endpoints and the provider model</h2>
+<p>JAX-RS handles HTTP. The annotations (<code>@GET</code>, <code>@POST</code>, <code>@Path</code>, <code>@QueryParam</code>) map methods to requests, and the runtime handles serialization via a registered JSON provider (JSON-B by default in Jakarta EE). The extension point worth knowing is the provider: <code>ExceptionMapper</code>, <code>ContainerRequestFilter</code>, and <code>MessageBodyWriter</code> let you centralize cross-cutting behavior instead of repeating it per endpoint.</p>
+<p>A clean exception-mapping strategy is a frequent staff signal. Do not let raw exceptions leak stack traces to clients; map them to a stable error contract.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">import</span> jakarta.ws.rs.ext.*;
+<span class="hljs-keyword">import</span> jakarta.ws.rs.core.Response;
+
+<span class="hljs-meta">@Provider</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">NotFoundMapper</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">ExceptionMapper</span>&lt;NotFoundException&gt; {
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-keyword">public</span> Response <span class="hljs-title function_">toResponse</span><span class="hljs-params">(NotFoundException e)</span> {
+        <span class="hljs-keyword">return</span> Response.status(<span class="hljs-number">404</span>)
+            .entity(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ApiError</span>(<span class="hljs-string">&quot;not_found&quot;</span>, e.getMessage()))
+            .build();
+    }
+}
+</code></pre>
+<p>The caveat is that JAX-RS is synchronous by default: the request thread blocks until the method returns. For long calls use <code>@Suspended AsyncResponse</code> or return a <code>CompletionStage</code> so the request thread is released. On Java 21+ this matters less because virtual threads make blocking cheap again, which is discussed below.</p>
+<hr>
+<h2>JPA and persistence: the traps that show seniority</h2>
+<p>JPA (with Hibernate as the usual implementation) maps objects to tables. The mechanics are easy; the production failures are the interview content. Three traps dominate.</p>
+<p>The N+1 select problem: you load a list of orders, then access each order's line items in a loop, and the lazy collection triggers one query per order. The fix is a fetch join or an entity graph, fetching the association in the original query.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// N+1: one query for orders, then one per order for its lines</span>
+List&lt;Order&gt; orders = em.createQuery(<span class="hljs-string">&quot;select o from Order o&quot;</span>, Order.class).getResultList();
+orders.forEach(o -&gt; o.getLines().size());   <span class="hljs-comment">// triggers N extra queries</span>
+
+<span class="hljs-comment">// Fixed: a single join fetch</span>
+List&lt;Order&gt; orders = em.createQuery(
+    <span class="hljs-string">&quot;select distinct o from Order o join fetch o.lines&quot;</span>, Order.class).getResultList();
+</code></pre>
+<p>The <code>LazyInitializationException</code>: a lazy association is accessed after the persistence context (and its transaction) has closed. The correct fix is to fetch what the caller needs inside the transaction boundary, never to make everything <code>EAGER</code> (which reintroduces N+1 globally) and never to keep the session open across the view layer (the discredited open-session-in-view anti-pattern).</p>
+<p>Transaction demarcation: in Jakarta EE you declare transactions, you do not manage them by hand. <code>@Transactional</code> on a CDI bean method opens and commits a transaction around the call. The subtlety is that self-invocation (one method on the bean calling another <code>@Transactional</code> method on <code>this</code>) bypasses the interceptor, because the proxy is not involved. Cross-bean calls work; same-bean calls silently do not.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">import</span> jakarta.transaction.Transactional;
+
+<span class="hljs-meta">@ApplicationScoped</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderService</span> {
+
+    <span class="hljs-meta">@Transactional</span>
+    <span class="hljs-keyword">public</span> Order <span class="hljs-title function_">place</span><span class="hljs-params">(NewOrder cmd)</span> {
+        <span class="hljs-type">Order</span> <span class="hljs-variable">o</span> <span class="hljs-operator">=</span> repo.save(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Order</span>(cmd));
+        <span class="hljs-comment">// calling this.audit() here would NOT start a new transaction</span>
+        <span class="hljs-keyword">return</span> o;
+    }
+}
+</code></pre>
+<hr>
+<h2>TomEE: Tomcat with an EE profile</h2>
+<p>TomEE is Apache Tomcat with the Jakarta EE Web Profile bolted on. That sentence is the whole pitch and a good interview answer. Plain Tomcat is a servlet container: it gives you Servlets, JSP, and WebSocket, nothing more. TomEE adds CDI (OpenWebBeans), JPA (OpenJPA or Hibernate), JAX-RS (CXF), JMS, and JTA, so you get the Web Profile on Tomcat's small, familiar, fast-starting base.</p>
+<p>The distinction interviewers probe is Web Profile versus Full Platform. The Web Profile covers what most services need: Servlets, CDI, JAX-RS, JPA, Bean Validation, JTA. The Full Platform adds the heavyweight pieces (full EJB with remote interfaces, JMS as a mandated broker, Jakarta Connectors). TomEE ships variants: the <code>webprofile</code> and <code>microprofile</code> builds for services, <code>plume</code> and <code>plus</code> for fuller stacks. Pick the smallest one that covers your specs.</p>
+<p>Why choose TomEE over plain Tomcat plus a framework? Because you get container-managed JTA transactions and a managed datasource without assembling them yourself, on a runtime your ops team already knows how to operate. Why choose it over a heavier server like WildFly or Payara? Faster startup, smaller footprint, and you avoid the full EE machinery you will not use.</p>
+<p>Datasource configuration lives in <code>tomee.xml</code> or <code>resources.xml</code>, and the server exposes it through JNDI, which JPA then references by name.</p>
+<pre><code class="hljs" data-lang="xml"><span class="hljs-comment">&lt;!-- tomee.xml --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">tomee</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">Resource</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;ordersDB&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;javax.sql.DataSource&quot;</span>&gt;</span>
+    JdbcDriver  org.postgresql.Driver
+    JdbcUrl     jdbc:postgresql://db:5432/orders
+    UserName    app
+    Password    ${DB_PASSWORD}
+    MaxActive   50
+    MaxIdle     10
+  <span class="hljs-tag">&lt;/<span class="hljs-name">Resource</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">tomee</span>&gt;</span>
+</code></pre>
+<p><code>MaxActive</code> is the connection-pool ceiling and it is a load-bearing number, covered in the metrics section. The packaging story is simple: build a war, drop it in <code>webapps/</code>, or run TomEE embedded for tests via the Arquillian or the TomEE Maven plugin.</p>
+<hr>
+<h2>Concurrency: thread-per-request and the virtual-thread shift</h2>
+<p>The classic application server uses a thread-per-request model: a bounded pool of OS threads (Tomcat's connector defaults near 200) each handle one request start to finish, blocking on I/O. This is simple to reason about and it is why JPA and JDBC are written as blocking APIs. The cost is that a slow downstream dependency ties up a thread doing nothing, and once all 200 threads are parked on a slow call, the server stops accepting work even though the CPU is idle. This is thread-pool exhaustion, and it is the classic outage in this architecture.</p>
+<p>Java 21 virtual threads (Project Loom) change the calculus. A virtual thread is cheap (you can have millions), and a blocking call parks the virtual thread while freeing the underlying carrier OS thread. The blocking, readable, thread-per-request style now scales to high concurrency without the pool ceiling. On Tomcat/TomEE you enable a virtual-thread executor on the connector, and your existing blocking JAX-RS and JPA code benefits with no rewrite.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Tomcat 10.1+ : back the connector with a virtual-thread executor</span>
+connector.getProtocolHandler()
+    .setExecutor(Executors.newVirtualThreadPerTaskExecutor());
+</code></pre>
+<p>The staff caveat: virtual threads are not free of footguns. They pin to their carrier thread inside <code>synchronized</code> blocks and native calls, so a hot path guarded by <code>synchronized</code> (older connection pools, some logging frameworks) negates the benefit. Replace <code>synchronized</code> with <code>ReentrantLock</code> on hot paths, and verify your JDBC pool is Loom-friendly.</p>
+<hr>
+<h2>Production metrics: RPS, latency, and the nines</h2>
+<p>Staff interviews expect you to attach numbers to claims. The figures below are order-of-magnitude defaults for a well-tuned single instance; quote them as ranges and always say &quot;measure before you trust.&quot;</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Typical figure (one tuned instance)</th>
+<th>What moves it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Throughput</td>
+<td>2k to 10k RPS for light JSON endpoints</td>
+<td>Payload size, DB round-trips per request, pool limits</td>
+</tr>
+<tr>
+<td>Latency p50</td>
+<td>5 to 30 ms</td>
+<td>In-process work, cache hit rate</td>
+</tr>
+<tr>
+<td>Latency p99</td>
+<td>50 to 300 ms</td>
+<td>GC pauses, pool waits, downstream tails</td>
+</tr>
+<tr>
+<td>Startup</td>
+<td>3 to 10 s (TomEE web profile)</td>
+<td>Classpath scanning, datasource init</td>
+</tr>
+<tr>
+<td>Heap</td>
+<td>256 MB to 1 GB</td>
+<td>Cache sizes, request concurrency</td>
+</tr>
+</tbody>
+</table>
+<p>The latency numbers worth internalizing are percentiles, not averages. The average hides the tail; p99 and p99.9 are where users feel pain, and in a request that fans out to several services the tail compounds (if each of five calls has a 1-in-100 slow response, roughly 1 in 20 requests hits at least one slow call). Always report p50/p95/p99, never the mean.</p>
+<p>The connection pool is usually the real throughput ceiling, not the CPU. Little's Law gives the intuition: concurrency equals throughput times latency. If each request holds a DB connection for 10 ms and you have 50 connections, the ceiling is 50 / 0.010 = 5000 RPS regardless of how many request threads exist. Sizing the request thread pool far above the connection pool just moves the queue and inflates latency. Size the pool to the database's capacity, not to optimism.</p>
+<p>The &quot;nines&quot; translate availability percentages into a downtime budget, and you should know the common rows cold.</p>
+<table>
+<thead>
+<tr>
+<th>Availability</th>
+<th>Downtime per year</th>
+<th>Downtime per 30 days</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>99% (two nines)</td>
+<td>3.65 days</td>
+<td>7.2 hours</td>
+</tr>
+<tr>
+<td>99.9% (three nines)</td>
+<td>8.77 hours</td>
+<td>43.2 minutes</td>
+</tr>
+<tr>
+<td>99.95%</td>
+<td>4.38 hours</td>
+<td>21.6 minutes</td>
+</tr>
+<tr>
+<td>99.99% (four nines)</td>
+<td>52.6 minutes</td>
+<td>4.32 minutes</td>
+</tr>
+<tr>
+<td>99.999% (five nines)</td>
+<td>5.26 minutes</td>
+<td>25.9 seconds</td>
+</tr>
+</tbody>
+</table>
+<p>The staff point is that a single application server instance cannot reach four nines, because routine restarts, deploys, and JVM crashes exceed a 52-minute yearly budget. Three or more nines is an architecture property (redundant instances behind a load balancer, rolling deploys, health checks), not a property of the server itself.</p>
+<hr>
+<h2>Staff-level caveats and the questions behind them</h2>
+<p>The classloader hierarchy is the source of the platform's most confusing errors. A <code>ClassCastException</code> between two classes that look identical, or <code>NoClassDefFoundError</code> for a class you can see on disk, almost always means a library is bundled in the war while the server also provides it, so two classloaders each have their own copy. The discipline is to keep server-provided APIs in <code>provided</code> scope and never ship a second copy.</p>
+<p>Deploy-time safety is the rest of the answer. The application-server model historically encouraged hot redeploy into a running server, which leaks classloaders and slowly poisons the JVM until a restart. In a container world, do not hot-redeploy: bake one war into one immutable image and roll instances. This converts the server's weakness (slow, leaky redeploy) into a non-issue.</p>
+<p>Know when to walk away from this stack. Choose Jakarta EE or TomEE when you have an existing EE estate, a team fluent in it, standards-portability requirements, or container-managed JTA across multiple datasources that you do not want to hand-roll. Reach for the cloud-native JVM stacks (Quarkus, Micronaut) when startup time and memory footprint are first-class concerns, typically for serverless or aggressive horizontal autoscaling, where a 5-second startup and a 512 MB floor are liabilities. Being able to draw that line, with numbers, is the difference between knowing the framework and owning the decision.</p>
+
+  </main>
+</div>
+</body>
+</html>

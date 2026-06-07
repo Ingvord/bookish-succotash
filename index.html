@@ -44,6 +44,17 @@
       width: 100%;
     }
 
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin: 0 0 1.25rem;
+    }
+
+    .section + .section { margin-top: 3rem; }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -116,38 +127,85 @@
 
 <header>
   <h1>Technical Interview Prep</h1>
-  <p>Frontend study guides — pick a topic and start reviewing</p>
+  <p>Frontend &amp; backend study guides — pick a topic and start reviewing</p>
 </header>
 
 <main>
-  <div class="grid">
 
-    <a class="card" href="frontend/interview-question-bank.html">
-      <span class="card-tag">General</span>
-      <h2>Interview Question Bank</h2>
-      <p>A curated collection of frontend interview questions covering HTML, CSS, JavaScript, and core web concepts.</p>
-      <span class="card-link">Open guide →</span>
-    </a>
+  <section class="section">
+    <h2 class="section-title">Frontend</h2>
+    <div class="grid">
 
-    <a class="card" href="frontend/js-interview-prep.html">
-      <span class="card-tag">JavaScript</span>
-      <h2>JavaScript Deep Dive</h2>
-      <p>ES2025 features, closures, async patterns, prototypes, and the modern JS interview questions you actually get asked.</p>
-      <span class="card-link">Open guide →</span>
-    </a>
+      <a class="card" href="frontend/interview-question-bank.html">
+        <span class="card-tag">General</span>
+        <h2>Interview Question Bank</h2>
+        <p>A curated collection of frontend interview questions covering HTML, CSS, JavaScript, and core web concepts.</p>
+        <span class="card-link">Open guide →</span>
+      </a>
 
-    <a class="card" href="frontend/vue-interview-prep.html">
-      <span class="card-tag">Vue</span>
-      <h2>Vue Interview Prep</h2>
-      <p>Vue 3 composition API, reactivity system, component patterns, Pinia, and the Vue ecosystem explained for interviews.</p>
-      <span class="card-link">Open guide →</span>
-    </a>
+      <a class="card" href="frontend/js-interview-prep.html">
+        <span class="card-tag">JavaScript</span>
+        <h2>JavaScript Deep Dive</h2>
+        <p>ES2025 features, closures, async patterns, prototypes, and the modern JS interview questions you actually get asked.</p>
+        <span class="card-link">Open guide →</span>
+      </a>
 
-  </div>
+      <a class="card" href="frontend/vue-interview-prep.html">
+        <span class="card-tag">Vue</span>
+        <h2>Vue Interview Prep</h2>
+        <p>Vue 3 composition API, reactivity system, component patterns, Pinia, and the Vue ecosystem explained for interviews.</p>
+        <span class="card-link">Open guide →</span>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Backend · Staff / Senior</h2>
+    <div class="grid">
+
+      <a class="card" href="backend/java-classic-prep.html">
+        <span class="card-tag">Java</span>
+        <h2>Java Classic: Jakarta EE &amp; TomEE</h2>
+        <p>The application-server model at staff level: CDI, JAX-RS, JPA traps, TomEE packaging, virtual threads, and production metrics.</p>
+        <span class="card-link">Open guide →</span>
+      </a>
+
+      <a class="card" href="backend/java-cloud-native-prep.html">
+        <span class="card-tag">Java</span>
+        <h2>Java Cloud-Native: Quarkus &amp; Micronaut</h2>
+        <p>Build-time DI, GraalVM native images, reactive vs. blocking, and the startup and memory numbers that justify going native.</p>
+        <span class="card-link">Open guide →</span>
+      </a>
+
+      <a class="card" href="backend/nodejs-backend-prep.html">
+        <span class="card-tag">Node.js</span>
+        <h2>Node.js: Express &amp; NestJS</h2>
+        <p>The event loop as a throughput budget: middleware, DI, async correctness, graceful shutdown, and event-loop-lag metrics.</p>
+        <span class="card-link">Open guide →</span>
+      </a>
+
+      <a class="card" href="backend/python-backend-prep.html">
+        <span class="card-tag">Python</span>
+        <h2>Python: FastAPI</h2>
+        <p>ASGI, the GIL, Pydantic v2, the blocking-the-loop trap, worker tuning, and contract-first OpenAPI workflows.</p>
+        <span class="card-link">Open guide →</span>
+      </a>
+
+      <a class="card" href="backend/scaling-foundations-prep.html">
+        <span class="card-tag">Foundations</span>
+        <h2>Scaling Foundations</h2>
+        <p>Load balancing, caching patterns and failure modes, security, auth (sessions vs. JWT, OAuth2/OIDC, RBAC/ABAC), and the nines.</p>
+        <span class="card-link">Open guide →</span>
+      </a>
+
+    </div>
+  </section>
+
 </main>
 
 <footer>
-  3 guides &nbsp;·&nbsp; Frontend focus &nbsp;·&nbsp; 2026
+  8 guides &nbsp;·&nbsp; Frontend &amp; backend &nbsp;·&nbsp; 2026
 </footer>
 
 </body>

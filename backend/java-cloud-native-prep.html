@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Java Cloud-Native: Quarkus & Micronaut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink: #1c1b19; --muted: #5f5c55; --paper: #ffffff;
+  --accent: #0a6b82; --accent-soft: #0a6b8214;
+  --rule: #e7e3da; --code-bg: #f6f8fa; --code-border: #e1e6ea; --code-tag: #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px; line-height: 1.72;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+.doc-header { border-bottom: 3px solid var(--ink); padding-bottom: 1.4rem; margin-bottom: 2.6rem; }
+.kicker { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .7rem;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 2.7rem;
+  line-height: 1.08; margin: .5rem 0 0; letter-spacing: -.015em; }
+.doc-header .sub { color: var(--muted); font-size: 1.02rem; margin-top: .85rem; line-height: 1.55; }
+h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.72rem;
+  margin: 3.2rem 0 1rem; padding-bottom: .42rem; border-bottom: 1px solid var(--rule); letter-spacing: -.01em; }
+h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.22rem; margin: 2.1rem 0 .55rem; }
+p { margin: 0 0 1rem; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+code { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em; background: var(--code-bg); border: 1px solid var(--code-border);
+  border-radius: 4px; padding: .06em .34em; color: var(--ink); }
+pre { position: relative; margin: 1.1rem 0 1.5rem; background: var(--code-bg);
+  border: 1px solid var(--code-border); border-left: 3px solid var(--accent);
+  border-radius: 8px; padding: 1rem 1.15rem; overflow-x: auto; }
+pre code.hljs { background: transparent; border: none; padding: 0; color: #24292e;
+  font-size: .8rem; line-height: 1.6; display: block; }
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang); position: absolute; top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace; font-size: .58rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted); background: var(--code-tag);
+  border: 1px solid var(--code-border); border-top: none; border-right: none;
+  border-bottom-left-radius: 6px; padding: .22em .6em; }
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td { border: 1px solid var(--rule); padding: .5rem .68rem; text-align: left; vertical-align: top; }
+th { background: var(--accent); color: #fff; font-family: "JetBrains Mono", monospace;
+  font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; font-weight: 500; }
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Java Cloud-Native: Quarkus & Micronaut</h1>
+    <div class="sub">Build-time DI, GraalVM native images, and reactive JVM services: where they win, where they bite, and the startup and memory numbers that justify them.</div>
+  </header>
+  <main>
+<h2>Why a second generation of JVM frameworks exists</h2>
+<p>Quarkus and Micronaut answer one question the classic stack answered badly: how do you make a JVM service start in tens of milliseconds and idle on tens of megabytes, so it fits serverless and aggressive autoscaling? The classic answer (Spring, Jakarta EE) does dependency injection, proxying, and configuration at runtime through reflection and classpath scanning. That work happens on every cold start, it keeps metadata resident in the heap, and it defeats ahead-of-time compilation because the reflective calls are invisible to a static compiler.</p>
+<p>Quarkus and Micronaut share one central idea: move that work to build time. At compile time an annotation processor (Micronaut) or a Maven/Gradle extension system (Quarkus) inspects your beans, resolves the wiring, and generates plain Java code (or bytecode) that does the injection directly, with no runtime reflection. The payoffs cascade: less reflection means GraalVM can compile the whole app to a native executable, native means startup in milliseconds and a tiny resident footprint, and a tiny footprint means you pack more replicas per node and scale to zero cheaply.</p>
+<p>State the trade-off honestly, because that is the staff signal. You buy startup and memory; you pay in build complexity, a less forgiving native-image step, and a smaller ecosystem of drop-in libraries than Spring's. If your service is long-lived and rarely restarts, the classic JVM warmed by the JIT may actually run <em>faster</em> at steady state than a native image, because the JIT optimizes hot paths that AOT compilation must guess at. Cloud-native frameworks win on the edges (cold start, density, scale-to-zero), not universally.</p>
+<hr>
+<h2>Quarkus: build-time DI, dev mode, and Mutiny</h2>
+<p>Quarkus is built on established standards (CDI for injection, JAX-RS via RESTEasy Reactive, Hibernate for JPA) but runs the augmentation at build time. Its signature developer feature is live coding: <code>quarkus dev</code> watches sources and hot-reloads on the next request with no restart, which removes the classic JVM edit-rebuild-redeploy loop.</p>
+<p>Bootstrap is a single command, and the generated project uses the <code>quarkus-maven-plugin</code> to run augmentation during the build.</p>
+<pre><code class="hljs" data-lang="bash">quarkus create app com.acme:orders \
+  --extension=rest-jackson,hibernate-orm-panache,jdbc-postgresql
+<span class="hljs-built_in">cd</span> orders &amp;&amp; quarkus dev   <span class="hljs-comment"># live-reload dev mode on :8080</span>
+</code></pre>
+<p>Endpoints use familiar JAX-RS annotations, but the RESTEasy Reactive implementation routes them on a non-blocking event loop by default. Panache is Quarkus's active-record/repository layer over Hibernate that removes JPA boilerplate.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">import</span> jakarta.ws.rs.*;
+<span class="hljs-keyword">import</span> io.quarkus.hibernate.orm.panache.PanacheEntity;
+
+<span class="hljs-meta">@Entity</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Order</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">PanacheEntity</span> {   <span class="hljs-comment">// id, persist(), listAll() inherited</span>
+    <span class="hljs-keyword">public</span> String customer;
+    <span class="hljs-keyword">public</span> BigDecimal total;
+}
+
+<span class="hljs-meta">@Path(&quot;/orders&quot;)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderResource</span> {
+    <span class="hljs-meta">@GET</span> <span class="hljs-meta">@Path(&quot;/{id}&quot;)</span>
+    <span class="hljs-keyword">public</span> Order <span class="hljs-title function_">get</span><span class="hljs-params">(<span class="hljs-meta">@PathParam(&quot;id&quot;)</span> Long id)</span> {
+        <span class="hljs-keyword">return</span> Order.findById(id);
+    }
+}
+</code></pre>
+<p>Quarkus's reactive model uses Mutiny (<code>Uni</code> for a single async value, <code>Multi</code> for a stream) rather than Reactor. The crucial caveat is the threading contract: a method that returns <code>Uni</code>/<code>Multi</code> runs on the I/O event loop and must never block, while a method returning a plain value runs on a worker thread where blocking is allowed. Block the event loop (a synchronous JDBC call inside a reactive route) and you stall every concurrent request on that loop. Quarkus actually detects many of these at runtime and throws a &quot;blocking call on the I/O thread&quot; error, which is a feature, not a bug. When you must block inside a reactive endpoint, annotate it <code>@Blocking</code> to dispatch it to a worker pool.</p>
+<hr>
+<h2>Micronaut: compile-time AOT and zero reflection</h2>
+<p>Micronaut took the build-time idea further by designing its own DI and AOP from scratch around an annotation processor, rather than retrofitting CDI. At compile time it generates <code>BeanDefinition</code> classes that know how to construct and inject every bean with direct method calls. The result is that Micronaut uses essentially no runtime reflection and no dynamic proxies, which is precisely what GraalVM native image wants.</p>
+<p>Bootstrap uses the Micronaut CLI or the Launch web app, and the programming model will feel familiar to Spring developers, which is deliberate.</p>
+<pre><code class="hljs" data-lang="bash">mn create-app com.acme.orders --features=data-jpa,postgres,http-server-netty
+</code></pre>
+<p>Controllers and injection use Micronaut's own annotations. Constructor injection is idiomatic and, because wiring is resolved at compile time, a missing bean is a <em>compile error</em>, not a runtime <code>NoSuchBeanDefinitionException</code>. That shift-left of DI failures is a genuine selling point worth naming.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">import</span> io.micronaut.http.annotation.*;
+<span class="hljs-keyword">import</span> jakarta.inject.Singleton;
+
+<span class="hljs-meta">@Controller(&quot;/orders&quot;)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">OrderController</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> OrderRepository repo;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">OrderController</span><span class="hljs-params">(OrderRepository repo)</span> {   <span class="hljs-comment">// resolved at compile time</span>
+        <span class="hljs-built_in">this</span>.repo = repo;
+    }
+
+    <span class="hljs-meta">@Get(&quot;/{id}&quot;)</span>
+    <span class="hljs-keyword">public</span> Order <span class="hljs-title function_">get</span><span class="hljs-params">(Long id)</span> {
+        <span class="hljs-keyword">return</span> repo.findById(id).orElseThrow();
+    }
+}
+</code></pre>
+<p>Micronaut runs on Netty (non-blocking) by default and, like Quarkus, distinguishes blocking from non-blocking handlers. Micronaut Data generates SQL/queries at compile time from repository method signatures, validating them against your schema during the build rather than at first call. The recurring theme across both frameworks: errors that the classic stack discovers at startup or first request, these discover at compile time.</p>
+<hr>
+<h2>GraalVM native image: the payoff and the pain</h2>
+<p>Native image is the feature that justifies these frameworks for serverless. GraalVM's <code>native-image</code> tool performs closed-world static analysis: it walks all reachable code from <code>main</code>, compiles it ahead of time to a standalone executable, and discards everything unreachable. The result starts in single-digit milliseconds and runs with a fraction of the JVM's memory, because there is no class loading, no JIT, and no bytecode interpreter at runtime.</p>
+<p>&quot;Closed-world&quot; is the catch, and explaining it is the staff-level moment. Static analysis cannot see reflection, dynamic proxies, JNI, or resources loaded by name, because those are resolved by strings at runtime. Anything reached only reflectively is invisible to the analyzer, gets pruned, and then fails at runtime with <code>ClassNotFoundException</code> or a missing-method error. The historical fix was hand-written <code>reflect-config.json</code> registration files, which were miserable to maintain.</p>
+<p>This is exactly why Quarkus and Micronaut exist in their current form: because they wire everything at build time, <em>they</em> know what is reflectively reachable and generate the native-image configuration for you. You get native image that mostly just works, where a hand-rolled framework would force you to register reflection manually.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Quarkus: produce a native executable (uses a GraalVM/Mandrel toolchain)</span>
+quarkus build --native
+<span class="hljs-comment"># Micronaut (Gradle): same idea</span>
+./gradlew nativeCompile
+</code></pre>
+<p>Remaining caveats to name: native builds are slow (minutes, not seconds) and memory-hungry on the build machine, so they belong in CI, not the inner loop. Steady-state peak throughput can be <em>lower</em> than a JIT-warmed JVM, because AOT cannot profile-guide optimization the way a running JIT does (GraalVM's Profile-Guided Optimization narrows but does not always close this gap, and PGO is a commercial Oracle GraalVM feature). And any third-party library that uses reflection without providing native metadata becomes your problem to register. Choose native image when cold start and density dominate; keep the plain JVM when steady-state peak throughput dominates.</p>
+<hr>
+<h2>Project bootstrap checklist, both frameworks</h2>
+<p>Beyond the create command, a production-ready bootstrap has the same shape in both frameworks, and listing it shows operational maturity.</p>
+<ul>
+<li><strong>Config via environment</strong>, not baked files: both honor <code>application.properties</code>/<code>application.yml</code> overridden by environment variables, following twelve-factor config.</li>
+<li><strong>Health and readiness</strong>: Quarkus ships SmallRye Health (<code>/q/health/live</code>, <code>/q/health/ready</code>); Micronaut exposes <code>/health</code>. Wire these to your orchestrator's liveness and readiness probes, and keep them distinct (liveness = &quot;restart me,&quot; readiness = &quot;route to me&quot;).</li>
+<li><strong>Metrics and tracing</strong>: Micrometer is the common denominator, exporting Prometheus metrics and OpenTelemetry traces. A service with no <code>/metrics</code> is not production-ready.</li>
+<li><strong>OpenAPI</strong>: both generate an OpenAPI document from your annotations (<code>quarkus-smallrye-openapi</code>, Micronaut's <code>@OpenAPIDefinition</code>), which supports a contract-first or contract-verified workflow.</li>
+<li><strong>Containerization</strong>: Quarkus generates a Dockerfile and supports Jib; for native, base the image on a minimal distroless or <code>ubi-minimal</code> layer so the tiny binary is not wrapped in a fat OS image.</li>
+</ul>
+<pre><code class="hljs" data-lang="dockerfile"><span class="hljs-comment"># Native-image runtime stage: a few MB of OS around a self-contained binary</span>
+<span class="hljs-keyword">FROM</span> registry.access.redhat.com/ubi9/ubi-minimal:<span class="hljs-number">9.4</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> target/orders-runner /app/orders</span>
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">8080</span>
+<span class="hljs-keyword">USER</span> <span class="hljs-number">1001</span>
+<span class="hljs-keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="hljs-string">&quot;/app/orders&quot;</span>]</span>
+</code></pre>
+<hr>
+<h2>Production metrics: where these frameworks earn their keep</h2>
+<p>The numbers are the argument for cloud-native JVM. Quote them as ranges; the relative gaps matter more than the absolute values.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Classic JVM (Spring/Jakarta)</th>
+<th>Quarkus/Micronaut JVM</th>
+<th>Quarkus/Micronaut native</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Startup</td>
+<td>3 to 10 s</td>
+<td>1 to 3 s</td>
+<td>15 to 60 ms</td>
+</tr>
+<tr>
+<td>Resident memory (idle)</td>
+<td>250 to 600 MB</td>
+<td>100 to 250 MB</td>
+<td>30 to 90 MB</td>
+</tr>
+<tr>
+<td>Time to first request</td>
+<td>seconds</td>
+<td>~1 s</td>
+<td>tens of ms</td>
+</tr>
+<tr>
+<td>Steady-state peak RPS</td>
+<td>high (JIT-optimized)</td>
+<td>high</td>
+<td>comparable or slightly lower</td>
+</tr>
+<tr>
+<td>Build time</td>
+<td>fast</td>
+<td>fast</td>
+<td>minutes (native)</td>
+</tr>
+</tbody>
+</table>
+<p>The startup and memory rows are why these frameworks own the serverless and high-density niches. On AWS Lambda a 5-second cold start is a user-visible stall and a billing cost; a 40-millisecond native cold start makes the JVM viable for functions at all. On Kubernetes, a 60 MB floor instead of a 400 MB floor means roughly six times the replica density per node, which is real money at scale and faster reaction to traffic spikes because new pods come ready almost instantly.</p>
+<p>The throughput row is the honest counterweight: for a service that runs for days and is JIT-warmed, peak RPS on the plain JVM can match or beat native. So the decision rule is about lifecycle, not benchmarks. Short-lived, bursty, scale-to-zero, density-bound: go native. Long-lived, steady, throughput-bound: the warmed JVM is fine and may be faster.</p>
+<p>For the availability &quot;nines,&quot; the same arithmetic applies as anywhere (99.9% is 43 minutes of monthly downtime, 99.99% is 4.3 minutes), but cloud-native frameworks help you <em>hit</em> the higher tiers because faster startup means faster rolling deploys, faster autoscale-up under load, and faster recovery after a crash, all of which shrink the windows that eat the error budget.</p>
+<hr>
+<h2>Staff-level caveats and decision framing</h2>
+<p>The reflective-library trap is the failure mode unique to this stack. A dependency that works fine on the JVM can break only in the native build, because it reflects without metadata. Your defenses, in order: prefer libraries that ship GraalVM reachability metadata (the community metadata repository covers many), run the native integration tests in CI so the break surfaces before production, and treat &quot;does it have native metadata&quot; as a selection criterion when you pick a dependency. Discovering a native-only failure in production is the avoidable mistake here.</p>
+<p>The reactive-versus-blocking decision deserves a clear answer. Both frameworks default to a non-blocking event loop, but most CRUD services do blocking JDBC work, and forcing them into a reactive <code>Uni</code>/<code>Multi</code> pipeline adds real cognitive cost (harder stack traces, harder debugging, easy event-loop stalls) for little gain when the bottleneck is the database, not the thread count. On Java 21 the cleaner answer for I/O-bound blocking work is often virtual threads: keep the readable blocking style and let Loom handle concurrency. Reach for full reactive only when you genuinely need streaming, backpressure, or massive fan-out concurrency that even virtual threads strain on.</p>
+<p>Close the loop on framework choice. Quarkus leans on familiar standards (CDI, JAX-RS, Hibernate) with an exceptional dev-mode experience and the broadest extension catalog of the two, which lowers the ramp for a team coming from Jakarta EE. Micronaut's purpose-built compile-time DI gives the cleanest reflection-free story and turns wiring mistakes into compile errors, which some teams prize. Both are correct choices; the wrong move in an interview is to claim one is universally superior. The senior framing is: same core thesis (build-time over runtime), pick on ecosystem fit and team familiarity, and reach for native image only when the workload's lifecycle actually rewards it.</p>
+
+  </main>
+</div>
+</body>
+</html>
