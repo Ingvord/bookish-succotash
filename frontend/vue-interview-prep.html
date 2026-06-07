@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vue Interview Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+:root{
+  --ink:#1c1b19; --muted:#5f5c55; --paper:#ffffff;
+  --accent:#0f6e62; --accent-soft:#0f6e6214;
+  --rule:#e7e3da; --code-bg:#f6f8fa; --code-border:#e1e6ea; --code-tag:#eef1f4;
+}
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Newsreader", Georgia, "Times New Roman", serif;
+  font-size:18px; line-height:1.72;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.wrap{ max-width:52rem; margin:0 auto; padding:3.5rem 1.6rem 6rem; }
+
+.doc-header{ border-bottom:3px solid var(--ink); padding-bottom:1.4rem; margin-bottom:2.6rem; }
+.kicker{ font-family:"JetBrains Mono", ui-monospace, monospace; font-size:.7rem;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--accent); }
+h1{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:2.7rem;
+  line-height:1.08; margin:.5rem 0 0; letter-spacing:-.015em; }
+.doc-header .sub{ color:var(--muted); font-size:1.02rem; margin-top:.85rem; line-height:1.55; }
+
+h2{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:1.72rem;
+  margin:3.2rem 0 1rem; padding-bottom:.42rem; border-bottom:1px solid var(--rule);
+  letter-spacing:-.01em; }
+h3{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:1.22rem;
+  margin:2.1rem 0 .55rem; }
+p{ margin:0 0 1rem; }
+a{ color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-soft); }
+strong{ font-weight:650; color:#141312; }
+ul,ol{ margin:0 0 1rem; padding-left:1.3rem; }
+li{ margin:.25rem 0; }
+hr{ border:none; border-top:1px solid var(--rule); margin:2.6rem 0; }
+
+/* inline code */
+code{ font-family:"JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size:.84em; background:var(--code-bg); border:1px solid var(--code-border);
+  border-radius:4px; padding:.06em .34em; color:#0b4f47; }
+
+/* code blocks */
+pre{ position:relative; margin:1.1rem 0 1.5rem; background:var(--code-bg);
+  border:1px solid var(--code-border); border-left:3px solid var(--accent);
+  border-radius:8px; padding:1rem 1.15rem; overflow-x:auto; }
+pre code.hljs{ background:transparent; border:none; padding:0; color:#24292e;
+  font-size:.8rem; line-height:1.6; display:block; }
+pre code[data-lang]:not([data-lang=""]):before{
+  content: attr(data-lang); position:absolute; top:0; right:0;
+  font-family:"JetBrains Mono", monospace; font-size:.58rem; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--muted); background:var(--code-tag);
+  border:1px solid var(--code-border); border-top:none; border-right:none;
+  border-bottom-left-radius:6px; padding:.22em .6em; }
+
+/* tables */
+table{ border-collapse:collapse; width:100%; margin:1.3rem 0; font-size:.82rem; }
+th,td{ border:1px solid var(--rule); padding:.5rem .68rem; text-align:left; vertical-align:top; }
+th{ background:var(--accent); color:#fff; font-family:"JetBrains Mono", monospace;
+  font-size:.66rem; letter-spacing:.04em; text-transform:uppercase; font-weight:500; }
+tbody tr:nth-child(even){ background:#faf9f6; }
+td code{ font-size:.8em; background:#eef2f1; border-color:#dce4e2; }
+
+@page{ margin:16mm; }
+@media print{
+  body{ font-size:10.5pt; }
+  .wrap{ max-width:none; padding:0; }
+  *{ print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  a{ color:var(--ink); border:none; }
+  pre code.hljs{ white-space:pre-wrap; word-break:break-word; }  /* wrap long lines so nothing clips on paper */
+  pre, table{ break-inside:auto; }
+  tr{ break-inside:avoid; }
+  h1,h2,h3{ break-after:avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation &middot; Staff Frontend Engineer</div>
+    <h1>From Webix, ExtJS &amp; Angular to Vue 3</h1>
+    <div class="sub">Framework mapping, a runnable cookbook, four build toolchains, and production deployment. Targeting Vue 3.5, Vite 8, Pinia, Vitest.</div>
+  </header>
+  <main>
+<h1>Vue Interview Prep: From Webix / ExtJS / Angular to Vue 3</h1>
+<p>Target role: Staff Frontend Engineer (Visable). Stack: Vue.js, Jest/Cypress, build tooling (Gulp, Vite, Webpack, Rollup), Nuxt/SSR bonus, AI-assisted development, multi-brand design system.</p>
+<p><strong>Versions you are targeting (June 2026).</strong> Vue stable is <strong>3.5.x</strong>, with the Composition API and <code>&lt;script setup&gt;</code> as the default authoring style. Vue <strong>3.6</strong> is in beta and introduces <strong>Vapor mode</strong>, a compile-time strategy that drops the virtual DOM for less memory and faster updates, opt-in per component and compatible with the Composition API. <strong>Vite 8</strong> is the standard build tool. <strong>Pinia</strong> is the state library, <strong>Vitest</strong> the test runner, <strong>Nuxt 4</strong> the SSR meta-framework. Everything below uses current idioms only. There is no Vue 2 or pre-3.5 material here.</p>
+<hr>
+<h2>1. The core mental model shift</h2>
+<p>The one idea that reframes everything you already know:</p>
+<p><strong>Webix and ExtJS are config-driven and imperative. You construct widgets from JSON config, then mutate those instances by reference or id (<code>$$(&quot;grid&quot;).setValue(...)</code>, <code>vm.set('count', ...)</code>). Vue is declarative and reactive. You describe the UI as a pure function of state, and the framework re-renders when state changes. You never touch the widget instance or the DOM directly.</strong></p>
+<p>What disappears when you move to Vue:</p>
+<ul>
+<li>No <code>$$(&quot;id&quot;)</code> lookups, no <code>getValue</code>/<code>setValue</code>. Reactive <code>ref</code>s replace manual reads and writes.</li>
+<li>No global widget registry. Components are values you import and mount as tags.</li>
+<li>No &quot;rebuild this part of the layout&quot; calls. You mutate state, Vue diffs and patches.</li>
+</ul>
+<p>The habit to build: stop reaching for the instance. Change the data and let it render.</p>
+<p>Angular maps closely to Vue. Both are declarative, component-based, and reactive, with near 1:1 template directives. Your Angular intuition transfers directly. The real gap is recent Vue idioms and current tooling, not concepts.</p>
+<hr>
+<h2>2. Concept mapping table</h2>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Webix</th>
+<th>ExtJS</th>
+<th>Angular</th>
+<th>Vue 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Define a component</td>
+<td><code>webix.ui({...})</code> / <code>webix.protoUI</code></td>
+<td><code>Ext.define('Cls', {...})</code></td>
+<td><code>@Component</code> class</td>
+<td><code>.vue</code> SFC / <code>defineComponent</code></td>
+</tr>
+<tr>
+<td>Mount / instantiate</td>
+<td>auto from config tree</td>
+<td><code>Ext.create</code> / <code>xtype</code></td>
+<td>selector in template</td>
+<td><code>&lt;MyComp /&gt;</code> tag</td>
+</tr>
+<tr>
+<td>Template</td>
+<td><code>template</code> string</td>
+<td><code>tpl</code> / <code>XTemplate</code></td>
+<td>HTML + directives</td>
+<td><code>&lt;template&gt;</code> + directives</td>
+</tr>
+<tr>
+<td>Reactive local state</td>
+<td>DataCollection + events</td>
+<td><code>viewModel.data</code></td>
+<td><code>signal()</code></td>
+<td><code>ref()</code> / <code>reactive()</code></td>
+</tr>
+<tr>
+<td>Two-way binding</td>
+<td><code>.bind()</code>, events</td>
+<td><code>bind: { value: '{x}' }</code></td>
+<td><code>[(ngModel)]</code></td>
+<td><code>v-model</code></td>
+</tr>
+<tr>
+<td>One-way attr bind</td>
+<td><code>template:&quot;#name#&quot;</code></td>
+<td><code>bind: {...}</code></td>
+<td><code>[prop]=&quot;x&quot;</code></td>
+<td><code>:prop=&quot;x&quot;</code></td>
+</tr>
+<tr>
+<td>Event handling</td>
+<td><code>click:</code> / <code>on:{}</code></td>
+<td><code>listeners</code> / <code>handler</code></td>
+<td><code>(click)=&quot;f()&quot;</code></td>
+<td><code>@click=&quot;f()&quot;</code></td>
+</tr>
+<tr>
+<td>List rendering</td>
+<td><code>view:&quot;list&quot;</code> + data</td>
+<td><code>Ext.view.View</code> + Store</td>
+<td><code>@for</code></td>
+<td><code>v-for</code></td>
+</tr>
+<tr>
+<td>Conditional render</td>
+<td><code>hidden</code> / <code>show()</code></td>
+<td><code>hidden</code> config</td>
+<td><code>@if</code></td>
+<td><code>v-if</code> / <code>v-show</code></td>
+</tr>
+<tr>
+<td>Derived value</td>
+<td>manual</td>
+<td>ViewModel <code>formulas</code></td>
+<td><code>computed()</code></td>
+<td><code>computed()</code></td>
+</tr>
+<tr>
+<td>Side effect on change</td>
+<td>event handlers</td>
+<td><code>bind</code> + listeners</td>
+<td><code>effect()</code> / RxJS</td>
+<td><code>watch</code> / <code>watchEffect</code></td>
+</tr>
+<tr>
+<td>Lifecycle</td>
+<td><code>on:onAfterRender</code></td>
+<td><code>initComponent</code></td>
+<td><code>ngOnInit</code></td>
+<td><code>onMounted</code> / <code>onUnmounted</code></td>
+</tr>
+<tr>
+<td>Cross-tree share</td>
+<td>global <code>webix</code></td>
+<td>singletons</td>
+<td>DI / <code>@Injectable</code></td>
+<td><code>provide</code> / <code>inject</code>, composables</td>
+</tr>
+<tr>
+<td>Reuse logic</td>
+<td>mixins</td>
+<td>mixins / plugins</td>
+<td>services</td>
+<td>composables (<code>useXxx</code>)</td>
+</tr>
+<tr>
+<td>App state store</td>
+<td>DataCollection</td>
+<td>Stores</td>
+<td>NgRx / services</td>
+<td>Pinia</td>
+</tr>
+<tr>
+<td>Content projection</td>
+<td>layout config</td>
+<td>items / docked</td>
+<td><code>&lt;ng-content&gt;</code></td>
+<td><code>&lt;slot&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>3. Code comparison: a reactive counter</h2>
+<p>Shows the spectrum from imperative (Webix) to reactive declarative (Vue).</p>
+<h3>Webix (imperative, mutate by id)</h3>
+<pre><code class="hljs" data-lang="js">webix.<span class="hljs-title function_">ui</span>({
+  <span class="hljs-attr">rows</span>: [
+    { <span class="hljs-attr">view</span>: <span class="hljs-string">&quot;label&quot;</span>, <span class="hljs-attr">id</span>: <span class="hljs-string">&quot;lbl&quot;</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&quot;Count: 0&quot;</span> },
+    { <span class="hljs-attr">view</span>: <span class="hljs-string">&quot;button&quot;</span>, <span class="hljs-attr">value</span>: <span class="hljs-string">&quot;Increment&quot;</span>, <span class="hljs-attr">click</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+      <span class="hljs-keyword">const</span> n = ($$(<span class="hljs-string">&quot;lbl&quot;</span>).<span class="hljs-property">config</span>.<span class="hljs-property">count</span> = ($$(<span class="hljs-string">&quot;lbl&quot;</span>).<span class="hljs-property">config</span>.<span class="hljs-property">count</span> || <span class="hljs-number">0</span>) + <span class="hljs-number">1</span>);
+      $$(<span class="hljs-string">&quot;lbl&quot;</span>).<span class="hljs-title function_">define</span>(<span class="hljs-string">&quot;label&quot;</span>, <span class="hljs-string">&quot;Count: &quot;</span> + n);
+      $$(<span class="hljs-string">&quot;lbl&quot;</span>).<span class="hljs-title function_">refresh</span>();
+    }}
+  ]
+});
+</code></pre>
+<h3>ExtJS (ViewModel binding)</h3>
+<pre><code class="hljs" data-lang="js"><span class="hljs-title class_">Ext</span>.<span class="hljs-title function_">define</span>(<span class="hljs-string">&#x27;MyCounter&#x27;</span>, {
+  <span class="hljs-attr">extend</span>: <span class="hljs-string">&#x27;Ext.panel.Panel&#x27;</span>,
+  <span class="hljs-attr">viewModel</span>: { <span class="hljs-attr">data</span>: { <span class="hljs-attr">count</span>: <span class="hljs-number">0</span> } },
+  <span class="hljs-attr">items</span>: [
+    { <span class="hljs-attr">xtype</span>: <span class="hljs-string">&#x27;displayfield&#x27;</span>, <span class="hljs-attr">bind</span>: { <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;Count: {count}&#x27;</span> } },
+    { <span class="hljs-attr">xtype</span>: <span class="hljs-string">&#x27;button&#x27;</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">&#x27;Increment&#x27;</span>, <span class="hljs-attr">handler</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+      <span class="hljs-keyword">const</span> vm = <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">lookupViewModel</span>();
+      vm.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;count&#x27;</span>, vm.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;count&#x27;</span>) + <span class="hljs-number">1</span>);
+    }}
+  ]
+});
+</code></pre>
+<h3>Angular (signals)</h3>
+<pre><code class="hljs" data-lang="ts"><span class="hljs-meta">@Component</span>({
+  <span class="hljs-attr">selector</span>: <span class="hljs-string">&#x27;app-counter&#x27;</span>,
+  <span class="hljs-attr">template</span>: <span class="hljs-string">`
+    &lt;p&gt;Count: {{ count() }}&lt;/p&gt;
+    &lt;button (click)=&quot;count.set(count() + 1)&quot;&gt;Increment&lt;/button&gt;
+  `</span>
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CounterComponent</span> {
+  count = <span class="hljs-title function_">signal</span>(<span class="hljs-number">0</span>);
+}
+</code></pre>
+<h3>Vue 3 (<code>&lt;script setup&gt;</code>)</h3>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { ref } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+<span class="hljs-keyword">const</span> count = <span class="hljs-title function_">ref</span>(<span class="hljs-number">0</span>)
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Count: {{ count }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;count++&quot;</span>&gt;</span>Increment<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p>You mutate <code>count</code>, Vue re-renders. <code>count.value</code> is auto-unwrapped in the template, so you write <code>count</code> in markup. Angular's <code>signal()</code> and Vue's <code>ref()</code> are the same idea: <code>count()</code> to read in Angular, <code>count.value</code> to read in Vue script.</p>
+<hr>
+<h2>4. Code comparison: filtered list</h2>
+<p>A likely live-coding shape.</p>
+<h3>Vue 3</h3>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { ref, computed } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+
+<span class="hljs-keyword">const</span> query = <span class="hljs-title function_">ref</span>(<span class="hljs-string">&#x27;&#x27;</span>)
+<span class="hljs-keyword">const</span> items = <span class="hljs-title function_">ref</span>([<span class="hljs-string">&#x27;apple&#x27;</span>, <span class="hljs-string">&#x27;banana&#x27;</span>, <span class="hljs-string">&#x27;cherry&#x27;</span>, <span class="hljs-string">&#x27;avocado&#x27;</span>])
+
+<span class="hljs-keyword">const</span> filtered = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span>
+  items.<span class="hljs-property">value</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">i</span> =&gt;</span> i.<span class="hljs-title function_">toLowerCase</span>().<span class="hljs-title function_">includes</span>(query.<span class="hljs-property">value</span>.<span class="hljs-title function_">toLowerCase</span>()))
+)
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">v-model</span>=<span class="hljs-string">&quot;query&quot;</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">&quot;Filter&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">v-for</span>=<span class="hljs-string">&quot;item in filtered&quot;</span> <span class="hljs-attr">:key</span>=<span class="hljs-string">&quot;item&quot;</span>&gt;</span>{{ item }}<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<h3>Angular</h3>
+<pre><code class="hljs" data-lang="ts"><span class="hljs-meta">@Component</span>({
+  <span class="hljs-attr">template</span>: <span class="hljs-string">`
+    &lt;input [(ngModel)]=&quot;query&quot; /&gt;
+    &lt;ul&gt;
+      @for (item of filtered(); track item) {
+        &lt;li&gt;{{ item }}&lt;/li&gt;
+      }
+    &lt;/ul&gt;
+  `</span>
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ListComponent</span> {
+  query = <span class="hljs-title function_">signal</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+  items = <span class="hljs-title function_">signal</span>([<span class="hljs-string">&#x27;apple&#x27;</span>, <span class="hljs-string">&#x27;banana&#x27;</span>, <span class="hljs-string">&#x27;cherry&#x27;</span>, <span class="hljs-string">&#x27;avocado&#x27;</span>]);
+  filtered = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">items</span>().<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">i</span> =&gt;</span> i.<span class="hljs-title function_">includes</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">query</span>())));
+}
+</code></pre>
+<h3>ExtJS</h3>
+<pre><code class="hljs" data-lang="js"><span class="hljs-title class_">Ext</span>.<span class="hljs-title function_">create</span>(<span class="hljs-string">&#x27;Ext.view.View&#x27;</span>, {
+  <span class="hljs-attr">store</span>: { <span class="hljs-attr">data</span>: [{ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;apple&#x27;</span> }, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;banana&#x27;</span> }] },
+  <span class="hljs-attr">tpl</span>: <span class="hljs-string">&#x27;&lt;tpl for=&quot;.&quot;&gt;&lt;div class=&quot;row&quot;&gt;{name}&lt;/div&gt;&lt;/tpl&gt;&#x27;</span>,
+  <span class="hljs-attr">itemSelector</span>: <span class="hljs-string">&#x27;div.row&#x27;</span>
+});
+<span class="hljs-comment">// store.filterBy(rec =&gt; rec.get(&#x27;name&#x27;).includes(query));</span>
+</code></pre>
+<h3>Webix</h3>
+<pre><code class="hljs" data-lang="js">webix.<span class="hljs-title function_">ui</span>({
+  <span class="hljs-attr">rows</span>: [
+    { <span class="hljs-attr">view</span>: <span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-attr">id</span>: <span class="hljs-string">&quot;q&quot;</span>, <span class="hljs-attr">on</span>: {
+      <span class="hljs-attr">onTimedKeyPress</span>: <span class="hljs-function">() =&gt;</span> $$(<span class="hljs-string">&quot;lst&quot;</span>).<span class="hljs-title function_">filter</span>(<span class="hljs-string">&quot;#value#&quot;</span>, $$(<span class="hljs-string">&quot;q&quot;</span>).<span class="hljs-title function_">getValue</span>())
+    }},
+    { <span class="hljs-attr">view</span>: <span class="hljs-string">&quot;list&quot;</span>, <span class="hljs-attr">id</span>: <span class="hljs-string">&quot;lst&quot;</span>, <span class="hljs-attr">template</span>: <span class="hljs-string">&quot;#value#&quot;</span>,
+      <span class="hljs-attr">data</span>: [<span class="hljs-string">&quot;apple&quot;</span>, <span class="hljs-string">&quot;banana&quot;</span>, <span class="hljs-string">&quot;cherry&quot;</span>, <span class="hljs-string">&quot;avocado&quot;</span>] }
+  ]
+});
+</code></pre>
+<p>The Vue habit to internalize: derive the view from state with <code>computed</code>, do not imperatively poke a widget.</p>
+<hr>
+<h2>5. Vue cookbook: runnable mini-apps</h2>
+<p>This is the section an interviewer probes hardest, because it separates people who have used Vue from people who understand its reactivity model. Each item states the concept in prose first, then gives a complete <code>.vue</code> component you can drop into the Vite scaffold from section 6 and run. Read the prose, then trace the code against it.</p>
+<h3>5.1 <code>ref</code> vs <code>reactive</code>, and why destructuring breaks reactivity</h3>
+<p>Reach for <code>ref</code> by default, for both primitives and objects. It behaves predictably everywhere: you read and write <code>.value</code> in script, and Vue auto-unwraps it in the template. <code>reactive</code> exists for objects only, and it carries a sharp edge that shows up constantly in interviews. A <code>reactive</code> object is a Proxy, and reactivity lives on the proxy, not on the values inside it. The moment you destructure it, you copy the current values out and sever the link to the proxy, so those copies never update again. <code>toRefs</code> fixes this by wrapping each property in its own ref that stays connected to the source.</p>
+<p>The practical rule: default to <code>ref</code>, and if you do use <code>reactive</code>, never destructure it without <code>toRefs</code>.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { reactive, toRefs, ref } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+
+<span class="hljs-keyword">const</span> user = <span class="hljs-title function_">reactive</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ada&#x27;</span>, <span class="hljs-attr">age</span>: <span class="hljs-number">36</span> })
+<span class="hljs-keyword">const</span> { name } = user            <span class="hljs-comment">// BROKEN: &#x27;name&#x27; is a plain string snapshot</span>
+<span class="hljs-keyword">const</span> { age } = <span class="hljs-title function_">toRefs</span>(user)     <span class="hljs-comment">// OK: &#x27;age&#x27; stays reactive</span>
+
+<span class="hljs-keyword">const</span> counter = <span class="hljs-title function_">ref</span>(<span class="hljs-number">0</span>)           <span class="hljs-comment">// simplest, always reactive</span>
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Broken snapshot: {{ name }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Reactive via toRefs: {{ age }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;user.age++&quot;</span>&gt;</span>Age + (only the toRefs binding updates)<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">hr</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Counter (ref): {{ counter }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;counter++&quot;</span>&gt;</span>Counter +<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p>In the running app, clicking the button mutates <code>user.age</code>, but only the <code>toRefs</code> binding re-renders. The plain destructured <code>name</code> stays frozen at its first value. That one behavior is the whole lesson.</p>
+<h3>5.2 computed vs method vs watch</h3>
+<p>These three look similar and do different jobs, and confusing them is the most common Vue smell. A <code>computed</code> derives a value from other reactive state and caches the result, recomputing only when a dependency changes. It must be pure, with no side effects. A plain method re-runs on every render whether or not its inputs changed, so it fits event handlers and is wrong for derived display values. A <code>watch</code> (or <code>watchEffect</code>) exists for side effects in response to change: persisting to storage, firing a request, logging. You never use a watch to produce a value you could have computed.</p>
+<p>The decision is mechanical: derive a value with <code>computed</code>, react to a change with a side effect using <code>watch</code>, respond to a user action with a method.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { ref, computed, watch } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+
+<span class="hljs-keyword">const</span> price = <span class="hljs-title function_">ref</span>(<span class="hljs-number">100</span>)
+<span class="hljs-keyword">const</span> qty = <span class="hljs-title function_">ref</span>(<span class="hljs-number">2</span>)
+
+<span class="hljs-keyword">const</span> total = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> price.<span class="hljs-property">value</span> * qty.<span class="hljs-property">value</span>)   <span class="hljs-comment">// cached, recomputes on dep change</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">totalMethod</span> = (<span class="hljs-params"></span>) =&gt; price.<span class="hljs-property">value</span> * qty.<span class="hljs-property">value</span>        <span class="hljs-comment">// runs on every render</span>
+
+<span class="hljs-title function_">watch</span>(total, <span class="hljs-function">(<span class="hljs-params">newTotal</span>) =&gt;</span> {                             <span class="hljs-comment">// side effect on change</span>
+  <span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">setItem</span>(<span class="hljs-string">&#x27;lastTotal&#x27;</span>, <span class="hljs-title class_">String</span>(newTotal))
+})
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;number&quot;</span> <span class="hljs-attr">v-model.number</span>=<span class="hljs-string">&quot;price&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;number&quot;</span> <span class="hljs-attr">v-model.number</span>=<span class="hljs-string">&quot;qty&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Computed total: {{ total }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Method total: {{ totalMethod() }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p>At runtime the computed total updates once per dependency change and is cached between renders, while the method version recalculates on every render even when price and quantity have not moved.</p>
+<h3>5.3 <code>v-for</code> keys and the <code>v-if</code> + <code>v-for</code> trap</h3>
+<p>Two rules here, both common live-coding traps. First, every <code>v-for</code> needs a stable unique <code>:key</code>, and that key should be a real id, not the array index. Vue uses the key to match old and new nodes during a patch. If you key by index and the list reorders, inserts, or deletes, the indices shift and Vue reuses the wrong DOM nodes, which leaks component state across rows, so a checkbox or input value ends up on the wrong item. Second, never put <code>v-if</code> and <code>v-for</code> on the same element. In current Vue, <code>v-if</code> has higher priority and evaluates first, so it cannot see the loop variable. The fix is to filter the list in a <code>computed</code> and loop over the result.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { ref, computed } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+
+<span class="hljs-keyword">const</span> todos = <span class="hljs-title function_">ref</span>([
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">&#x27;ship&#x27;</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">&#x27;test&#x27;</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">3</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">&#x27;deploy&#x27;</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> },
+])
+<span class="hljs-keyword">const</span> visible = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> todos.<span class="hljs-property">value</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> !t.<span class="hljs-property">done</span>))  <span class="hljs-comment">// filter here</span>
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-comment">&lt;!-- Correct: stable id key, filtering done in computed --&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">v-for</span>=<span class="hljs-string">&quot;todo in visible&quot;</span> <span class="hljs-attr">:key</span>=<span class="hljs-string">&quot;todo.id&quot;</span>&gt;</span>{{ todo.text }}<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+
+  <span class="hljs-comment">&lt;!-- WRONG, do not do this:
+  &lt;li v-for=&quot;todo in todos&quot; v-if=&quot;!todo.done&quot; :key=&quot;index&quot;&gt;...&lt;/li&gt;
+  v-if runs before v-for and cannot see todo; index keys cause state bleed. --&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p>The corrected version filters in <code>visible</code> and keys by <code>todo.id</code>. The commented-out version shows the two mistakes together: an index key and a same-element <code>v-if</code> that references a variable it cannot reach.</p>
+<h3>5.4 <code>v-if</code> vs <code>v-show</code></h3>
+<p>Both hide content, with different mechanics and different costs. <code>v-if</code> adds and removes the element from the DOM entirely, so it is cheaper when something is rarely shown or expensive to render, and more costly to toggle repeatedly because each toggle mounts or unmounts. <code>v-show</code> always renders the element once and toggles its CSS <code>display</code>, so it is cheap to toggle but pays the render cost even while hidden.</p>
+<p>Choose by toggle frequency: a tab you flip constantly uses <code>v-show</code>, a heavy panel you open occasionally uses <code>v-if</code>.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { ref } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+<span class="hljs-keyword">const</span> open = <span class="hljs-title function_">ref</span>(<span class="hljs-literal">true</span>)
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;open = !open&quot;</span>&gt;</span>Toggle<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">v-if</span>=<span class="hljs-string">&quot;open&quot;</span>&gt;</span>v-if: removed from DOM when hidden<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">v-show</span>=<span class="hljs-string">&quot;open&quot;</span>&gt;</span>v-show: stays in DOM, display none when hidden<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<h3>5.5 Component contract: props down, events up</h3>
+<p>Vue enforces one-way data flow, and stating this clearly signals you understand component design rather than just syntax. Data flows down through props, and changes flow up through events. A child must never mutate a prop, because the parent owns that state and a mutation would desync the two. Instead the child emits an event, and the parent updates its own state in response. This is the same contract as Angular <code>@Input</code> and <code>@Output</code>, so your Angular experience maps directly.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- TodoItem.vue --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-title function_">defineProps</span>({ <span class="hljs-attr">text</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">done</span>: <span class="hljs-title class_">Boolean</span> })
+<span class="hljs-keyword">const</span> emit = <span class="hljs-title function_">defineEmits</span>([<span class="hljs-string">&#x27;toggle&#x27;</span>, <span class="hljs-string">&#x27;remove&#x27;</span>])
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;checkbox&quot;</span> <span class="hljs-attr">:checked</span>=<span class="hljs-string">&quot;done&quot;</span> @<span class="hljs-attr">change</span>=<span class="hljs-string">&quot;emit(&#x27;toggle&#x27;)&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">:class</span>=<span class="hljs-string">&quot;{ done }&quot;</span>&gt;</span>{{ text }}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;emit(&#x27;remove&#x27;)&quot;</span>&gt;</span>x<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">style</span> <span class="hljs-attr">scoped</span>&gt;</span><span class="language-css"><span class="hljs-selector-class">.done</span> { <span class="hljs-attribute">text-decoration</span>: line-through; }</span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- Parent.vue --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { ref } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">TodoItem</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./TodoItem.vue&#x27;</span>
+
+<span class="hljs-keyword">const</span> todos = <span class="hljs-title function_">ref</span>([{ <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">&#x27;learn&#x27;</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> }])
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">toggle</span> = (<span class="hljs-params">id</span>) =&gt; {
+  <span class="hljs-keyword">const</span> t = todos.<span class="hljs-property">value</span>.<span class="hljs-title function_">find</span>(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> t.<span class="hljs-property">id</span> === id)
+  <span class="hljs-keyword">if</span> (t) t.<span class="hljs-property">done</span> = !t.<span class="hljs-property">done</span>
+}
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">remove</span> = (<span class="hljs-params">id</span>) =&gt; { todos.<span class="hljs-property">value</span> = todos.<span class="hljs-property">value</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> t.<span class="hljs-property">id</span> !== id) }
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">TodoItem</span>
+      <span class="hljs-attr">v-for</span>=<span class="hljs-string">&quot;t in todos&quot;</span> <span class="hljs-attr">:key</span>=<span class="hljs-string">&quot;t.id&quot;</span>
+      <span class="hljs-attr">:text</span>=<span class="hljs-string">&quot;t.text&quot;</span> <span class="hljs-attr">:done</span>=<span class="hljs-string">&quot;t.done&quot;</span>
+      @<span class="hljs-attr">toggle</span>=<span class="hljs-string">&quot;toggle(t.id)&quot;</span> @<span class="hljs-attr">remove</span>=<span class="hljs-string">&quot;remove(t.id)&quot;</span>
+    /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p>The child renders from <code>text</code> and <code>done</code> and emits <code>toggle</code> and <code>remove</code>, owning no state. The parent holds the array and is the only place that mutates it. That separation is what makes components reusable and testable.</p>
+<h3>5.6 Two-way binding on a component with <code>defineModel</code></h3>
+<p><code>v-model</code> on a component is two-way binding sugar, and <code>defineModel</code> is the current, clean way to implement it. Calling <code>defineModel()</code> in the child gives you a writable ref wired to a <code>modelValue</code> prop and an <code>update:modelValue</code> event behind the scenes, so the parent writes <code>v-model=&quot;x&quot;</code> and reads and writes through it as if it were local state. This removes the manual prop-plus-emit boilerplate that two-way component binding used to require.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- MoneyInput.vue --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">const</span> amount = <span class="hljs-title function_">defineModel</span>({ <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>, <span class="hljs-attr">default</span>: <span class="hljs-number">0</span> })
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;number&quot;</span> <span class="hljs-attr">:value</span>=<span class="hljs-string">&quot;amount&quot;</span> @<span class="hljs-attr">input</span>=<span class="hljs-string">&quot;amount = Number($event.target.value)&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- Parent.vue --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { ref } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">MoneyInput</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./MoneyInput.vue&#x27;</span>
+<span class="hljs-keyword">const</span> budget = <span class="hljs-title function_">ref</span>(<span class="hljs-number">50</span>)
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">MoneyInput</span> <span class="hljs-attr">v-model</span>=<span class="hljs-string">&quot;budget&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Budget is {{ budget }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p>Writing to <code>amount</code> in the child propagates up to <code>budget</code> in the parent, and a change to <code>budget</code> flows back down. One line in the child replaces a prop declaration and an emit.</p>
+<h3>5.7 Lifecycle and cleanup (the classic leak question)</h3>
+<p>Lifecycle hooks let you run code at defined moments: <code>onMounted</code> after the component is in the DOM, <code>onUnmounted</code> when it is removed. The interview trap is cleanup. Anything you start in <code>onMounted</code>, whether an interval, an event listener, a subscription, or a socket, must be torn down in <code>onUnmounted</code>, or it survives the component and leaks memory and CPU. A timer that keeps firing after its component is gone is the textbook example, and interviewers like to ask where this leaks.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { ref, onMounted, onUnmounted } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+
+<span class="hljs-keyword">const</span> seconds = <span class="hljs-title function_">ref</span>(<span class="hljs-number">0</span>)
+<span class="hljs-keyword">let</span> timer
+
+<span class="hljs-title function_">onMounted</span>(<span class="hljs-function">() =&gt;</span> {
+  timer = <span class="hljs-built_in">setInterval</span>(<span class="hljs-function">() =&gt;</span> { seconds.<span class="hljs-property">value</span>++ }, <span class="hljs-number">1000</span>)
+  <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;resize&#x27;</span>, onResize)
+})
+<span class="hljs-title function_">onUnmounted</span>(<span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-built_in">clearInterval</span>(timer)                       <span class="hljs-comment">// without this, the timer leaks</span>
+  <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">removeEventListener</span>(<span class="hljs-string">&#x27;resize&#x27;</span>, onResize)
+})
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">onResize</span>(<span class="hljs-params"></span>) { <span class="hljs-comment">/* ... */</span> }
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Mounted for {{ seconds }}s<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p>The fix is the symmetry: every <code>setInterval</code> has a <code>clearInterval</code>, every <code>addEventListener</code> has a <code>removeEventListener</code>, paired across mount and unmount.</p>
+<h3>5.8 Composables (reuse logic, the replacement for mixins)</h3>
+<p>A composable is a function that uses Vue's reactivity primitives and returns reactive state plus the functions that operate on it, named by convention <code>useSomething</code>. This is how you share stateful logic across components in the Composition API, and it replaces the old mixin approach cleanly. Mixins merged properties into a component implicitly, which caused name collisions and made it hard to see where a value came from. A composable is an explicit function call with an explicit return, so the source of every value is obvious. Frame it for the interviewer as the Composition API answer to Angular services and old Vue mixins, without the implicit naming problems mixins had.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// useFetch.js</span>
+<span class="hljs-keyword">import</span> { ref } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">useFetch</span>(<span class="hljs-params">url</span>) {
+  <span class="hljs-keyword">const</span> data = <span class="hljs-title function_">ref</span>(<span class="hljs-literal">null</span>)
+  <span class="hljs-keyword">const</span> error = <span class="hljs-title function_">ref</span>(<span class="hljs-literal">null</span>)
+  <span class="hljs-keyword">const</span> loading = <span class="hljs-title function_">ref</span>(<span class="hljs-literal">true</span>)
+
+  <span class="hljs-title function_">fetch</span>(url)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> r.<span class="hljs-title function_">json</span>())
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">json</span> =&gt;</span> { data.<span class="hljs-property">value</span> = json })
+    .<span class="hljs-title function_">catch</span>(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> { error.<span class="hljs-property">value</span> = e })
+    .<span class="hljs-title function_">finally</span>(<span class="hljs-function">() =&gt;</span> { loading.<span class="hljs-property">value</span> = <span class="hljs-literal">false</span> })
+
+  <span class="hljs-keyword">return</span> { data, error, loading }
+}
+</code></pre>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- Usage.vue --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { useFetch } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./useFetch&#x27;</span>
+<span class="hljs-keyword">const</span> { data, error, loading } = <span class="hljs-title function_">useFetch</span>(<span class="hljs-string">&#x27;/api/todos&#x27;</span>)
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">v-if</span>=<span class="hljs-string">&quot;loading&quot;</span>&gt;</span>Loading...<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">v-else-if</span>=<span class="hljs-string">&quot;error&quot;</span>&gt;</span>Failed: {{ error.message }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">ul</span> <span class="hljs-attr">v-else</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">v-for</span>=<span class="hljs-string">&quot;t in data&quot;</span> <span class="hljs-attr">:key</span>=<span class="hljs-string">&quot;t.id&quot;</span>&gt;</span>{{ t.text }}<span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p>Each call to <code>useFetch</code> creates its own independent <code>data</code>, <code>error</code>, and <code>loading</code> state, so two components calling it do not interfere. That independence is the point.</p>
+<h3>5.9 Slots, including a scoped slot</h3>
+<p>Slots are Vue's content projection, the equivalent of Angular <code>&lt;ng-content&gt;</code>. A default slot lets a parent pass markup into a child's layout. A named slot gives several labeled insertion points. A scoped slot is the powerful one and worth raising for a design-system role: it lets the child expose its internal data back up to the parent's slot content, so the child owns iteration and structure while the parent controls how each item renders. Angular has no clean equivalent, which makes it a good differentiator to mention.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- DataList.vue --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-title function_">defineProps</span>({ <span class="hljs-attr">items</span>: <span class="hljs-title class_">Array</span> })
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">v-for</span>=<span class="hljs-string">&quot;item in items&quot;</span> <span class="hljs-attr">:key</span>=<span class="hljs-string">&quot;item.id&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">slot</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;row&quot;</span> <span class="hljs-attr">:item</span>=<span class="hljs-string">&quot;item&quot;</span>&gt;</span>{{ item.label }}<span class="hljs-tag">&lt;/<span class="hljs-name">slot</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- Parent.vue --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">DataList</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./DataList.vue&#x27;</span>
+<span class="hljs-keyword">const</span> items = [{ <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;A&#x27;</span> }, { <span class="hljs-attr">id</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">label</span>: <span class="hljs-string">&#x27;B&#x27;</span> }]
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">DataList</span> <span class="hljs-attr">:items</span>=<span class="hljs-string">&quot;items&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">template</span> #<span class="hljs-attr">row</span>=<span class="hljs-string">&quot;{ item }&quot;</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">strong</span>&gt;</span>#{{ item.id }}<span class="hljs-tag">&lt;/<span class="hljs-name">strong</span>&gt;</span> {{ item.label }}
+    <span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">DataList</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p><code>DataList</code> owns the loop and the list element, and hands each <code>item</code> back to the parent through the scoped <code>row</code> slot. The parent decides the markup for a row without ever touching the iteration. That is exactly the seam a multi-brand design system needs.</p>
+<h3>5.10 provide / inject (dependency injection across the tree)</h3>
+<p><code>provide</code> and <code>inject</code> are Vue's dependency injection, for passing a value to deeply nested descendants without threading it through every intermediate component as props, which is the prop-drilling problem. An ancestor calls <code>provide('key', value)</code> once, and any descendant at any depth calls <code>inject('key')</code> to read it. Wrap the provided value in <code>readonly</code> so descendants cannot mutate shared state behind the owner's back, which keeps the one-way flow intact. This is the idiomatic way to distribute things like theme, locale, or a design-system configuration.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- App.vue (ancestor) --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { provide, readonly, ref } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+<span class="hljs-keyword">const</span> theme = <span class="hljs-title function_">ref</span>(<span class="hljs-string">&#x27;dark&#x27;</span>)
+<span class="hljs-title function_">provide</span>(<span class="hljs-string">&#x27;theme&#x27;</span>, <span class="hljs-title function_">readonly</span>(theme))
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- DeepChild.vue --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { inject } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+<span class="hljs-keyword">const</span> theme = <span class="hljs-title function_">inject</span>(<span class="hljs-string">&#x27;theme&#x27;</span>, <span class="hljs-string">&#x27;light&#x27;</span>)   <span class="hljs-comment">// second arg is the default</span>
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">:class</span>=<span class="hljs-string">&quot;theme&quot;</span>&gt;</span>Themed by inject<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p>The theme is provided once at the top and injected directly where it is needed, with a default value as the second argument to <code>inject</code> for when no ancestor provided it.</p>
+<h3>5.11 Reactive props destructure and <code>nextTick</code></h3>
+<p>Two current-Vue details that come up in practice. First, you can destructure <code>defineProps</code> and the bindings stay reactive, with default values written inline, so <code>const { label = 'Default' } = defineProps(['label'])</code> is both concise and correct. Second, Vue applies DOM updates asynchronously and in batches, so right after you change state the DOM has not updated yet. <code>nextTick</code> returns a promise that resolves once Vue has flushed the update, which is when you can safely measure, scroll, or read the freshly rendered DOM.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { nextTick, ref } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+
+<span class="hljs-keyword">const</span> { label = <span class="hljs-string">&#x27;Default&#x27;</span> } = <span class="hljs-title function_">defineProps</span>([<span class="hljs-string">&#x27;label&#x27;</span>])  <span class="hljs-comment">// reactive, with default</span>
+
+<span class="hljs-keyword">const</span> list = <span class="hljs-title function_">ref</span>([])
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">addAndScroll</span>(<span class="hljs-params"></span>) {
+  list.<span class="hljs-property">value</span>.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;row &#x27;</span> + (list.<span class="hljs-property">value</span>.<span class="hljs-property">length</span> + <span class="hljs-number">1</span>))
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">nextTick</span>()                       <span class="hljs-comment">// DOM now contains the new row</span>
+  <span class="hljs-comment">// safe to measure or scroll here</span>
+}
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>{{ label }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;addAndScroll&quot;</span>&gt;</span>Add<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">v-for</span>=<span class="hljs-string">&quot;row in list&quot;</span> <span class="hljs-attr">:key</span>=<span class="hljs-string">&quot;row&quot;</span>&gt;</span>{{ row }}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p>The component pushes a row, awaits <code>nextTick</code>, and only then is the new row present in the DOM and safe to measure or scroll to.</p>
+<h3>5.12 Pinia store</h3>
+<p>Pinia is the official state library, and the setup-style store shown here is the modern shape. It mirrors a component's <code>&lt;script setup&gt;</code>: <code>ref</code> for state, <code>computed</code> for getters, plain functions for actions, all returned from the store definition. When you consume the store and want to destructure its state, use <code>storeToRefs</code> so the extracted values keep their reactivity, the same lesson as <code>toRefs</code> from 5.1. Vuex is retired, so do not bring it up unless asked about migration.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// stores/cart.js</span>
+<span class="hljs-keyword">import</span> { defineStore } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;pinia&#x27;</span>
+<span class="hljs-keyword">import</span> { ref, computed } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> useCartStore = <span class="hljs-title function_">defineStore</span>(<span class="hljs-string">&#x27;cart&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-keyword">const</span> items = <span class="hljs-title function_">ref</span>([])
+  <span class="hljs-keyword">const</span> total = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> items.<span class="hljs-property">value</span>.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">s, i</span>) =&gt;</span> s + i.<span class="hljs-property">price</span>, <span class="hljs-number">0</span>))
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">item</span>) { items.<span class="hljs-property">value</span>.<span class="hljs-title function_">push</span>(item) }
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">clear</span>(<span class="hljs-params"></span>) { items.<span class="hljs-property">value</span> = [] }
+  <span class="hljs-keyword">return</span> { items, total, add, clear }
+})
+</code></pre>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- Cart.vue --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { useCartStore } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./stores/cart&#x27;</span>
+<span class="hljs-keyword">import</span> { storeToRefs } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;pinia&#x27;</span>
+
+<span class="hljs-keyword">const</span> cart = <span class="hljs-title function_">useCartStore</span>()
+<span class="hljs-keyword">const</span> { items, total } = <span class="hljs-title function_">storeToRefs</span>(cart)   <span class="hljs-comment">// keep reactivity when destructuring</span>
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Items: {{ items.length }}, total: {{ total }}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;cart.add({ id: Date.now(), price: 9.99 })&quot;</span>&gt;</span>Add<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;cart.clear()&quot;</span>&gt;</span>Clear<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+</code></pre>
+<p><code>storeToRefs</code> is the detail that catches people: destructuring the store directly would break reactivity on <code>items</code> and <code>total</code>, exactly as destructuring a <code>reactive</code> object does, and <code>storeToRefs</code> is the fix.</p>
+<hr>
+<h2>6. Project scaffolds: the same TODO app, four toolchains</h2>
+<p>All four build or serve the same component. Save this as <code>src/TodoApp.vue</code> and reuse it (the no-bundler variant inlines an equivalent, since it has no SFC compiler).</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- src/TodoApp.vue --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { ref, computed } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+
+<span class="hljs-keyword">const</span> newTodo = <span class="hljs-title function_">ref</span>(<span class="hljs-string">&#x27;&#x27;</span>)
+<span class="hljs-keyword">const</span> todos = <span class="hljs-title function_">ref</span>([
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">&#x27;Learn Vue reactivity&#x27;</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">true</span> },
+  { <span class="hljs-attr">id</span>: <span class="hljs-number">2</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">&#x27;Build the todo app&#x27;</span>, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> },
+])
+<span class="hljs-keyword">let</span> nextId = <span class="hljs-number">3</span>
+
+<span class="hljs-keyword">const</span> remaining = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> todos.<span class="hljs-property">value</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> !t.<span class="hljs-property">done</span>).<span class="hljs-property">length</span>)
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">add</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> text = newTodo.<span class="hljs-property">value</span>.<span class="hljs-title function_">trim</span>()
+  <span class="hljs-keyword">if</span> (!text) <span class="hljs-keyword">return</span>
+  todos.<span class="hljs-property">value</span>.<span class="hljs-title function_">push</span>({ <span class="hljs-attr">id</span>: nextId++, text, <span class="hljs-attr">done</span>: <span class="hljs-literal">false</span> })
+  newTodo.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;&#x27;</span>
+}
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">remove</span>(<span class="hljs-params">id</span>) { todos.<span class="hljs-property">value</span> = todos.<span class="hljs-property">value</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">t</span> =&gt;</span> t.<span class="hljs-property">id</span> !== id) }
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">section</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;todo&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Todos ({{ remaining }} left)<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">v-model</span>=<span class="hljs-string">&quot;newTodo&quot;</span> @<span class="hljs-attr">keyup.enter</span>=<span class="hljs-string">&quot;add&quot;</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">&quot;Add a todo&quot;</span> /&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;add&quot;</span>&gt;</span>Add<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">v-for</span>=<span class="hljs-string">&quot;todo in todos&quot;</span> <span class="hljs-attr">:key</span>=<span class="hljs-string">&quot;todo.id&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">label</span> <span class="hljs-attr">:class</span>=<span class="hljs-string">&quot;{ done: todo.done }&quot;</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;checkbox&quot;</span> <span class="hljs-attr">v-model</span>=<span class="hljs-string">&quot;todo.done&quot;</span> /&gt;</span> {{ todo.text }}
+        <span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;remove(todo.id)&quot;</span>&gt;</span>x<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+      <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">section</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">style</span> <span class="hljs-attr">scoped</span>&gt;</span><span class="language-css">
+<span class="hljs-selector-class">.done</span> { <span class="hljs-attribute">text-decoration</span>: line-through; <span class="hljs-attribute">opacity</span>: <span class="hljs-number">0.6</span>; }
+<span class="hljs-selector-class">.todo</span> { <span class="hljs-attribute">max-width</span>: <span class="hljs-number">420px</span>; <span class="hljs-attribute">margin</span>: <span class="hljs-number">2rem</span> auto; <span class="hljs-attribute">font-family</span>: system-ui; }
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// src/main.js (used by Vite, Webpack, Gulp)</span>
+<span class="hljs-keyword">import</span> { createApp } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span>
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">TodoApp</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./TodoApp.vue&#x27;</span>
+<span class="hljs-title function_">createApp</span>(<span class="hljs-title class_">TodoApp</span>).<span class="hljs-title function_">mount</span>(<span class="hljs-string">&#x27;#app&#x27;</span>)
+</code></pre>
+<h3>6.1 Vite (the recommended modern choice)</h3>
+<p>Fastest path: <code>npm create vue@latest</code> runs the official scaffolder with router, Pinia, Vitest, and TypeScript prompts. A minimal manual setup:</p>
+<pre><code class="hljs" data-lang="json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;todo-vite&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;private&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;module&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;dev&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;vite&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;build&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;vite build&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;preview&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;vite preview&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;vue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^3.5.0&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;vite&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^8.0.0&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;@vitejs/plugin-vue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^6.0.0&quot;</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// vite.config.js</span>
+<span class="hljs-keyword">import</span> { defineConfig } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vite&#x27;</span>
+<span class="hljs-keyword">import</span> vue <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@vitejs/plugin-vue&#x27;</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-title function_">defineConfig</span>({
+  <span class="hljs-attr">plugins</span>: [<span class="hljs-title function_">vue</span>()],
+  <span class="hljs-attr">server</span>: {
+    <span class="hljs-attr">port</span>: <span class="hljs-number">5173</span>,
+    <span class="hljs-attr">open</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">proxy</span>: { <span class="hljs-string">&#x27;/api&#x27;</span>: <span class="hljs-string">&#x27;http://localhost:3000&#x27;</span> }   <span class="hljs-comment">// forward API calls in dev</span>
+  },
+  <span class="hljs-attr">build</span>: { <span class="hljs-attr">outDir</span>: <span class="hljs-string">&#x27;dist&#x27;</span>, <span class="hljs-attr">sourcemap</span>: <span class="hljs-literal">false</span> }
+})
+</code></pre>
+<pre><code class="hljs" data-lang="html"><span class="hljs-comment">&lt;!-- index.html (Vite uses this as the entry, at project root) --&gt;</span>
+<span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;en&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span> /&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Todo (Vite)<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;app&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/src/main.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<p>Run dev: <code>npm run dev</code>. Build: <code>npm run build</code>. Why Vite is fast: in dev it serves native ES modules and transforms files on demand with esbuild, so there is no upfront bundle. It bundles with Rollup only for production.</p>
+<h3>6.2 Webpack (the classic bundler)</h3>
+<pre><code class="hljs" data-lang="json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;todo-webpack&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;private&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;dev&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;webpack serve --mode development&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;build&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;webpack --mode production&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;vue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^3.5.0&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;webpack&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^5.99.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;webpack-cli&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^6.0.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;webpack-dev-server&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^5.2.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;vue-loader&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^17.4.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;@vue/compiler-sfc&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^3.5.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;css-loader&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^7.1.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;vue-style-loader&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^4.1.3&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;html-webpack-plugin&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^5.6.0&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// webpack.config.js</span>
+<span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;path&#x27;</span>)
+<span class="hljs-keyword">const</span> webpack = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;webpack&#x27;</span>)
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">VueLoaderPlugin</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;vue-loader&#x27;</span>)
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">HtmlWebpackPlugin</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;html-webpack-plugin&#x27;</span>)
+
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {
+  <span class="hljs-attr">entry</span>: <span class="hljs-string">&#x27;./src/main.js&#x27;</span>,
+  <span class="hljs-attr">output</span>: {
+    <span class="hljs-attr">path</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;dist&#x27;</span>),
+    <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;[name].[contenthash].js&#x27;</span>,
+    <span class="hljs-attr">clean</span>: <span class="hljs-literal">true</span>,
+  },
+  <span class="hljs-attr">resolve</span>: { <span class="hljs-attr">extensions</span>: [<span class="hljs-string">&#x27;.js&#x27;</span>, <span class="hljs-string">&#x27;.vue&#x27;</span>] },
+  <span class="hljs-attr">module</span>: {
+    <span class="hljs-attr">rules</span>: [
+      { <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.vue$/</span>, <span class="hljs-attr">loader</span>: <span class="hljs-string">&#x27;vue-loader&#x27;</span> },
+      { <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.css$/</span>, <span class="hljs-attr">use</span>: [<span class="hljs-string">&#x27;vue-style-loader&#x27;</span>, <span class="hljs-string">&#x27;css-loader&#x27;</span>] },
+    ],
+  },
+  <span class="hljs-attr">plugins</span>: [
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">VueLoaderPlugin</span>(),
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">HtmlWebpackPlugin</span>({ <span class="hljs-attr">template</span>: <span class="hljs-string">&#x27;./public/index.html&#x27;</span> }),
+    <span class="hljs-comment">// Define Vue feature flags so dev-only code is removed from the bundle:</span>
+    <span class="hljs-keyword">new</span> webpack.<span class="hljs-title class_">DefinePlugin</span>({
+      <span class="hljs-attr">__VUE_OPTIONS_API__</span>: <span class="hljs-string">&#x27;false&#x27;</span>,
+      <span class="hljs-attr">__VUE_PROD_DEVTOOLS__</span>: <span class="hljs-string">&#x27;false&#x27;</span>,
+      <span class="hljs-attr">__VUE_PROD_HYDRATION_MISMATCH_DETAILS__</span>: <span class="hljs-string">&#x27;false&#x27;</span>,
+    }),
+  ],
+  <span class="hljs-attr">devServer</span>: { <span class="hljs-attr">static</span>: <span class="hljs-string">&#x27;./dist&#x27;</span>, <span class="hljs-attr">hot</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">port</span>: <span class="hljs-number">8080</span>, <span class="hljs-attr">open</span>: <span class="hljs-literal">true</span> },
+}
+</code></pre>
+<pre><code class="hljs" data-lang="html"><span class="hljs-comment">&lt;!-- public/index.html (template, no script tag, the plugin injects it) --&gt;</span>
+<span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;en&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;utf-8&quot;</span> /&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Todo (Webpack)<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;app&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<p>Run dev: <code>npm run dev</code> serves on <code>http://localhost:8080</code> with hot module replacement. The caveat to know: <code>vue-loader</code> pre-compiles SFC templates so the runtime-only Vue build works, and the <code>DefinePlugin</code> feature flags strip dev code and silence warnings in production.</p>
+<h3>6.3 Pure npm, no bundler</h3>
+<p>Vue runs with no build step using native ES modules and an import map. There is no SFC compiler here, so the component uses a template string and Vue's full browser build (which includes the compiler). Good for prototypes and demos, not for production.</p>
+<pre><code class="hljs" data-lang="html"><span class="hljs-comment">&lt;!-- index.html --&gt;</span>
+<span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;en&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Todo (no build)<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;importmap&quot;</span>&gt;</span><span class="language-javascript">
+    { <span class="hljs-string">&quot;imports&quot;</span>: { <span class="hljs-string">&quot;vue&quot;</span>: <span class="hljs-string">&quot;https://unpkg.com/vue@3/dist/vue.esm-browser.js&quot;</span> } }
+  </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;app&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-handlebars"><span class="language-xml">
+    import { createApp, ref, computed } from &#x27;vue&#x27;
+    createApp({
+      setup() {
+        const newTodo = ref(&#x27;&#x27;)
+        const todos = ref([{ id: 1, text: &#x27;Run Vue with no build step&#x27;, done: false }])
+        let nextId = 2
+        const remaining = computed(() =&gt; todos.value.filter(t =&gt; !t.done).length)
+        const add = () =&gt; {
+          const text = newTodo.value.trim()
+          if (!text) return
+          todos.value.push({ id: nextId++, text, done: false })
+          newTodo.value = &#x27;&#x27;
+        }
+        const remove = (id) =&gt; { todos.value = todos.value.filter(t =&gt; t.id !== id) }
+        return { newTodo, todos, remaining, add, remove }
+      },
+      template: `
+        <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Todos (</span><span class="hljs-template-variable">{{ <span class="hljs-name">remaining</span> }}</span><span class="language-xml"> left)<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">v-model</span>=<span class="hljs-string">&quot;newTodo&quot;</span> @<span class="hljs-attr">keyup.enter</span>=<span class="hljs-string">&quot;add&quot;</span> <span class="hljs-attr">placeholder</span>=<span class="hljs-string">&quot;Add a todo&quot;</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;add&quot;</span>&gt;</span>Add<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+          <span class="hljs-tag">&lt;<span class="hljs-name">li</span> <span class="hljs-attr">v-for</span>=<span class="hljs-string">&quot;t in todos&quot;</span> <span class="hljs-attr">:key</span>=<span class="hljs-string">&quot;t.id&quot;</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;checkbox&quot;</span> <span class="hljs-attr">v-model</span>=<span class="hljs-string">&quot;t.done&quot;</span> /&gt;</span> </span><span class="hljs-template-variable">{{ <span class="hljs-name">t.text</span> }}</span><span class="language-xml">
+            <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;remove(t.id)&quot;</span>&gt;</span>x<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+          <span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span>`
+    }).mount(&#x27;#app&#x27;)
+  </span></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<pre><code class="hljs" data-lang="json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;todo-no-build&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;private&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;dev&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx serve .&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;start&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx http-server -o&quot;</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Run: <code>npm run dev</code>, then open the served URL. Caveat to state out loud in an interview: this ships the in-browser compiler, which is larger and compiles templates at runtime. Fine for a demo, wrong for production. Production always uses a build step and the runtime-only build.</p>
+<h3>6.4 Gulp (task runner orchestrating a bundler)</h3>
+<p>Gulp is a task runner, not a module bundler, and modern SFC needs a bundler. The honest, practical setup uses Gulp to orchestrate the pipeline (bundle with esbuild, copy static, watch, live reload) while esbuild does the actual SFC compilation and bundling.</p>
+<pre><code class="hljs" data-lang="json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;todo-gulp&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;private&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;dev&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;gulp dev&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;build&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;gulp build&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;vue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^3.5.0&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;gulp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^5.0.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;esbuild&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^0.25.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;esbuild-plugin-vue3&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^0.4.2&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;browser-sync&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^3.0.0&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// gulpfile.js</span>
+<span class="hljs-keyword">const</span> gulp = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;gulp&#x27;</span>)
+<span class="hljs-keyword">const</span> esbuild = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;esbuild&#x27;</span>)
+<span class="hljs-keyword">const</span> vuePlugin = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;esbuild-plugin-vue3&#x27;</span>)
+<span class="hljs-keyword">const</span> browserSync = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;browser-sync&#x27;</span>).<span class="hljs-title function_">create</span>()
+
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">buildOptions</span> = (<span class="hljs-params">prod</span>) =&gt; ({
+  <span class="hljs-attr">entryPoints</span>: [<span class="hljs-string">&#x27;src/main.js&#x27;</span>],
+  <span class="hljs-attr">bundle</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">outfile</span>: <span class="hljs-string">&#x27;dist/bundle.js&#x27;</span>,
+  <span class="hljs-attr">sourcemap</span>: !prod,
+  <span class="hljs-attr">minify</span>: prod,
+  <span class="hljs-attr">plugins</span>: [<span class="hljs-title function_">vuePlugin</span>()],
+  <span class="hljs-attr">define</span>: {                                   <span class="hljs-comment">// strip Vue dev code</span>
+    <span class="hljs-attr">__VUE_OPTIONS_API__</span>: <span class="hljs-string">&#x27;false&#x27;</span>,
+    <span class="hljs-attr">__VUE_PROD_DEVTOOLS__</span>: <span class="hljs-string">&#x27;false&#x27;</span>,
+    <span class="hljs-attr">__VUE_PROD_HYDRATION_MISMATCH_DETAILS__</span>: <span class="hljs-string">&#x27;false&#x27;</span>,
+  },
+})
+
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">bundle</span> = (<span class="hljs-params">prod</span>) =&gt; <span class="hljs-function">() =&gt;</span> esbuild.<span class="hljs-title function_">build</span>(<span class="hljs-title function_">buildOptions</span>(prod))
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">html</span> = (<span class="hljs-params"></span>) =&gt; gulp.<span class="hljs-title function_">src</span>(<span class="hljs-string">&#x27;public/index.html&#x27;</span>).<span class="hljs-title function_">pipe</span>(gulp.<span class="hljs-title function_">dest</span>(<span class="hljs-string">&#x27;dist&#x27;</span>))
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">reload</span> = (<span class="hljs-params">done</span>) =&gt; { browserSync.<span class="hljs-title function_">reload</span>(); <span class="hljs-title function_">done</span>() }
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">serve</span>(<span class="hljs-params"></span>) {
+  browserSync.<span class="hljs-title function_">init</span>({ <span class="hljs-attr">server</span>: <span class="hljs-string">&#x27;./dist&#x27;</span>, <span class="hljs-attr">port</span>: <span class="hljs-number">3000</span> })
+  gulp.<span class="hljs-title function_">watch</span>(<span class="hljs-string">&#x27;src/**/*&#x27;</span>, gulp.<span class="hljs-title function_">series</span>(<span class="hljs-title function_">bundle</span>(<span class="hljs-literal">false</span>), reload))
+  gulp.<span class="hljs-title function_">watch</span>(<span class="hljs-string">&#x27;public/index.html&#x27;</span>, gulp.<span class="hljs-title function_">series</span>(html, reload))
+}
+
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">build</span> = gulp.<span class="hljs-title function_">series</span>(html, <span class="hljs-title function_">bundle</span>(<span class="hljs-literal">true</span>))
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">dev</span> = gulp.<span class="hljs-title function_">series</span>(html, <span class="hljs-title function_">bundle</span>(<span class="hljs-literal">false</span>), serve)
+</code></pre>
+<pre><code class="hljs" data-lang="html"><span class="hljs-comment">&lt;!-- public/index.html --&gt;</span>
+<span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;en&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;utf-8&quot;</span> /&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Todo (Gulp)<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;app&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;bundle.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+<p>Run dev: <code>npm run dev</code> bundles, serves on <code>http://localhost:3000</code> via BrowserSync, and live-reloads on change. Build: <code>npm run build</code>. The framing for an interviewer: Gulp earns its place as the orchestrator for a multi-step asset pipeline (Sass, image optimization, copying, bundling). It delegates module bundling to a real bundler rather than doing it alone.</p>
+<hr>
+<h2>7. Local development servers</h2>
+<p><strong>Vite dev server</strong> (<code>vite</code>). Serves source as native ES modules with on-demand transform, so startup is near-instant and stays flat as the project grows. Hot module replacement is built in and precise. API proxying via <code>server.proxy</code>. This is the default you should reach for.</p>
+<p><strong>webpack-dev-server</strong> (<code>webpack serve</code>). Bundles the app in memory and serves from memory, with HMR enabled by <code>hot: true</code>. Cold start and rebuilds get slower as the graph grows, since it bundles up front. API proxying via <code>devServer.proxy</code>. Still common in established codebases.</p>
+<p>Both share the same dev concerns: enable HMR, proxy your backend to avoid CORS, bind a stable port, and keep source maps on in development. The practical difference is startup and rebuild speed, where Vite wins because it does not bundle during development.</p>
+<hr>
+<h2>8. Production deployment best practices</h2>
+<p>Lead with these in an architecture discussion. They are staff-level signals.</p>
+<p><strong>Build correctly.</strong> Ship a bundled, minified, tree-shaken build from the runtime-only Vue (never the in-browser compiler or full build). Set the Vue feature flags (<code>__VUE_OPTIONS_API__</code>, <code>__VUE_PROD_DEVTOOLS__</code>, <code>__VUE_PROD_HYDRATION_MISMATCH_DETAILS__</code>) to <code>false</code> so dev code is removed. Set <code>NODE_ENV=production</code>.</p>
+<p><strong>Split and lazy-load.</strong> Use dynamic <code>import()</code> for route-level components and <code>defineAsyncComponent</code> for heavy widgets, so the initial bundle stays small. Measure with <code>rollup-plugin-visualizer</code> (Vite) or <code>webpack-bundle-analyzer</code>, and hold a performance budget in CI.</p>
+<p><strong>Cache aggressively and safely.</strong> Emit content-hashed filenames (<code>[name].[contenthash].js</code>). Serve hashed assets with long-lived immutable cache headers, and serve <code>index.html</code> with no-cache so new deploys are picked up immediately.</p>
+<p><strong>Compress and serve from the edge.</strong> Enable Brotli or gzip at the server or CDN. A static SPA deploys cleanly to S3 plus CloudFront, Cloudflare Pages, Netlify, Vercel, or an Nginx box. Put a CDN in front.</p>
+<p><strong>Handle SPA routing.</strong> With Vue Router history mode, configure the server to rewrite unknown paths to <code>index.html</code>, or deep links 404.</p>
+<p><strong>Address SEO and first paint when it matters.</strong> For marketing, product, and listing pages, render on the server or prerender. Nuxt gives SSR and static generation. Watch for hydration mismatches: no <code>window</code> or <code>document</code> during server render, gate browser-only code behind <code>onMounted</code> or <code>import.meta.client</code>, and avoid non-deterministic render (dates, random, locale) that differs between server and client.</p>
+<p><strong>Operate it.</strong> Generate source maps and upload them to your error tracker (Sentry) rather than serving them publicly. Add a health check and basic web-vitals monitoring. Commit the lockfile, pin the Node version, and build reproducibly in CI.</p>
+<p><strong>Containerize with a multi-stage image.</strong> Build with Node, serve the static output with Nginx.</p>
+<pre><code class="hljs" data-lang="dockerfile"><span class="hljs-comment"># build stage</span>
+<span class="hljs-keyword">FROM</span> node:<span class="hljs-number">22</span>-alpine AS build
+<span class="hljs-keyword">WORKDIR</span><span class="language-bash"> /app</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> package*.json ./</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm ci</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> . .</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm run build</span>
+
+<span class="hljs-comment"># serve stage</span>
+<span class="hljs-keyword">FROM</span> nginx:alpine
+<span class="hljs-keyword">COPY</span><span class="language-bash"> --from=build /app/dist /usr/share/nginx/html</span>
+<span class="hljs-keyword">COPY</span><span class="language-bash"> nginx.conf /etc/nginx/conf.d/default.conf</span>
+<span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">80</span>
+</code></pre>
+<pre><code class="hljs" data-lang="nginx"><span class="hljs-comment"># nginx.conf</span>
+<span class="hljs-section">server</span> {
+  <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;
+  <span class="hljs-attribute">root</span> /usr/share/nginx/html;
+
+  <span class="hljs-section">location</span> / {
+    <span class="hljs-attribute">try_files</span> <span class="hljs-variable">$uri</span> <span class="hljs-variable">$uri</span>/ /index.html;   <span class="hljs-comment"># SPA fallback for Vue Router history mode</span>
+  }
+  <span class="hljs-section">location</span> <span class="hljs-regexp">~* \.(js|css|png|svg|woff2)$</span> {
+    <span class="hljs-attribute">expires</span> <span class="hljs-number">1y</span>;
+    <span class="hljs-attribute">add_header</span> Cache-Control <span class="hljs-string">&quot;public, immutable&quot;</span>;
+  }
+}
+</code></pre>
+<hr>
+<h2>9. Testing (the job names Jest and Cypress)</h2>
+<p>Unit and component tests use <strong>Vue Test Utils</strong> (<code>@vue/test-utils</code>) with <code>mount</code> (full render) or <code>shallowMount</code> (stub children). The idiomatic runner today is <strong>Vitest</strong>, which shares Jest's API and runs faster on Vite projects. Position it as: you set up Jest and Cypress before, and on a Vite/Vue codebase you reach for Vitest for the same reasons with a familiar API.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">import</span> { mount } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@vue/test-utils&#x27;</span>
+<span class="hljs-keyword">import</span> <span class="hljs-title class_">TodoApp</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../src/TodoApp.vue&#x27;</span>
+
+<span class="hljs-title function_">test</span>(<span class="hljs-string">&#x27;adds a todo on enter&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  <span class="hljs-keyword">const</span> wrapper = <span class="hljs-title function_">mount</span>(<span class="hljs-title class_">TodoApp</span>)
+  <span class="hljs-keyword">await</span> wrapper.<span class="hljs-title function_">find</span>(<span class="hljs-string">&#x27;input&#x27;</span>).<span class="hljs-title function_">setValue</span>(<span class="hljs-string">&#x27;write tests&#x27;</span>)
+  <span class="hljs-keyword">await</span> wrapper.<span class="hljs-title function_">find</span>(<span class="hljs-string">&#x27;input&#x27;</span>).<span class="hljs-title function_">trigger</span>(<span class="hljs-string">&#x27;keyup.enter&#x27;</span>)
+  <span class="hljs-title function_">expect</span>(wrapper.<span class="hljs-title function_">text</span>()).<span class="hljs-title function_">toContain</span>(<span class="hljs-string">&#x27;write tests&#x27;</span>)
+})
+</code></pre>
+<p>End-to-end and component testing use <strong>Cypress</strong> (you have done this). Test behavior through the rendered output and emitted events, not internal refs.</p>
+<hr>
+<h2>10. Live-coding katas to drill this week</h2>
+<p>Build each from scratch in a Vite scaffold until it is reflexive:</p>
+<ol>
+<li>Counter with reset and a <code>computed</code> doubled value.</li>
+<li>Debounced search filter using <code>watch</code> with a cleared timeout.</li>
+<li>A reusable <code>&lt;BaseInput&gt;</code> with <code>defineModel</code>, used twice in a parent.</li>
+<li>The TODO app in section 6, with a <code>computed</code> remaining count and stable keys.</li>
+<li>A <code>useFetch</code> composable exposing <code>data</code>, <code>error</code>, <code>loading</code>.</li>
+<li>A Pinia store with state, a getter, and an action, consumed by two components.</li>
+</ol>
+<hr>
+<h2>11. Framing your background (staff-level signal)</h2>
+<p>Lead with what already matches the posting. Do not apologize for the Vue ramp.</p>
+<ul>
+<li>&quot;Use AI to solve practical problems and improve team efficiency&quot; is a stated requirement. Your AI-assisted frontend work is direct evidence. Have a concrete story: what you delegated to the agent, where you reviewed and corrected, what shipped.</li>
+<li>You set up Cypress and Jest yourself. That is the testing requirement, answered.</li>
+<li>Angular, Webix, and ExtJS across 18 years is exactly the &quot;large complex projects over a long period&quot; and &quot;many codebases&quot; they ask for. Pitch yourself as someone who reasons from first principles (reactivity, component contracts, one-way data flow), so Vue specifics are a short ramp.</li>
+<li>Multi-brand design system: talk component API design, scoped slots for consumer customization, design tokens via <code>provide</code>/<code>inject</code> or CSS variables, and how you keep consistency across many codebases. This is the staff-level thinking they want.</li>
+<li>Know what is current: Vue 3.5 today, Vapor mode landing in 3.6, Vite 8, Pinia, Vitest, Nuxt for SSR. Naming the trajectory shows you keep up, which the posting asks for explicitly.</li>
+</ul>
+
+  </main>
+</div>
+</body>
+</html>

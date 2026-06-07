@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technical Interview Prep</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      color: #64748b;
+      font-size: 1rem;
+    }
+
+    main {
+      flex: 1;
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.75rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+    }
+
+    .card:hover {
+      box-shadow: 0 6px 20px rgba(0,0,0,.1);
+      transform: translateY(-2px);
+      border-color: #2563eb;
+    }
+
+    .card-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #2563eb;
+      background: #eff6ff;
+      border-radius: 4px;
+      padding: 0.2rem 0.5rem;
+      align-self: flex-start;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #64748b;
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    .card-link {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #2563eb;
+      margin-top: 0.25rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Technical Interview Prep</h1>
+  <p>Frontend study guides — pick a topic and start reviewing</p>
+</header>
+
+<main>
+  <div class="grid">
+
+    <a class="card" href="frontend/interview-question-bank.html">
+      <span class="card-tag">General</span>
+      <h2>Interview Question Bank</h2>
+      <p>A curated collection of frontend interview questions covering HTML, CSS, JavaScript, and core web concepts.</p>
+      <span class="card-link">Open guide →</span>
+    </a>
+
+    <a class="card" href="frontend/js-interview-prep.html">
+      <span class="card-tag">JavaScript</span>
+      <h2>JavaScript Deep Dive</h2>
+      <p>ES2025 features, closures, async patterns, prototypes, and the modern JS interview questions you actually get asked.</p>
+      <span class="card-link">Open guide →</span>
+    </a>
+
+    <a class="card" href="frontend/vue-interview-prep.html">
+      <span class="card-tag">Vue</span>
+      <h2>Vue Interview Prep</h2>
+      <p>Vue 3 composition API, reactivity system, component patterns, Pinia, and the Vue ecosystem explained for interviews.</p>
+      <span class="card-link">Open guide →</span>
+    </a>
+
+  </div>
+</main>
+
+<footer>
+  3 guides &nbsp;·&nbsp; Frontend focus &nbsp;·&nbsp; 2026
+</footer>
+
+</body>
+</html>

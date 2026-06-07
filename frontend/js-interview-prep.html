@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JavaScript Deep Dive (ES2025)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+:root{
+  --ink:#1c1b19; --muted:#5f5c55; --paper:#ffffff;
+  --accent:#b0502f; --accent-soft:#b0502f14;
+  --rule:#e7e3da; --code-bg:#f6f8fa; --code-border:#e1e6ea; --code-tag:#eef1f4;
+}
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Newsreader", Georgia, "Times New Roman", serif;
+  font-size:18px; line-height:1.72;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+}
+.wrap{ max-width:52rem; margin:0 auto; padding:3.5rem 1.6rem 6rem; }
+
+.doc-header{ border-bottom:3px solid var(--ink); padding-bottom:1.4rem; margin-bottom:2.6rem; }
+.kicker{ font-family:"JetBrains Mono", ui-monospace, monospace; font-size:.7rem;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--accent); }
+h1{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:2.7rem;
+  line-height:1.08; margin:.5rem 0 0; letter-spacing:-.015em; }
+.doc-header .sub{ color:var(--muted); font-size:1.02rem; margin-top:.85rem; line-height:1.55; }
+
+h2{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:1.72rem;
+  margin:3.2rem 0 1rem; padding-bottom:.42rem; border-bottom:1px solid var(--rule);
+  letter-spacing:-.01em; }
+h3{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:1.22rem;
+  margin:2.1rem 0 .55rem; }
+p{ margin:0 0 1rem; }
+a{ color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-soft); }
+strong{ font-weight:650; color:#141312; }
+ul,ol{ margin:0 0 1rem; padding-left:1.3rem; }
+li{ margin:.25rem 0; }
+hr{ border:none; border-top:1px solid var(--rule); margin:2.6rem 0; }
+
+code{ font-family:"JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size:.84em; background:var(--code-bg); border:1px solid var(--code-border);
+  border-radius:4px; padding:.06em .34em; color:#8a3c20; }
+
+pre{ position:relative; margin:1.1rem 0 1.5rem; background:var(--code-bg);
+  border:1px solid var(--code-border); border-left:3px solid var(--accent);
+  border-radius:8px; padding:1rem 1.15rem; overflow-x:auto; }
+pre code.hljs{ background:transparent; border:none; padding:0; color:#24292e;
+  font-size:.8rem; line-height:1.6; display:block; }
+pre code[data-lang]:not([data-lang=""]):before{
+  content: attr(data-lang); position:absolute; top:0; right:0;
+  font-family:"JetBrains Mono", monospace; font-size:.58rem; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--muted); background:var(--code-tag);
+  border:1px solid var(--code-border); border-top:none; border-right:none;
+  border-bottom-left-radius:6px; padding:.22em .6em; }
+
+table{ border-collapse:collapse; width:100%; margin:1.3rem 0; font-size:.86rem; }
+th,td{ border:1px solid var(--rule); padding:.5rem .68rem; text-align:left; vertical-align:top; }
+th{ background:var(--accent); color:#fff; font-family:"JetBrains Mono", monospace;
+  font-size:.66rem; letter-spacing:.04em; text-transform:uppercase; font-weight:500; }
+tbody tr:nth-child(even){ background:#faf9f6; }
+td code{ font-size:.84em; background:#f3ece9; border-color:#e6d8d2; }
+
+@page{ margin:16mm; }
+@media print{
+  body{ font-size:10.5pt; }
+  .wrap{ max-width:none; padding:0; }
+  *{ print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  a{ color:var(--ink); border:none; }
+  pre code.hljs{ white-space:pre-wrap; word-break:break-word; }
+  pre, table{ break-inside:auto; }
+  tr{ break-inside:avoid; }
+  h1,h2,h3{ break-after:avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation &middot; Staff Frontend Engineer</div>
+    <h1>JavaScript Deep Dive: Staff-Level Caveats</h1>
+    <div class="sub">The mechanisms behind the questions, assuming ES2025: this, closures, the event loop, memory leaks, prototypes, and what is newly relevant.</div>
+  </header>
+  <main>
+<h1>JavaScript Deep Dive: Staff-Level Interview Caveats (ES2025)</h1>
+<p>This guide targets the live, verbal part of a senior or staff frontend interview: the &quot;why does this happen&quot; and &quot;what's the catch&quot; questions. It assumes ES2025 and modern engines. Each topic states the trap in prose, then shows it in code.</p>
+<h2>How to read your own instinct about what is still asked</h2>
+<p>You are half right that some of the old material faded, and saying so out loud is a strong signal. The nuance is that the language got safer in the places that were syntactic accidents, while the genuinely hard topics became more important, not less, because single-page apps now live for hours in one tab and async is everywhere. Frame it like this in the room:</p>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Status</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>var</code> hoisting tricks, IIFE module pattern</td>
+<td>Faded</td>
+<td><code>let</code>/<code>const</code> and ES modules removed the need</td>
+</tr>
+<tr>
+<td>Manual prototype wiring</td>
+<td>Mostly faded in app code</td>
+<td><code>class</code> is the daily syntax, but the chain still matters at staff level</td>
+</tr>
+<tr>
+<td>Callback pyramids, <code>arguments</code> object</td>
+<td>Faded</td>
+<td><code>async</code>/<code>await</code>, rest params, arrow functions</td>
+</tr>
+<tr>
+<td>Closures</td>
+<td>Evergreen, more central</td>
+<td>Hooks, event handlers, and stale-closure bugs live here</td>
+</tr>
+<tr>
+<td><code>this</code> binding</td>
+<td>Evergreen</td>
+<td>Callbacks, class fields, and event handlers still trip people</td>
+</tr>
+<tr>
+<td>The event loop, microtask ordering</td>
+<td>Evergreen, more important</td>
+<td>Async is the default, ordering bugs are subtle</td>
+</tr>
+<tr>
+<td>Memory leaks</td>
+<td>More important</td>
+<td>Long-lived SPAs leak in ways short pages never did</td>
+</tr>
+<tr>
+<td>Type coercion and equality</td>
+<td>Evergreen</td>
+<td>Still a fast filter question</td>
+</tr>
+</tbody>
+</table>
+<p>A staff candidate is expected to explain mechanisms and tradeoffs, not just recite syntax. The sections below go deep on the evergreen four you named (<code>this</code>, closures, memory, prototypes), then the async and equality topics that interviewers lean on, then the ES2025 features worth name-dropping, and finish with predict-the-output puzzles.</p>
+<hr>
+<h2>1. <code>this</code>: the most asked, still</h2>
+<p><code>this</code> is not bound to where a function is defined. It is determined by how the function is called, resolved fresh on every call. There are four rules, checked in order of precedence.</p>
+<ol>
+<li><code>new</code> binding: calling with <code>new</code> sets <code>this</code> to the freshly created object.</li>
+<li>Explicit binding: <code>call</code>, <code>apply</code>, or <code>bind</code> set <code>this</code> to the argument you pass.</li>
+<li>Implicit binding: <code>obj.method()</code> sets <code>this</code> to <code>obj</code>, the object left of the dot.</li>
+<li>Default binding: a plain call sets <code>this</code> to <code>undefined</code> in strict mode (modules and class bodies are always strict), or the global object in sloppy mode.</li>
+</ol>
+<p>Arrow functions ignore all four. They have no <code>this</code> of their own and capture it lexically from the surrounding scope at definition time, which is exactly why they are the fix for callbacks that would otherwise lose <code>this</code>.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> counter = {
+  <span class="hljs-attr">count</span>: <span class="hljs-number">0</span>,
+  <span class="hljs-title function_">increment</span>(<span class="hljs-params"></span>) { <span class="hljs-variable language_">this</span>.<span class="hljs-property">count</span>++ },        <span class="hljs-comment">// regular method: &#x27;this&#x27; depends on the call site</span>
+}
+
+counter.<span class="hljs-title function_">increment</span>()        <span class="hljs-comment">// implicit binding, this === counter, works</span>
+<span class="hljs-keyword">const</span> fn = counter.<span class="hljs-property">increment</span>
+<span class="hljs-title function_">fn</span>()                       <span class="hljs-comment">// default binding, this === undefined, throws in strict mode</span>
+
+<span class="hljs-built_in">setTimeout</span>(counter.<span class="hljs-property">increment</span>, <span class="hljs-number">0</span>)         <span class="hljs-comment">// BROKEN: passed as a bare callback, loses &#x27;this&#x27;</span>
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> counter.<span class="hljs-title function_">increment</span>(), <span class="hljs-number">0</span>) <span class="hljs-comment">// FIXED: arrow keeps the call on counter</span>
+</code></pre>
+<p>The modern footgun is class fields. A method written as a class field arrow is bound once to the instance, which solves the lost-<code>this</code> callback problem but costs one function per instance instead of one shared on the prototype. Know the tradeoff.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Button</span> {
+  label = <span class="hljs-string">&#x27;Click&#x27;</span>
+  onClickArrow = <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">label</span>   <span class="hljs-comment">// bound to the instance, safe as a callback, one per instance</span>
+  <span class="hljs-title function_">onClickMethod</span>(<span class="hljs-params"></span>) { <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">label</span> }  <span class="hljs-comment">// on the prototype, shared, but &#x27;this&#x27; can be lost</span>
+}
+</code></pre>
+<hr>
+<h2>2. Closures: the topic that quietly runs everything</h2>
+<p>A closure is a function bundled with the lexical environment it was defined in, so it keeps access to those outer variables even after the outer function has returned. This is not a special feature you opt into. Every function in JavaScript is a closure over its definition scope.</p>
+<p>The classic trap is a loop that captures a loop variable. With <code>var</code>, there is one shared binding for the whole loop, so every callback sees the final value. With <code>let</code>, each iteration gets a fresh binding, which is what you almost always want.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">3</span>; i++) <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(i))   <span class="hljs-comment">// logs 3, 3, 3</span>
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">3</span>; i++) <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(i))   <span class="hljs-comment">// logs 0, 1, 2</span>
+</code></pre>
+<p>The version of this that bites people today is the stale closure. A callback captures a variable by reference to its binding, but if you capture a value at one moment and the binding is later replaced, the callback may read an outdated snapshot. This is the root cause of a whole class of React hook bugs, where an effect or handler closes over state from the render in which it was created.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">makeHandlers</span>(<span class="hljs-params">value</span>) {
+  <span class="hljs-comment">// both handlers close over the SAME &#x27;value&#x27; binding</span>
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">read</span>: <span class="hljs-function">() =&gt;</span> value,           <span class="hljs-comment">// always reflects the current binding</span>
+    <span class="hljs-attr">later</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(value), <span class="hljs-number">1000</span>),
+  }
+}
+</code></pre>
+<p>Closures also have a memory dimension covered in section 8: a closure keeps its captured variables alive, so a long-lived closure that captures a large object keeps that object out of the garbage collector.</p>
+<hr>
+<h2>3. Scope, hoisting, and the temporal dead zone</h2>
+<p><code>var</code> is function-scoped and hoisted: the declaration moves to the top of the function and is initialized to <code>undefined</code>, so reading it before the assignment gives <code>undefined</code> rather than an error. <code>let</code> and <code>const</code> are block-scoped and also hoisted, but they are not initialized until execution reaches the declaration. The gap between the top of the block and that line is the temporal dead zone, and reading the variable inside it throws a <code>ReferenceError</code>. Function declarations are hoisted whole, so you can call them above their definition.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(a)   <span class="hljs-comment">// undefined  (var hoisted and initialized)</span>
+<span class="hljs-keyword">var</span> a = <span class="hljs-number">1</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(b)   <span class="hljs-comment">// ReferenceError (TDZ)</span>
+<span class="hljs-keyword">let</span> b = <span class="hljs-number">2</span>
+</code></pre>
+<p><code>const</code> prevents reassignment of the binding, not mutation of the value. A <code>const</code> object is still mutable.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> user = { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ada&#x27;</span> }
+user.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;Grace&#x27;</span>   <span class="hljs-comment">// allowed, the object is mutated</span>
+user = {}             <span class="hljs-comment">// TypeError, the binding cannot be reassigned</span>
+</code></pre>
+<hr>
+<h2>4. Prototypes: write classes, understand the chain</h2>
+<p>Your instinct is right that you rarely wire prototypes by hand anymore, because <code>class</code> is the daily syntax. The reason it still comes up at staff level is that <code>class</code> is pure syntactic sugar over the prototype chain, and the abstraction leaks the moment you debug a framework, reason about <code>instanceof</code>, or chase a performance issue. Every object has an internal link to another object, its prototype, and property lookup walks that chain until it finds the property or reaches <code>null</code>. A class puts its methods on <code>Constructor.prototype</code>, and instances link to it.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Animal</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">name</span>) { <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name }
+  <span class="hljs-title function_">speak</span>(<span class="hljs-params"></span>) { <span class="hljs-keyword">return</span> <span class="hljs-string">`<span class="hljs-subst">${<span class="hljs-variable language_">this</span>.name}</span> makes a sound`</span> }
+}
+<span class="hljs-comment">// desugars to roughly:</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">Animal</span>(<span class="hljs-params">name</span>) { <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name }
+<span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">speak</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) { <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> + <span class="hljs-string">&#x27; makes a sound&#x27;</span> }
+
+<span class="hljs-keyword">const</span> dog = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Animal</span>(<span class="hljs-string">&#x27;Rex&#x27;</span>)
+<span class="hljs-title class_">Object</span>.<span class="hljs-title function_">getPrototypeOf</span>(dog) === <span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>   <span class="hljs-comment">// true</span>
+dog.<span class="hljs-title function_">speak</span>()   <span class="hljs-comment">// &#x27;speak&#x27; not on dog, found one hop up on Animal.prototype</span>
+</code></pre>
+<p>A few distinctions that come up:</p>
+<ul>
+<li><code>prototype</code> is a property on constructor functions; the live link on an instance is its internal <code>[[Prototype]]</code>, read via <code>Object.getPrototypeOf</code> (the legacy <code>__proto__</code> accessor exposes the same thing).</li>
+<li><code>instanceof</code> walks the prototype chain checking whether the constructor's <code>prototype</code> appears in it, which is why it can be fooled and why duck typing is sometimes safer.</li>
+<li>Modern class features to mention: real private fields with <code>#name</code> (truly inaccessible outside the class, unlike the old underscore convention), <code>static</code> members, and <code>static {}</code> initialization blocks.</li>
+<li>A performance note that signals depth: engines optimize objects that share a stable shape (hidden class). Adding properties in different orders or mutating shapes after creation can deoptimize hot code.</li>
+</ul>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Account</span> {
+  #balance = <span class="hljs-number">0</span>                      <span class="hljs-comment">// private, not reachable as account.#balance outside</span>
+  <span class="hljs-title function_">deposit</span>(<span class="hljs-params">n</span>) { <span class="hljs-variable language_">this</span>.#balance += n; <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span> }
+  <span class="hljs-keyword">get</span> <span class="hljs-title function_">balance</span>() { <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.#balance }
+}
+</code></pre>
+<hr>
+<h2>5. Equality and coercion</h2>
+<p>There are three equality checks, and you should know exactly when each differs. <code>===</code> compares without coercion. <code>==</code> coerces operands to a common type first, following rules worth avoiding in production. <code>Object.is</code> is like <code>===</code> with two deliberate exceptions: it treats <code>NaN</code> as equal to itself, and it distinguishes <code>+0</code> from <code>-0</code>.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-title class_">NaN</span> === <span class="hljs-title class_">NaN</span>            <span class="hljs-comment">// false</span>
+<span class="hljs-title class_">Object</span>.<span class="hljs-title function_">is</span>(<span class="hljs-title class_">NaN</span>, <span class="hljs-title class_">NaN</span>)    <span class="hljs-comment">// true</span>
+<span class="hljs-title class_">Object</span>.<span class="hljs-title function_">is</span>(+<span class="hljs-number">0</span>, -<span class="hljs-number">0</span>)      <span class="hljs-comment">// false</span>
+<span class="hljs-number">0</span> === -<span class="hljs-number">0</span>               <span class="hljs-comment">// true</span>
+
+<span class="hljs-literal">null</span> == <span class="hljs-literal">undefined</span>      <span class="hljs-comment">// true  (special case in ==)</span>
+<span class="hljs-literal">null</span> === <span class="hljs-literal">undefined</span>     <span class="hljs-comment">// false</span>
+<span class="hljs-string">&#x27;&#x27;</span> == <span class="hljs-number">0</span>                <span class="hljs-comment">// true  (both coerce toward 0)</span>
+[] == ![]              <span class="hljs-comment">// true  (![] is false, [] coerces to &#x27;&#x27;, &#x27;&#x27; == 0 ... a classic puzzle)</span>
+</code></pre>
+<p>The practical rules: use <code>===</code> always, reach for <code>Object.is</code> only when <code>NaN</code> or signed zero matters, and remember the falsy set is <code>false</code>, <code>0</code>, <code>-0</code>, <code>0n</code>, <code>''</code>, <code>null</code>, <code>undefined</code>, and <code>NaN</code>. Everything else is truthy, including <code>'0'</code>, <code>'false'</code>, <code>[]</code>, and <code>{}</code>. Also worth a sentence: <code>typeof null</code> returns <code>'object'</code>, a famous historical bug that cannot be fixed without breaking the web.</p>
+<hr>
+<h2>6. The event loop: where async ordering lives</h2>
+<p>This is a near-certain question once async comes up. The runtime has a call stack, a macrotask queue (timers like <code>setTimeout</code>, I/O, message events), and a microtask queue (promise callbacks, <code>queueMicrotask</code>, <code>await</code> continuations). The rule that drives every ordering puzzle: after the current synchronous code finishes, the engine drains the entire microtask queue before taking the next macrotask, and it drains microtasks again after each macrotask. Microtasks added while draining run in the same pass, before any timer.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;1&#x27;</span>)
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;2&#x27;</span>))            <span class="hljs-comment">// macrotask</span>
+<span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;3&#x27;</span>)) <span class="hljs-comment">// microtask</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;4&#x27;</span>)
+<span class="hljs-comment">// Output: 1, 4, 3, 2</span>
+</code></pre>
+<p><code>async</code>/<code>await</code> is built on microtasks: everything after an <code>await</code> is scheduled as a microtask continuation.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">f</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;a&#x27;</span>)
+  <span class="hljs-keyword">await</span> <span class="hljs-literal">null</span>            <span class="hljs-comment">// suspends, schedules the rest as a microtask</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;b&#x27;</span>)
+}
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;start&#x27;</span>)
+<span class="hljs-title function_">f</span>()
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;end&#x27;</span>)
+<span class="hljs-comment">// Output: start, a, end, b</span>
+</code></pre>
+<p>The staff-level point to add: because microtasks always run to completion before the next render or timer, a recursive chain of microtasks can starve rendering and timers entirely, freezing the UI. That is a real production failure mode, not just trivia.</p>
+<hr>
+<h2>7. Promises and async/await pitfalls</h2>
+<p>The common mistakes cluster around three ideas: forgetting to wait, waiting in the wrong shape, and mishandling errors.</p>
+<p>A floating promise is one you never await or <code>.catch</code>, so failures vanish into unhandled rejections. <code>await</code> inside a loop runs iterations serially, which is correct when each depends on the last and wasteful when they are independent. For independent work, fire them together and await once.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// Serial: each await blocks the next, slow when the calls are independent</span>
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> id <span class="hljs-keyword">of</span> ids) { <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchOne</span>(id) }
+
+<span class="hljs-comment">// Parallel: start all, then await together</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>(ids.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span> <span class="hljs-title function_">fetchOne</span>(id)))
+</code></pre>
+<p>Know the four combinators and how they fail. <code>Promise.all</code> rejects as soon as any input rejects and loses the other results. <code>Promise.allSettled</code> always resolves with a status for each. <code>Promise.race</code> settles with the first to settle, success or failure. <code>Promise.any</code> resolves with the first success and rejects only if all fail.</p>
+<p>Two more traps. <code>Array.prototype.forEach</code> does not await its callback, so an <code>async</code> callback inside <code>forEach</code> runs unawaited; use a <code>for...of</code> loop or <code>Promise.all(map(...))</code>. And an <code>async</code> function always returns a promise, so a <code>throw</code> inside it becomes a rejected promise, which means you catch it with <code>.catch</code> or a <code>try/catch</code> around the <code>await</code>, never with a bare <code>try/catch</code> around the call that did not await.</p>
+<p>ES2025 adds <code>Promise.try</code>, which runs a function and always gives you a promise, so a synchronous throw and an async rejection flow through the same <code>.catch</code>. It removes the awkward seam where the first step of a chain might throw synchronously.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">try</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">maybeThrowsSync</span>(input))
+  .<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> <span class="hljs-title function_">maybeAsync</span>(v))
+  .<span class="hljs-title function_">catch</span>(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-title function_">report</span>(err))   <span class="hljs-comment">// sync and async failures both land here</span>
+</code></pre>
+<hr>
+<h2>8. Memory leaks: the staff-level differentiator</h2>
+<p>Short pages never had to care. Long-lived SPAs do, and this is where senior candidates separate themselves. Four causes account for most leaks.</p>
+<p>First, timers and subscriptions you never clear. An <code>setInterval</code> or an event listener keeps its callback, and everything that callback closes over, alive forever. Second, detached DOM nodes still referenced by JavaScript: you remove an element from the document but keep a variable or a listener pointing at it, so it cannot be collected. Third, closures that capture large objects and outlive their usefulness. Fourth, accidental globals and ever-growing caches or <code>Map</code>s that nothing evicts.</p>
+<p>The modern tools to name:</p>
+<p><code>WeakMap</code> and <code>WeakSet</code> hold their keys weakly, so when nothing else references a key object, the entry is collected automatically. This is the correct structure for per-object metadata or caches keyed by DOM nodes, because it cannot keep those nodes alive.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> metadata = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WeakMap</span>()
+metadata.<span class="hljs-title function_">set</span>(domNode, { <span class="hljs-attr">lastSeen</span>: <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() })
+<span class="hljs-comment">// when domNode is removed and unreferenced, the entry is GC&#x27;d, no manual cleanup</span>
+</code></pre>
+<p><code>WeakRef</code> and <code>FinalizationRegistry</code> let you hold a value weakly and run a cleanup callback after collection, but the timing is nondeterministic and engine-dependent, so the rule is never to rely on them for correctness, only for opportunistic cleanup.</p>
+<p><code>AbortController</code> is the cleanest modern pattern for teardown. One signal can cancel a fetch and remove many listeners at once, which is far less error-prone than matching every <code>addEventListener</code> with a <code>removeEventListener</code>.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> ctrl = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AbortController</span>()
+<span class="hljs-keyword">const</span> { signal } = ctrl
+button.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, onClick, { signal })
+<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;resize&#x27;</span>, onResize, { signal })
+<span class="hljs-title function_">fetch</span>(url, { signal })
+<span class="hljs-comment">// teardown, all at once:</span>
+ctrl.<span class="hljs-title function_">abort</span>()
+</code></pre>
+<p>For diagnosis, mention heap snapshots and the detached-nodes view in DevTools, and the technique of taking two snapshots and comparing retained objects.</p>
+<hr>
+<h2>9. Copying and immutability</h2>
+<p>Assignment never copies an object, it copies a reference, so two variables point at the same value. A shallow copy via spread or <code>Object.assign</code> duplicates the top level only, leaving nested objects shared. For a true deep copy, <code>structuredClone</code> is the built-in answer and handles nested structures, <code>Map</code>, <code>Set</code>, <code>Date</code>, typed arrays, and even cyclic references, but it cannot clone functions, DOM nodes, or prototypes.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> original = { <span class="hljs-attr">a</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">nested</span>: { <span class="hljs-attr">b</span>: <span class="hljs-number">2</span> } }
+<span class="hljs-keyword">const</span> shallow = { ...original }
+shallow.<span class="hljs-property">nested</span>.<span class="hljs-property">b</span> = <span class="hljs-number">99</span>           <span class="hljs-comment">// also changes original.nested.b, shared reference</span>
+
+<span class="hljs-keyword">const</span> deep = <span class="hljs-title function_">structuredClone</span>(original)
+deep.<span class="hljs-property">nested</span>.<span class="hljs-property">b</span> = <span class="hljs-number">99</span>              <span class="hljs-comment">// original is untouched</span>
+</code></pre>
+<p>The old <code>JSON.parse(JSON.stringify(x))</code> trick still appears, so name its failures: it drops <code>undefined</code> and functions, turns <code>Date</code> into a string, and throws on cycles. <code>const</code> gives binding immutability, <code>Object.freeze</code> gives a shallow freeze, and the ES2023 array methods <code>toSorted</code>, <code>toReversed</code>, <code>toSpliced</code>, and <code>with</code> return new arrays instead of mutating, which pairs well with immutable state.</p>
+<hr>
+<h2>10. Modern operators that changed the gotchas</h2>
+<p>These reduced old bugs and introduced their own subtleties.</p>
+<p>Optional chaining <code>?.</code> short-circuits the whole expression to <code>undefined</code> the moment a link is nullish, and it works for calls <code>?.()</code> and indexing <code>?.[]</code>. Nullish coalescing <code>??</code> falls back only on <code>null</code> or <code>undefined</code>, which is the fix for the long-standing bug where <code>||</code> also rejects valid falsy values like <code>0</code> and <code>''</code>.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> port = config.<span class="hljs-property">port</span> ?? <span class="hljs-number">8080</span>   <span class="hljs-comment">// keeps 0 if explicitly set</span>
+<span class="hljs-keyword">const</span> port2 = config.<span class="hljs-property">port</span> || <span class="hljs-number">8080</span>  <span class="hljs-comment">// <span class="hljs-doctag">BUG:</span> replaces a valid 0 with 8080</span>
+<span class="hljs-keyword">const</span> name = user?.<span class="hljs-property">profile</span>?.<span class="hljs-property">name</span> ?? <span class="hljs-string">&#x27;Anonymous&#x27;</span>
+</code></pre>
+<p>Logical assignment <code>??=</code>, <code>||=</code>, and <code>&amp;&amp;=</code> assign conditionally and short-circuit, so <code>obj.x ??= compute()</code> only calls <code>compute</code> when <code>x</code> is nullish. <code>.at(-1)</code> reads from the end without <code>length</code> arithmetic. <code>Object.hasOwn(obj, key)</code> is the safe replacement for <code>obj.hasOwnProperty(key)</code>, which breaks on objects created with <code>Object.create(null)</code> or that shadow the method.</p>
+<hr>
+<h2>11. ES2025 features worth name-dropping</h2>
+<p>Knowing these signals that you keep current, which the posting asks for explicitly.</p>
+<p><strong>Iterator helpers</strong> put <code>map</code>, <code>filter</code>, <code>take</code>, <code>drop</code>, <code>flatMap</code>, <code>reduce</code>, and <code>toArray</code> directly on iterators, and they are lazy: they pull one value at a time and never build intermediate arrays, so they work on infinite sequences.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">function</span>* <span class="hljs-title function_">naturals</span>(<span class="hljs-params"></span>) { <span class="hljs-keyword">let</span> n = <span class="hljs-number">1</span>; <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) <span class="hljs-keyword">yield</span> n++ }
+<span class="hljs-keyword">const</span> result = <span class="hljs-title function_">naturals</span>()
+  .<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> n % <span class="hljs-number">2</span> === <span class="hljs-number">0</span>)
+  .<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> n * n)
+  .<span class="hljs-title function_">take</span>(<span class="hljs-number">3</span>)
+  .<span class="hljs-title function_">toArray</span>()             <span class="hljs-comment">// [4, 16, 36], the infinite generator is never fully realized</span>
+</code></pre>
+<p><strong>Set methods</strong> add real set algebra: <code>union</code>, <code>intersection</code>, <code>difference</code>, <code>symmetricDifference</code>, <code>isSubsetOf</code>, <code>isSupersetOf</code>, and <code>isDisjointFrom</code>.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> a = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])
+<span class="hljs-keyword">const</span> b = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>([<span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>])
+a.<span class="hljs-title function_">intersection</span>(b)   <span class="hljs-comment">// Set {2, 3}</span>
+a.<span class="hljs-title function_">difference</span>(b)     <span class="hljs-comment">// Set {1}</span>
+</code></pre>
+<p><strong><code>RegExp.escape</code></strong> escapes a string for safe use inside a regex, the same idea as escaping SQL, which closes a real injection hole when you build patterns from user input.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> safe = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RegExp</span>(<span class="hljs-title class_">RegExp</span>.<span class="hljs-built_in">escape</span>(userInput))
+</code></pre>
+<p><strong>JSON modules with import attributes</strong> let you import JSON directly, parsed, with the <code>with</code> keyword declaring the type so the contents are never mistaken for code.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">import</span> config <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./config.json&#x27;</span> <span class="hljs-keyword">with</span> { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;json&#x27;</span> }
+</code></pre>
+<p>Rounding out the edition: <code>Promise.try</code> (section 7), <code>Float16Array</code> for half-precision data such as GPU buffers, duplicate named capture groups across regex alternatives, and inline regex pattern modifiers like <code>(?i:...)</code>.</p>
+<p>What is not in ES2025, so do not claim it: pattern matching and records and tuples are still proposals, and Temporal, the long-awaited date and time API, is arriving in engines on its own track rather than as part of this edition. Mention Temporal as emerging, not shipped everywhere.</p>
+<hr>
+<h2>12. Predict-the-output puzzles</h2>
+<p>Interviewers use these to check that you reason about mechanism rather than guess. Cover the answer, then check yourself.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// Puzzle 1: this and call site</span>
+<span class="hljs-keyword">const</span> obj = {
+  <span class="hljs-attr">val</span>: <span class="hljs-number">42</span>,
+  <span class="hljs-title function_">regular</span>(<span class="hljs-params"></span>) { <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>?.<span class="hljs-property">val</span> },
+  <span class="hljs-attr">arrow</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">this</span>?.<span class="hljs-property">val</span>,
+}
+<span class="hljs-keyword">const</span> loose = obj.<span class="hljs-property">regular</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(obj.<span class="hljs-title function_">regular</span>())  <span class="hljs-comment">// 42, implicit binding</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">loose</span>())        <span class="hljs-comment">// undefined, lost binding</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(obj.<span class="hljs-title function_">arrow</span>())    <span class="hljs-comment">// undefined, arrow took lexical this, not obj</span>
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// Puzzle 2: event loop ordering</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;A&#x27;</span>)
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;B&#x27;</span>))
+<span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;C&#x27;</span>)).<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;D&#x27;</span>))
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;E&#x27;</span>)
+<span class="hljs-comment">// A, E, C, D, B   (sync first, then all microtasks incl. the chained one, then the timer)</span>
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// Puzzle 3: closure over a loop binding</span>
+<span class="hljs-keyword">const</span> fns = []
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">3</span>; i++) fns.<span class="hljs-title function_">push</span>(<span class="hljs-function">() =&gt;</span> i)
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(fns.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span> <span class="hljs-title function_">f</span>()))   <span class="hljs-comment">// [3, 3, 3], one shared var binding</span>
+<span class="hljs-comment">// swap var for let to get [0, 1, 2]</span>
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// Puzzle 4: coercion and ??</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-number">0</span> || <span class="hljs-string">&#x27;fallback&#x27;</span>)   <span class="hljs-comment">// &#x27;fallback&#x27;, 0 is falsy</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-number">0</span> ?? <span class="hljs-string">&#x27;fallback&#x27;</span>)   <span class="hljs-comment">// 0, nullish only triggers on null/undefined</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;&#x27;</span> ?? <span class="hljs-string">&#x27;fallback&#x27;</span>)  <span class="hljs-comment">// &#x27;&#x27;, empty string is not nullish</span>
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// Puzzle 5: async interleaving</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">run</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-number">1</span>)
+  <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>()
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-number">2</span>)
+}
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-number">0</span>)
+<span class="hljs-title function_">run</span>()
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-number">3</span>)
+<span class="hljs-comment">// 0, 1, 3, 2   (everything after await is a microtask)</span>
+</code></pre>
+<hr>
+<h2>13. What staff-level actually demonstrates</h2>
+<p>The trivia is a filter, not the goal. Above the senior line, interviewers want to see that you explain the mechanism behind an answer, name the tradeoff rather than the rule, and connect a language detail to a real failure mode you have debugged. When you hit one of these caveats, do three things: say what happens, say why the engine does that, and say where it bites in production. For example, do not just answer that <code>forEach</code> ignores async; explain that the callback returns a promise the method discards, that the loop therefore finishes before the work does, and that this is why a batch of writes can appear to succeed while half are still pending.</p>
+<p>Tie it back to your background where it fits. Eighteen years across Angular, Webix, and ExtJS means you have debugged <code>this</code> and memory issues in anger, watched closures cause stale UI, and reasoned about prototype chains inside framework internals. That lived experience, explained calmly, reads as more senior than reciting the falsy list.</p>
+
+  </main>
+</div>
+</body>
+</html>

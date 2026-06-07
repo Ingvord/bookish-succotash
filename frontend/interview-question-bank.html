@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interview Question Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+:root{
+  --ink:#1c1b19; --muted:#5f5c55; --paper:#ffffff;
+  --accent:#33408c; --accent-soft:#33408c14;
+  --rule:#e7e3da; --code-bg:#f6f8fa; --code-border:#e1e6ea; --code-tag:#eef1f4;
+}
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{ margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Newsreader", Georgia, "Times New Roman", serif;
+  font-size:18px; line-height:1.72;
+  print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+.wrap{ max-width:52rem; margin:0 auto; padding:3.5rem 1.6rem 6rem; }
+.doc-header{ border-bottom:3px solid var(--ink); padding-bottom:1.4rem; margin-bottom:2.6rem; }
+.kicker{ font-family:"JetBrains Mono", ui-monospace, monospace; font-size:.7rem;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--accent); }
+h1{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:2.7rem;
+  line-height:1.08; margin:.5rem 0 0; letter-spacing:-.015em; }
+.doc-header .sub{ color:var(--muted); font-size:1.02rem; margin-top:.85rem; line-height:1.55; }
+h2{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:1.72rem;
+  margin:3.2rem 0 1rem; padding-bottom:.42rem; border-bottom:1px solid var(--rule); letter-spacing:-.01em; }
+h3{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:1.22rem; margin:2.1rem 0 .55rem; }
+p{ margin:0 0 1rem; }
+a{ color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-soft); }
+strong{ font-weight:650; color:#141312; }
+ul,ol{ margin:0 0 1rem; padding-left:1.3rem; }
+li{ margin:.25rem 0; }
+hr{ border:none; border-top:1px solid var(--rule); margin:2.6rem 0; }
+code{ font-family:"JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size:.84em; background:var(--code-bg); border:1px solid var(--code-border);
+  border-radius:4px; padding:.06em .34em; color:#28336e; }
+pre{ position:relative; margin:1.1rem 0 1.5rem; background:var(--code-bg);
+  border:1px solid var(--code-border); border-left:3px solid var(--accent);
+  border-radius:8px; padding:1rem 1.15rem; overflow-x:auto; }
+pre code.hljs{ background:transparent; border:none; padding:0; color:#24292e;
+  font-size:.8rem; line-height:1.6; display:block; }
+pre code[data-lang]:not([data-lang=""]):before{
+  content: attr(data-lang); position:absolute; top:0; right:0;
+  font-family:"JetBrains Mono", monospace; font-size:.58rem; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--muted); background:var(--code-tag);
+  border:1px solid var(--code-border); border-top:none; border-right:none;
+  border-bottom-left-radius:6px; padding:.22em .6em; }
+table{ border-collapse:collapse; width:100%; margin:1.3rem 0; font-size:.86rem; }
+th,td{ border:1px solid var(--rule); padding:.5rem .68rem; text-align:left; vertical-align:top; }
+th{ background:var(--accent); color:#fff; font-family:"JetBrains Mono", monospace;
+  font-size:.66rem; letter-spacing:.04em; text-transform:uppercase; font-weight:500; }
+tbody tr:nth-child(even){ background:#faf9f6; }
+td code{ font-size:.84em; background:#edeff7; border-color:#d8dcec; }
+@page{ margin:16mm; }
+@media print{
+  body{ font-size:10.5pt; }
+  .wrap{ max-width:none; padding:0; }
+  *{ print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  a{ color:var(--ink); border:none; }
+  pre code.hljs{ white-space:pre-wrap; word-break:break-word; }
+  pre, table{ break-inside:auto; }
+  tr{ break-inside:avoid; }
+  h1,h2,h3{ break-after:avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation &middot; Staff Frontend Engineer</div>
+    <h1>Question Bank: Coding &amp; Frontend Knowledge</h1>
+    <div class="sub">Likely live-coding tasks with model solutions, plus knowledge questions across the browser, CSS, accessibility, performance, networking, security, Vue, testing, and architecture.</div>
+  </header>
+  <main>
+<h1>Interview Question Bank: Coding + Frontend Knowledge</h1>
+<p>This is a preparation bank for the &quot;coding + frontend knowledge questions&quot; round. It pairs the questions an interviewer is likely to ask with what they are really testing, a concise answer, and code where it helps. It assumes the Visable Staff Frontend role: Vue, testing, large codebases, a multi-brand design system, SSR, and AI-assisted development. It complements the JavaScript deep-dive and the Vue guides rather than repeating them.</p>
+<h2>How the hour usually runs</h2>
+<p>A 60-minute deep dive with live coding typically splits into a short warm-up, around 25 to 35 minutes of live coding on a shared editor, and the rest on knowledge and architecture discussion. The coding task is rarely an algorithm puzzle for a frontend role. It is usually a utility, an async problem, a small component, or &quot;implement this browser or framework primitive.&quot; Two behaviors score more than raw speed: think aloud so they can follow your reasoning, and ask clarifying questions before you type. State your assumptions, start with the simplest correct version, then handle edge cases out loud.</p>
+<hr>
+<h2>1. Live-coding tasks, with model solutions</h2>
+<p>These are the ones that come up again and again. Practice typing them cold.</p>
+<p><strong>Implement debounce and throttle, and explain the difference.</strong> Debounce waits until activity stops, so it fires once after the last call plus a delay, good for search input and resize. Throttle fires at most once per interval during continuous activity, good for scroll and pointer move.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">debounce</span>(<span class="hljs-params">fn, delay</span>) {
+  <span class="hljs-keyword">let</span> timer
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params">...args</span>) {
+    <span class="hljs-built_in">clearTimeout</span>(timer)
+    timer = <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> fn.<span class="hljs-title function_">apply</span>(<span class="hljs-variable language_">this</span>, args), delay)
+  }
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">throttle</span>(<span class="hljs-params">fn, interval</span>) {
+  <span class="hljs-keyword">let</span> last = <span class="hljs-number">0</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params">...args</span>) {
+    <span class="hljs-keyword">const</span> now = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>()
+    <span class="hljs-keyword">if</span> (now - last &gt;= interval) {
+      last = now
+      fn.<span class="hljs-title function_">apply</span>(<span class="hljs-variable language_">this</span>, args)
+    }
+  }
+}
+</code></pre>
+<p><strong>Deep clone an object.</strong> Lead with the built-in: <code>structuredClone</code> handles nested objects, arrays, <code>Map</code>, <code>Set</code>, <code>Date</code>, and cycles, but not functions or DOM nodes. Then implement it to show you understand cycles and own keys.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">deepClone</span>(<span class="hljs-params">value, seen = <span class="hljs-keyword">new</span> <span class="hljs-built_in">WeakMap</span>()</span>) {
+  <span class="hljs-keyword">if</span> (value === <span class="hljs-literal">null</span> || <span class="hljs-keyword">typeof</span> value !== <span class="hljs-string">&#x27;object&#x27;</span>) <span class="hljs-keyword">return</span> value
+  <span class="hljs-keyword">if</span> (seen.<span class="hljs-title function_">has</span>(value)) <span class="hljs-keyword">return</span> seen.<span class="hljs-title function_">get</span>(value)          <span class="hljs-comment">// break cycles</span>
+  <span class="hljs-keyword">const</span> copy = <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">isArray</span>(value) ? [] : {}
+  seen.<span class="hljs-title function_">set</span>(value, copy)
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> key <span class="hljs-keyword">of</span> <span class="hljs-title class_">Reflect</span>.<span class="hljs-title function_">ownKeys</span>(value)) {
+    copy[key] = <span class="hljs-title function_">deepClone</span>(value[key], seen)
+  }
+  <span class="hljs-keyword">return</span> copy
+}
+</code></pre>
+<p><strong>Build a small event emitter (pub/sub).</strong> Tests data structures and API design. Returning an unsubscribe function from <code>on</code> is the detail that signals maturity.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">class</span> <span class="hljs-title class_">EventEmitter</span> {
+  #listeners = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>()
+  <span class="hljs-title function_">on</span>(<span class="hljs-params">event, fn</span>) {
+    <span class="hljs-keyword">if</span> (!<span class="hljs-variable language_">this</span>.#listeners.<span class="hljs-title function_">has</span>(event)) <span class="hljs-variable language_">this</span>.#listeners.<span class="hljs-title function_">set</span>(event, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>())
+    <span class="hljs-variable language_">this</span>.#listeners.<span class="hljs-title function_">get</span>(event).<span class="hljs-title function_">add</span>(fn)
+    <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">off</span>(event, fn)                   <span class="hljs-comment">// unsubscribe handle</span>
+  }
+  <span class="hljs-title function_">off</span>(<span class="hljs-params">event, fn</span>) { <span class="hljs-variable language_">this</span>.#listeners.<span class="hljs-title function_">get</span>(event)?.<span class="hljs-title function_">delete</span>(fn) }
+  <span class="hljs-title function_">emit</span>(<span class="hljs-params">event, ...args</span>) {
+    <span class="hljs-variable language_">this</span>.#listeners.<span class="hljs-title function_">get</span>(event)?.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">fn</span> =&gt;</span> <span class="hljs-title function_">fn</span>(...args))
+  }
+}
+</code></pre>
+<p><strong>Implement <code>Promise.all</code> from scratch.</strong> Tests understanding of promises and ordering. The key points: preserve input order regardless of settle order, resolve only when the count hits zero, and reject on the first rejection.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">promiseAll</span>(<span class="hljs-params">items</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">resolve, reject</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> results = []
+    <span class="hljs-keyword">let</span> remaining = items.<span class="hljs-property">length</span>
+    <span class="hljs-keyword">if</span> (remaining === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-title function_">resolve</span>(results)
+    items.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">item, i</span>) =&gt;</span> {
+      <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(item).<span class="hljs-title function_">then</span>(
+        <span class="hljs-function"><span class="hljs-params">value</span> =&gt;</span> { results[i] = value; <span class="hljs-keyword">if</span> (--remaining === <span class="hljs-number">0</span>) <span class="hljs-title function_">resolve</span>(results) },
+        reject                                         <span class="hljs-comment">// first rejection wins</span>
+      )
+    })
+  })
+}
+</code></pre>
+<p><strong>Memoize a pure function.</strong> Watch the cache key: <code>JSON.stringify</code> of arguments is the quick default, with the caveat that it fails on functions, cyclic args, and key order in objects.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">memoize</span>(<span class="hljs-params">fn, keyFn = (...args) =&gt; <span class="hljs-built_in">JSON</span>.stringify(args)</span>) {
+  <span class="hljs-keyword">const</span> cache = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>()
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params">...args</span>) {
+    <span class="hljs-keyword">const</span> key = <span class="hljs-title function_">keyFn</span>(...args)
+    <span class="hljs-keyword">if</span> (cache.<span class="hljs-title function_">has</span>(key)) <span class="hljs-keyword">return</span> cache.<span class="hljs-title function_">get</span>(key)
+    <span class="hljs-keyword">const</span> result = fn.<span class="hljs-title function_">apply</span>(<span class="hljs-variable language_">this</span>, args)
+    cache.<span class="hljs-title function_">set</span>(key, result)
+    <span class="hljs-keyword">return</span> result
+  }
+}
+</code></pre>
+<p><strong>Curry a function.</strong> Demonstrates closures and <code>fn.length</code>.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">curry</span>(<span class="hljs-params">fn</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">curried</span>(<span class="hljs-params">...args</span>) {
+    <span class="hljs-keyword">return</span> args.<span class="hljs-property">length</span> &gt;= fn.<span class="hljs-property">length</span>
+      ? fn.<span class="hljs-title function_">apply</span>(<span class="hljs-variable language_">this</span>, args)
+      : <span class="hljs-function">(<span class="hljs-params">...rest</span>) =&gt;</span> curried.<span class="hljs-title function_">apply</span>(<span class="hljs-variable language_">this</span>, [...args, ...rest])
+  }
+}
+</code></pre>
+<p><strong>Flatten a nested array.</strong> Mention the built-in <code>arr.flat(Infinity)</code> first, then show recursion.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">flatten</span>(<span class="hljs-params">arr</span>) {
+  <span class="hljs-keyword">return</span> arr.<span class="hljs-title function_">reduce</span>(
+    <span class="hljs-function">(<span class="hljs-params">acc, item</span>) =&gt;</span> acc.<span class="hljs-title function_">concat</span>(<span class="hljs-title class_">Array</span>.<span class="hljs-title function_">isArray</span>(item) ? <span class="hljs-title function_">flatten</span>(item) : item),
+    []
+  )
+}
+</code></pre>
+<p><strong>Implement an LRU cache.</strong> A frequent staff-level task. A <code>Map</code> keeps insertion order, so the oldest key is <code>keys().next().value</code>, and re-inserting on access marks an entry most-recent.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">class</span> <span class="hljs-title class_">LRUCache</span> {
+  #max
+  #map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>()
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">max</span>) { <span class="hljs-variable language_">this</span>.#max = max }
+  <span class="hljs-title function_">get</span>(<span class="hljs-params">key</span>) {
+    <span class="hljs-keyword">if</span> (!<span class="hljs-variable language_">this</span>.#map.<span class="hljs-title function_">has</span>(key)) <span class="hljs-keyword">return</span> <span class="hljs-literal">undefined</span>
+    <span class="hljs-keyword">const</span> value = <span class="hljs-variable language_">this</span>.#map.<span class="hljs-title function_">get</span>(key)
+    <span class="hljs-variable language_">this</span>.#map.<span class="hljs-title function_">delete</span>(key); <span class="hljs-variable language_">this</span>.#map.<span class="hljs-title function_">set</span>(key, value)   <span class="hljs-comment">// mark most-recent</span>
+    <span class="hljs-keyword">return</span> value
+  }
+  <span class="hljs-title function_">set</span>(<span class="hljs-params">key, value</span>) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.#map.<span class="hljs-title function_">has</span>(key)) <span class="hljs-variable language_">this</span>.#map.<span class="hljs-title function_">delete</span>(key)
+    <span class="hljs-variable language_">this</span>.#map.<span class="hljs-title function_">set</span>(key, value)
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.#map.<span class="hljs-property">size</span> &gt; <span class="hljs-variable language_">this</span>.#max) {
+      <span class="hljs-variable language_">this</span>.#map.<span class="hljs-title function_">delete</span>(<span class="hljs-variable language_">this</span>.#map.<span class="hljs-title function_">keys</span>().<span class="hljs-title function_">next</span>().<span class="hljs-property">value</span>)  <span class="hljs-comment">// evict least-recent</span>
+    }
+  }
+}
+</code></pre>
+<p><strong>Retry an async call with exponential backoff.</strong> Real-world resilience, and a good place to mention jitter to avoid thundering herds.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">retry</span>(<span class="hljs-params">fn, { retries = <span class="hljs-number">3</span>, base = <span class="hljs-number">200</span> } = {}</span>) {
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> attempt = <span class="hljs-number">0</span>; ; attempt++) {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">fn</span>()
+    } <span class="hljs-keyword">catch</span> (err) {
+      <span class="hljs-keyword">if</span> (attempt &gt;= retries) <span class="hljs-keyword">throw</span> err
+      <span class="hljs-keyword">const</span> delay = base * <span class="hljs-number">2</span> ** attempt + <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-number">100</span>   <span class="hljs-comment">// backoff + jitter</span>
+      <span class="hljs-keyword">await</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> <span class="hljs-built_in">setTimeout</span>(r, delay))
+    }
+  }
+}
+</code></pre>
+<p><strong>Build a typeahead search that cancels stale requests.</strong> This is the highest-value frontend coding task because it hides a real bug: a slow earlier response arriving after a newer one and overwriting it. <code>AbortController</code> cancels the in-flight request on each new keystroke, which fixes both the waste and the out-of-order overwrite.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">let</span> controller
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">search</span>(<span class="hljs-params">query</span>) {
+  controller?.<span class="hljs-title function_">abort</span>()                       <span class="hljs-comment">// cancel the previous request</span>
+  controller = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AbortController</span>()
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`/api/search?q=<span class="hljs-subst">${<span class="hljs-built_in">encodeURIComponent</span>(query)}</span>`</span>, {
+      <span class="hljs-attr">signal</span>: controller.<span class="hljs-property">signal</span>,
+    })
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> res.<span class="hljs-title function_">json</span>()
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-keyword">if</span> (err.<span class="hljs-property">name</span> !== <span class="hljs-string">&#x27;AbortError&#x27;</span>) <span class="hljs-keyword">throw</span> err  <span class="hljs-comment">// ignore intentional cancellations</span>
+  }
+}
+</code></pre>
+<p><strong>Implement Vue-style reactivity.</strong> A favorite for a Vue role, because it proves you understand what the framework does rather than just using it. The whole model is: track the running effect when a property is read, re-run those effects when it is written, using a <code>Proxy</code>.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">let</span> activeEffect = <span class="hljs-literal">null</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">effect</span>(<span class="hljs-params">fn</span>) { activeEffect = fn; <span class="hljs-title function_">fn</span>(); activeEffect = <span class="hljs-literal">null</span> }
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">reactive</span>(<span class="hljs-params">target</span>) {
+  <span class="hljs-keyword">const</span> deps = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>()
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Proxy</span>(target, {
+    <span class="hljs-title function_">get</span>(<span class="hljs-params">obj, key</span>) {
+      <span class="hljs-keyword">if</span> (activeEffect) {
+        <span class="hljs-keyword">if</span> (!deps.<span class="hljs-title function_">has</span>(key)) deps.<span class="hljs-title function_">set</span>(key, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>())
+        deps.<span class="hljs-title function_">get</span>(key).<span class="hljs-title function_">add</span>(activeEffect)        <span class="hljs-comment">// track</span>
+      }
+      <span class="hljs-keyword">return</span> obj[key]
+    },
+    <span class="hljs-title function_">set</span>(<span class="hljs-params">obj, key, value</span>) {
+      obj[key] = value
+      deps.<span class="hljs-title function_">get</span>(key)?.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">run</span> =&gt;</span> <span class="hljs-title function_">run</span>())     <span class="hljs-comment">// trigger</span>
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+    },
+  })
+}
+</code></pre>
+<p>For Vue component katas (debounced search component, reusable input with <code>defineModel</code>, a Pinia store), see the Vue guide. Expect at least one to be done live in a sandbox.</p>
+<hr>
+<h2>2. JavaScript fundamentals they will probe verbally</h2>
+<p>These overlap with the JavaScript deep-dive guide, so here are the exact phrasings to expect, with the one-line hook for each. Explain the mechanism, not just the rule.</p>
+<p>Expect: &quot;What is a closure and where does it bite?&quot; (functions retain their definition scope; stale closures and the <code>var</code> loop trap). &quot;How is <code>this</code> determined?&quot; (the call site, four binding rules, arrows capture lexically). &quot;Walk me through the event loop.&quot; (sync stack, then drain all microtasks, then one macrotask, repeat). &quot;What is the difference between <code>==</code> and <code>===</code>?&quot; (coercion versus strict, and <code>Object.is</code> for <code>NaN</code> and signed zero). &quot;How does prototypal inheritance work?&quot; (the chain, and <code>class</code> as sugar over it). &quot;What causes memory leaks in an SPA?&quot; (timers, detached nodes, listeners, growing caches, and <code>WeakMap</code> plus <code>AbortController</code> as fixes).</p>
+<hr>
+<h2>3. Browser and rendering</h2>
+<p><strong>Describe the critical rendering path.</strong> The browser parses HTML into the DOM and CSS into the CSSOM, combines them into the render tree, runs layout to compute geometry, then paints pixels, and composites layers. Render-blocking CSS and synchronous scripts delay first paint, which is why critical CSS is inlined and scripts are deferred.</p>
+<p><strong>Reflow versus repaint, and layout thrashing.</strong> A reflow (layout) recomputes geometry and is expensive, a repaint only redraws pixels for a style change like color. Layout thrashing is reading a layout property like <code>offsetHeight</code> and then writing a style in a loop, forcing the browser to recompute layout synchronously each iteration. The fix is to batch reads, then batch writes, and to animate only <code>transform</code> and <code>opacity</code>, which the compositor can handle without layout.</p>
+<p><strong><code>setTimeout</code> versus <code>requestAnimationFrame</code>.</strong> <code>requestAnimationFrame</code> runs right before the next paint at the display refresh rate, so it is correct for animation, while <code>setTimeout</code> is untethered from the frame and causes jank.</p>
+<p><strong>Event delegation, bubbling, and capturing.</strong> Events flow down in the capture phase and back up in the bubble phase. Delegation attaches one listener on a common ancestor and inspects <code>event.target</code>, which scales to many or dynamic children and is the idiomatic way to handle lists.</p>
+<pre><code class="hljs" data-lang="js">list.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> item = e.<span class="hljs-property">target</span>.<span class="hljs-title function_">closest</span>(<span class="hljs-string">&#x27;li[data-id]&#x27;</span>)
+  <span class="hljs-keyword">if</span> (item) <span class="hljs-title function_">select</span>(item.<span class="hljs-property">dataset</span>.<span class="hljs-property">id</span>)
+})
+</code></pre>
+<p><strong>Why do frameworks use a virtual DOM.</strong> Direct DOM mutation is slow and imperative. A virtual DOM lets the framework compute the minimal set of real changes by diffing, and lets you write declarative state-to-view code. Note that this is a tradeoff, and newer approaches such as Vue's Vapor mode and signal-based libraries skip the virtual DOM for less overhead.</p>
+<hr>
+<h2>4. CSS</h2>
+<p><strong>Explain the box model and <code>box-sizing</code>.</strong> Width by default applies to the content box, with padding and border added outside it. <code>box-sizing: border-box</code> makes width include padding and border, which is why it is the common reset.</p>
+<p><strong>How does specificity and the cascade decide a winner.</strong> Specificity ranks inline, then id, then class, attribute, and pseudo-class, then element. Ties break by source order. <code>!important</code> overrides normal declarations and should be a last resort. Cascade layers now let you order groups of rules explicitly, which tames specificity wars in large codebases.</p>
+<p><strong>Flexbox versus Grid.</strong> Flexbox lays out along one axis and is right for components like toolbars and rows. Grid lays out in two dimensions and is right for page and section layout. They compose, with Grid for the macro structure and Flexbox inside cells.</p>
+<p><strong>What creates a stacking context, and why does <code>z-index</code> not work sometimes.</strong> Properties like <code>position</code> with a <code>z-index</code>, <code>opacity</code> below one, <code>transform</code>, and <code>filter</code> create a new stacking context. A child cannot escape its parent's context, so a high <code>z-index</code> does nothing if an ancestor sits lower in a separate context. That mismatch is the usual cause of &quot;z-index not working.&quot;</p>
+<p><strong>Modern CSS worth naming.</strong> Container queries style by parent size rather than viewport, which is the real unlock for reusable components. The <code>:has()</code> parent selector, logical properties for internationalization, custom properties for theming, and cascade layers are all current and relevant to a multi-brand design system.</p>
+<hr>
+<h2>5. Accessibility</h2>
+<p><strong>What is your approach to accessibility.</strong> Semantic HTML first, ARIA second. Native elements like <code>button</code>, <code>a</code>, <code>label</code>, and <code>nav</code> bring focus, keyboard behavior, and roles for free, so reach for ARIA only to fill gaps, since wrong ARIA is worse than none.</p>
+<p><strong>How do you make a custom widget accessible.</strong> It must be reachable and operable by keyboard, expose the right role and state, and manage focus. A modal traps focus while open, returns focus to the trigger on close, and closes on Escape. Dynamic updates announce through an <code>aria-live</code> region.</p>
+<p><strong>Common failures interviewers check for.</strong> Inputs without associated labels, images without meaningful <code>alt</code>, click handlers on non-interactive <code>div</code>s with no keyboard path, and insufficient color contrast against WCAG ratios.</p>
+<hr>
+<h2>6. Performance and Core Web Vitals</h2>
+<p><strong>Name the Core Web Vitals and their thresholds.</strong> Largest Contentful Paint under 2.5 seconds for loading, Interaction to Next Paint under 200 milliseconds for responsiveness, and Cumulative Layout Shift under 0.1 for visual stability, each judged at the 75th percentile of real users. INP replaced First Input Delay in March 2024 and measures every interaction, not just the first. Some 2026 sources claim Google tightened LCP toward 2.0 seconds, so it is worth verifying the current number on web.dev, but 2.5 seconds is the long-standing answer.</p>
+<p><strong>How do you fix each.</strong> For LCP: server-side rendering, preloading the hero image, inlining critical CSS, and <code>font-display: swap</code>. For INP: break long tasks, defer non-critical JavaScript, and yield to the main thread, since INP is mostly a JavaScript-architecture problem. For CLS: set explicit width and height on images, videos, and ad slots, and reserve space for dynamic content.</p>
+<p><strong>General frontend performance levers.</strong> Code splitting and route-level lazy loading to shrink the initial bundle, tree shaking to drop dead code, responsive and lazy-loaded images, bundle analysis with a performance budget enforced in CI, and virtualization for long lists so the DOM holds only visible rows. Memory leaks matter here too, covered in the JavaScript guide.</p>
+<hr>
+<h2>7. Networking and the web platform</h2>
+<p><strong>How does HTTP caching work.</strong> <code>Cache-Control</code> sets freshness, so hashed static assets get <code>max-age</code> far in the future with <code>immutable</code>, while HTML gets <code>no-cache</code> so new deploys appear immediately. <code>ETag</code> enables revalidation: the browser sends <code>If-None-Match</code> and the server answers <code>304 Not Modified</code> when nothing changed.</p>
+<p><strong>What is CORS and how do you resolve a CORS error.</strong> The browser blocks cross-origin requests unless the server opts in with <code>Access-Control-Allow-Origin</code> and related headers. Non-simple requests trigger a preflight <code>OPTIONS</code> call the server must answer. The fix is server configuration, not a frontend change, and in development a dev-server proxy avoids it.</p>
+<p><strong>REST versus GraphQL.</strong> REST is simple, cacheable over HTTP, and can over- or under-fetch. GraphQL lets the client request exactly the fields it needs in one round trip, at the cost of more server complexity and harder HTTP caching. Choose by data shape and client diversity.</p>
+<p><strong>Real-time transport choices.</strong> Polling is simplest and wasteful, Server-Sent Events give one-way server-to-client streaming over HTTP, and WebSockets give full duplex for chat and collaboration. Pick the lightest one that meets the need.</p>
+<p><strong>Client storage options.</strong> Cookies travel with every request and suit auth tokens with <code>HttpOnly</code> and <code>SameSite</code>. <code>localStorage</code> and <code>sessionStorage</code> are synchronous string stores for small data, and IndexedDB is the asynchronous database for large or structured client data.</p>
+<hr>
+<h2>8. Security</h2>
+<p><strong>How do you prevent XSS.</strong> Never inject untrusted strings as HTML. Frameworks escape interpolated text by default, so the danger is the escape hatch: Vue's <code>v-html</code> and React's <code>dangerouslySetInnerHTML</code>. If you must render user HTML, sanitize it with a vetted library such as DOMPurify, and add a Content Security Policy as defense in depth.</p>
+<pre><code class="hljs" data-lang="">Content-Security-Policy: default-src 'self'; script-src 'self'
+</code></pre>
+<p><strong>How do you prevent CSRF.</strong> Mark session cookies <code>SameSite=Lax</code> or <code>Strict</code>, and for state-changing requests use anti-CSRF tokens or require a custom header that a cross-site form cannot set.</p>
+<p><strong>Supply chain and dependencies.</strong> Pin versions, commit the lockfile, audit dependencies, and treat a transitive package as code you ship, because it is.</p>
+<hr>
+<h2>9. Vue-specific knowledge</h2>
+<p><strong>How does Vue 3 reactivity work.</strong> It wraps state in a <code>Proxy</code> that tracks which effect is running when a property is read and re-runs those effects when the property is written. That is the <code>reactive</code> and <code>effect</code> pair from the coding section, and <code>ref</code> is the same idea boxed for primitives.</p>
+<p><strong>Composition API versus Options API, and why Composition at scale.</strong> Options groups code by kind (data, methods, computed), which scatters one feature across the file as a component grows. Composition groups by feature and extracts reusable logic into composables, which is why it is the default for large components and a design system.</p>
+<p><strong>Quick hits they may fire.</strong> <code>:key</code> must be a stable id so the diff matches nodes correctly. <code>nextTick</code> waits for the DOM to flush after a state change. <code>provide</code> and <code>inject</code> distribute values like theme without prop drilling. Scoped slots let a consumer control rendering while the component owns structure, which is the seam a multi-brand design system needs. Pinia is the state library, with <code>storeToRefs</code> to keep reactivity when destructuring.</p>
+<p><strong>SSR and hydration.</strong> With Nuxt, the server renders HTML and the client hydrates it. A hydration mismatch happens when the client's first render differs from the server's, caused by browser-only branches, dates, or random values during render, so gate browser-only code behind <code>onMounted</code> or <code>import.meta.client</code>.</p>
+<p><strong>Vue performance levers.</strong> <code>v-once</code> for static subtrees, <code>v-memo</code> to skip re-render unless dependencies change, <code>shallowRef</code> for large objects you replace wholesale, <code>defineAsyncComponent</code> for lazy loading, and <code>KeepAlive</code> to cache toggled components.</p>
+<hr>
+<h2>10. Testing</h2>
+<p><strong>What is your testing strategy.</strong> A pyramid: many fast unit tests, fewer integration tests, and a thin layer of end-to-end tests for critical user journeys. Heavy reliance on slow end-to-end tests is a smell.</p>
+<p><strong>What do you test in a component.</strong> Behavior through the public interface, meaning rendered output and emitted events, not internal refs or private methods. Testing internals makes refactors break tests that should not break.</p>
+<p><strong>Tooling and pitfalls.</strong> Vue Test Utils with <code>mount</code> or <code>shallowMount</code>, Vitest as the runner on a Vite project, and Cypress for end-to-end. Mock the network at the boundary, for example with MSW, rather than stubbing deep internals. Flaky tests usually come from real timers, unawaited async, or shared state, so use fake timers, await DOM updates, and isolate each test.</p>
+<hr>
+<h2>11. Architecture and design systems</h2>
+<p>This is where a staff candidate is really assessed. The posting asks for consistency across many codebases and a multi-brand design system, so expect open-ended design questions.</p>
+<p><strong>How would you design a reusable component API.</strong> Keep the surface small and predictable: props for input, events for output, slots for composition. Prefer composition over a forest of boolean flags, expose design tokens rather than hard-coded values, and document the contract. A component is a contract, and stability of that contract is what makes it reusable.</p>
+<p><strong>How do you support multiple brands from one system.</strong> Drive appearance from design tokens as CSS custom properties, switch the token set per brand at the theme boundary, and keep structure and behavior shared. Scoped slots and sensible defaults let each brand override rendering without forking the component.</p>
+<p><strong>How do you keep many codebases consistent.</strong> Shared packages in a monorepo for the design system and utilities, a single source of truth for tokens, shared lint and format and TypeScript config, and codemods for sweeping migrations. Consistency comes from tooling and shared primitives, not from documents people are asked to follow.</p>
+<p><strong>How would you migrate a large legacy frontend.</strong> Incrementally. Establish the target, carve a seam, migrate route by route or component by component behind a consistent interface, keep both running during the transition, and avoid a big-bang rewrite that stalls feature work. Your 18 years across Angular, Webix, and ExtJS is direct evidence you have done this under real constraints.</p>
+<p><strong>When would you reach for micro-frontends.</strong> Only when independent teams need independent deploy cadences on a large product, and you accept the cost in shared-dependency duplication, runtime integration, and consistency overhead. For most products a well-factored monorepo is simpler and better.</p>
+<hr>
+<h2>12. AI-assisted development</h2>
+<p>The posting explicitly wants a proven record of using AI to solve practical problems and improve team efficiency, so prepare a concrete, honest narrative rather than a slogan. Cover where you apply it (scaffolding, tests, refactors, exploring an unfamiliar API, reviewing diffs), how you keep it safe (treat output as a draft, lean on types and tests as guardrails, review every line you ship), and how it helped the team (faster onboarding to a codebase, less boilerplate, more time on design). The signal they want is judgment: you know what to delegate and what to verify, not that you accept whatever the model emits.</p>
+<hr>
+<h2>13. Staff-level and behavioral questions</h2>
+<p>Expect a few of these, and answer with specifics and tradeoffs.</p>
+<p>&quot;Tell me about the most complex project you owned end to end.&quot; Pick one long-running project, state the constraints, the decisions you made, and what you would change. &quot;Describe a technical disagreement and how you resolved it.&quot; Show that you can disagree, then commit, and that you optimize for the outcome over being right. &quot;How do you raise engineering standards on a team.&quot; Talk about shared tooling, review culture, and pragmatic standards that people actually adopt. &quot;How do you decide between two approaches under time pressure.&quot; Show a framework: reversible decisions move fast, one-way doors get more rigor.</p>
+<hr>
+<h2>14. How to answer well</h2>
+<p>Three habits carry the round. Think aloud, because they are evaluating reasoning, not just the final answer. Ask before assuming, because clarifying the requirement is itself a senior signal. And connect each answer to a real failure mode you have seen, because lived experience explained calmly reads as more senior than reciting definitions. When you hit a caveat, say what happens, why the platform does that, and where it bites in production.</p>
+
+  </main>
+</div>
+</body>
+</html>
