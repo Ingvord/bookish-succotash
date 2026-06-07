@@ -215,6 +215,115 @@ The staff caveat: virtual threads are not free of footguns. They pin to their ca
 
 ---
 
+## Non-blocking I/O: the caveats and gotchas
+
+Before virtual threads, the way to scale past the thread-per-request ceiling on a classic server was non-blocking, asynchronous I/O: release the request thread while a slow operation is in flight, and resume on a callback when it completes. The platform offers this at two layers. Servlet async (`request.startAsync()`, since Servlet 3.0) detaches request processing from the container thread; Servlet non-blocking I/O (`ReadListener`/`WriteListener`, since 3.1) drives the request and response bodies through callbacks instead of blocking reads and writes. JAX-RS exposes the same capability more ergonomically through `@Suspended AsyncResponse` and by returning a `CompletionStage`. The model works, and it was the right tool for years, but it is studded with traps that interviewers use to separate people who have read about it from people who have run it.
+
+The first and most important gotcha: async does not create throughput, it only releases a thread. If you call `startAsync()` and then do blocking JDBC on some other pool's thread, you have not removed the block, you have merely moved it, and you now have two thread pools to size instead of one. Async only helps when the offloaded work is itself non-blocking (an async HTTP client, a non-blocking driver) or when the point is purely to free the container thread for a genuinely long wait. Hand-waving "we made it async so it scales" without a non-blocking downstream is the classic shallow answer.
+
+```java
+// Gotcha: this is "async" but still blocks a thread on the JDBC call.
+@GET @Path("/{id}")
+public void get(@PathParam("id") long id, @Suspended AsyncResponse async) {
+    executor.submit(() -> {            // freed the request thread...
+        Order o = repo.find(id);       // ...but THIS thread now blocks on JDBC
+        async.resume(o);               // no throughput gained, just relocated
+    });
+}
+```
+
+The deepest trap is context loss. The request thread carries a stack of `ThreadLocal`-backed context: the Jakarta security context (the authenticated principal), the JTA transaction, the CDI request scope, and the SLF4J MDC used for correlation IDs in logs. All of it is bound to the thread, not the request. The instant you resume on a different thread, that context is gone: `@RequestScoped` beans throw `ContextNotActiveException` or resolve to the wrong instance, the security principal is null, and your structured logs lose their request ID exactly when you need it to debug the async path. The fix is explicit context propagation (MicroProfile Context Propagation, or capturing and restoring the values by hand around the handoff), and the discipline is to assume nothing thread-bound survives a thread switch.
+
+```java
+// MicroProfile Context Propagation: capture request context, restore it on the worker.
+@Inject ThreadContext threadContext;
+
+CompletableFuture<Order> load(long id) {
+    return threadContext.withContextCapture(            // snapshot CDI/security/MDC now
+        CompletableFuture.supplyAsync(() -> repo.find(id), executor));
+}
+```
+
+Transactions deserve their own warning because the failure is silent. A JTA transaction is thread-bound: you cannot begin it on the request thread and commit it on a callback thread, and a `@Transactional` boundary does not stretch across an async handoff. Code that splits a unit of work across threads either runs outside any transaction (writes auto-commit individually, so a later failure leaves partial data) or throws an obscure transaction-association error. Keep the entire transactional unit on one thread; if you must go async, complete the transaction fully before the handoff and treat the async continuation as a separate unit.
+
+Servlet-level non-blocking I/O adds its own callback hazards. With a `ReadListener` you may only read while `isReady()` returns true, and reading outside `onDataAvailable()` corrupts the stream; ignoring `isReady()` and reading eagerly defeats the whole point and can buffer an unbounded request body into memory, which is a denial-of-service vector (backpressure exists precisely so a fast client cannot force you to buffer faster than you consume). Exceptions thrown inside these callbacks do not flow into the container's normal error handling or your `ExceptionMapper`; they surface on `onError()`, and if you do not implement it the request leaks. And every async request needs an explicit timeout via `AsyncContext.setTimeout` plus an `AsyncListener`, because without one a downstream that never responds leaves the async context (and its resources) hung indefinitely rather than failing cleanly.
+
+```java
+// Async timeouts and errors are opt-in: without this, a stalled call leaks the context.
+AsyncContext ctx = request.startAsync();
+ctx.setTimeout(5_000);
+ctx.addListener(new AsyncListener() {
+    public void onTimeout(AsyncEvent e) { complete(e, 504); }
+    public void onError(AsyncEvent e)   { complete(e, 500); }   // callback errors land here, not in an ExceptionMapper
+    public void onComplete(AsyncEvent e) {}
+    public void onStartAsync(AsyncEvent e) {}
+});
+```
+
+Two more practical costs to name. Debuggability degrades sharply: a blocking stack trace tells the whole story in one frame, while an async failure is scattered across thread handoffs and callback boundaries, so a single logical request has no single stack, which is why correlation IDs in the MDC (the thing context loss silently breaks) matter so much here. And the programming model is simply harder to reason about, which means more bugs per feature, so the complexity has to buy real scalability to be worth it.
+
+That trade-off is the staff-level conclusion, and on a modern JVM it usually points the other way. The entire reason for hand-rolled non-blocking I/O on a classic server was to escape the thread-per-request ceiling, and Java 21 virtual threads remove that ceiling while keeping the blocking, readable, single-stack style: no context loss, no transaction-across-threads problem, no callback error plumbing, normal stack traces. So on Jakarta EE or TomEE running Java 21+, prefer virtual threads for I/O-bound scaling and reserve explicit non-blocking I/O for the narrow cases that genuinely need it, chiefly streaming large or long-lived response bodies (server-sent events, large downloads) where you want to push data incrementally without holding a thread for the whole transfer. Reaching for reactive or callback-based NIO as a default in 2026, when virtual threads exist, is the choice an interviewer will push back on.
+
+---
+
+## The java.nio package: channels, buffers, selectors
+
+The async features above are the framework's view; underneath them sits the standard non-blocking I/O package, `java.nio` ("New I/O"). You rarely write it by hand, but knowing its three abstractions explains how the server's NIO connector, Netty, and every reactive runtime actually work, and that mechanism is fair game at staff level. A `Buffer` (almost always a `ByteBuffer`) is a fixed-size container for the bytes in flight. A `Channel` (`SocketChannel`, `ServerSocketChannel`, `FileChannel`) is a bidirectional connection to a socket or file that reads and writes through buffers. A `Selector` is the multiplexer that lets one thread watch many channels at once.
+
+The pivot from blocking I/O is a single call: `channel.configureBlocking(false)`. A non-blocking channel's `read` returns immediately with whatever bytes are available (possibly zero) instead of parking the thread until data arrives. You then register the channel with a `Selector` declaring the events you care about (`OP_ACCEPT`, `OP_READ`, `OP_WRITE`), and a single thread loops on `selector.select()`, which blocks until *any* registered channel is ready, then hands you the ready set. One thread services thousands of connections because it only ever wakes for sockets that actually have work. This is the reactor pattern, and it is the event loop, expressed in standard library terms.
+
+```java
+Selector selector = Selector.open();
+serverChannel.configureBlocking(false);
+serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+while (true) {
+    selector.select();                                   // blocks until a channel is ready
+    Iterator<SelectionKey> it = selector.selectedKeys().iterator();
+    while (it.hasNext()) {
+        SelectionKey key = it.next();
+        it.remove();                                     // gotcha: must remove, or it re-fires
+        if (key.isReadable()) {
+            SocketChannel ch = (SocketChannel) key.channel();
+            int n = ch.read(buffer);                     // returns now, even if 0 bytes
+            // ...handle bytes...
+        }
+    }
+}
+```
+
+The `ByteBuffer` is where people get cut, because it is a stateful cursor, not a simple array. It tracks `position`, `limit`, and `capacity`, and you switch between filling and draining it with `flip()` (after writing into it, before reading out), `clear()` (reset to fill again), and `compact()` (keep unread bytes, make room for more). The canonical bug is reading from a buffer without calling `flip()` first, which reads garbage from beyond the data you wrote. A second gotcha is direct versus heap buffers: `ByteBuffer.allocateDirect()` lives off-heap so the OS can do zero-copy transfers (faster for sockets) but is expensive to allocate and is not bounded by the normal heap, so pooling direct buffers and leaking them are both real concerns.
+
+The honest staff framing: raw `java.nio` is verbose, easy to get subtly wrong (partial reads, partial writes, buffer state, registering `OP_WRITE` only when a write would block), and almost nobody should hand-roll a selector loop in production. The point of learning it is to understand what Netty and the Tomcat NIO connector do for you, to reason about their tuning and failure modes, and to recognize that a single selector thread that does any blocking work inside the loop stalls every connection it serves, which is the low-level version of the event-loop rule stated earlier.
+
+---
+
+## Non-blocking algorithms: CAS, atomics, and lock-free design
+
+"Non-blocking" also describes a family of concurrency algorithms that coordinate threads without locks, and the distinction from non-blocking I/O is a common interview clarification: same adjective, different problem. A lock-free algorithm guarantees that the system as a whole makes progress even if individual threads stall, because no thread can hold a lock that blocks the others. The hardware primitive underneath is compare-and-swap (CAS): an atomic "if this memory location still holds the value I last read, set it to this new value, otherwise tell me you failed." The `java.util.concurrent.atomic` package exposes it through `AtomicInteger`, `AtomicLong`, and `AtomicReference`, whose `compareAndSet` maps to a single CPU instruction.
+
+The design pattern that replaces a lock is the CAS retry loop: read the current value, compute the new value, attempt to swap it in, and if another thread changed it in between, loop and try again on the fresh value. There is no blocking; a losing thread simply retries.
+
+```java
+// A lock-free counter: no synchronized, no lock, just retry on contention.
+AtomicLong counter = new AtomicLong();
+
+long incrementAndGet() {
+    long prev, next;
+    do {
+        prev = counter.get();
+        next = prev + 1;
+    } while (!counter.compareAndSet(prev, next));   // retry if someone else won the race
+    return next;
+}
+```
+
+Two traps define the staff-level answer. The first is the ABA problem: a CAS checks the value, not the history, so if another thread changes the slot from A to B and back to A, your `compareAndSet(A, ...)` succeeds even though the world moved underneath you. This is harmless for a counter but corrupts pointer-based structures like a lock-free stack, where a recycled node makes a stale pointer look current. The fix is to version the reference with `AtomicStampedReference`, so the CAS compares value *and* stamp and the reused-A no longer matches the old stamp. The second is contention: CAS is cheap when uncontended but degrades under heavy write contention, because many threads burn CPU retrying the same loop. For a hot counter this is why `LongAdder` usually beats `AtomicLong`: it stripes the count across multiple cells so threads rarely collide, and sums them only when read. Reaching for `LongAdder` on a high-traffic metric is a small detail that reads as experience.
+
+The library already ships the hard cases, so the practical skill is choosing them, not writing them. `ConcurrentHashMap` and `ConcurrentLinkedQueue` are non-blocking (or finely lock-striped) structures you should prefer over a `synchronized` wrapper for concurrent access. The selection rule: reach for atomics and lock-free structures on simple, single-variable, low-to-moderate-contention hot paths (counters, flags, single references, CAS-guarded state machines), use `LongAdder` when a counter is genuinely hot, and fall back to a `ReentrantLock` or `synchronized` when you must update several variables under one consistent invariant, because a multi-word atomic update is exactly what CAS cannot express and where hand-rolled lock-free code becomes subtly wrong. And remember the correctness floor underneath all of it: `volatile` and the atomics provide the happens-before visibility guarantees that make a value written by one thread reliably visible to another, which plain fields do not.
+
+---
+
 ## Production metrics: RPS, latency, and the nines
 
 Staff interviews expect you to attach numbers to claims. The figures below are order-of-magnitude defaults for a well-tuned single instance; quote them as ranges and always say "measure before you trust."

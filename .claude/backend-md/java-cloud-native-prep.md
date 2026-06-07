@@ -80,6 +80,54 @@ Micronaut runs on Netty (non-blocking) by default and, like Quarkus, distinguish
 
 ---
 
+## Reactive programming: Mutiny, Reactor, and the streams model
+
+Both frameworks are reactive at their core because they run on a small pool of event-loop threads (Netty/Vert.x) rather than a thread per request. The promise is high concurrency on few threads with end-to-end backpressure, and the price is a different programming model that you compose from operators instead of writing top to bottom. Knowing the model, not just the slogan, is the staff-level bar.
+
+The foundation is the Reactive Streams specification: a `Publisher` emits items to a `Subscriber`, which signals demand back through a `Subscription` via `request(n)`. That demand signal *is* backpressure: a slow consumer tells a fast producer to throttle, so data flows at the consumer's pace and nothing buffers unboundedly by default. Mutiny (Quarkus) and Reactor and RxJava (Micronaut interoperates with both) are implementations of this contract. Quarkus standardizes on Mutiny with two types: `Uni` for a single asynchronous value (or failure), and `Multi` for a stream of zero-to-many items with backpressure. Reactor's equivalents are `Mono` and `Flux`. RESTEasy Reactive lets a JAX-RS endpoint return a `Uni`/`Multi` directly, and the framework subscribes for you.
+
+```java
+import io.smallrye.mutiny.Uni;
+
+@GET @Path("/{id}")
+public Uni<Order> get(@PathParam("id") Long id) {
+    return repo.findById(id)                       // Uni<Order>, runs on the event loop
+        .onItem().ifNull().failWith(() -> new NotFoundException("order " + id))
+        .onItem().transform(this::redactInternalFields)
+        .onFailure(SQLException.class).retry().atMost(2);   // declarative, not try/catch
+}
+```
+
+The first thing to internalize is that a `Uni`/`Multi` is lazy and cold: it describes a pipeline and does nothing until something subscribes. The framework subscribes when you return it from an endpoint, but a `Uni` you create and forget to return (or forget to subscribe to) is a silent no-op, no exception, no execution, just nothing happens. This is one of the most common reactive bugs and it has no analogue in imperative code, so it surprises people coming from blocking style.
+
+Reactive is all-or-nothing on the data path, which is the gotcha that sinks naive adoption. The whole point is to never block the event loop, so a reactive endpoint that calls a *blocking* JDBC driver mid-pipeline blocks the loop and stalls every concurrent request sharing that thread, erasing the benefit and usually performing worse than plain blocking would have. To stay reactive end to end you need non-blocking data access: Hibernate Reactive, the Vert.x reactive SQL client, or R2DBC, all of which return `Uni`/`Multi` instead of blocking. If you only have a blocking driver, do not fake it; mark the work blocking so the framework dispatches it off the loop.
+
+```java
+// Quarkus: @Blocking moves this handler to a worker pool where JDBC is safe.
+@GET @Path("/{id}") @Blocking
+public Order getBlocking(@PathParam("id") Long id) {
+    return repo.findByIdBlocking(id);   // legal here; would stall the loop without @Blocking
+}
+```
+
+The threading contract is the rule you must be able to recite. On Quarkus, a handler returning `Uni`/`Multi` is assumed non-blocking and runs on the I/O thread; a handler returning a plain value runs on a worker thread where blocking is allowed; `@Blocking` and `@NonBlocking` override the inference. Micronaut makes the same split and offers `@ExecuteOn(TaskExecutors.BLOCKING)` to push a handler onto a worker pool. Quarkus goes further and detects many blocking calls on the I/O thread at runtime, throwing a "blocking call on the I/O thread" error: treat that as a helpful guardrail, not a nuisance to suppress.
+
+Backpressure is the feature people forget to actually use. A `Multi` streaming from a fast source to a slow consumer respects demand, but when you bridge to a source that cannot be slowed (a flood of events, a firehose), you must choose an overflow strategy explicitly, and the default of buffering can grow without bound and exhaust the heap. Naming `onOverflow().drop()` or `.buffer(n)` versus the unbounded default is exactly the kind of detail that signals you have run reactive in production rather than read about it.
+
+```java
+import io.smallrye.mutiny.Multi;
+
+Multi<Event> stream = source.toMulti()
+    .onOverflow().buffer(1024)        // bounded; or .drop() / .dropPreviousItems()
+    .onItem().transformToUniAndConcatenate(this::handle);
+```
+
+Two cross-cutting hazards mirror the classic guide's async pitfalls because they share a root cause: work hops between threads. Context loss is the first: `ThreadLocal`-bound state (the CDI request context, the security principal, the SLF4J MDC correlation ID) does not automatically follow a reactive pipeline across operators and thread boundaries, so request-scoped lookups fail and logs lose their request ID. The fix is framework context propagation: SmallRye Context Propagation on Quarkus, or carrying values in the Mutiny/Reactor `Context` that travels with the pipeline rather than with the thread. The second is debuggability: a reactive stack trace shows the operator assembly, not the logical call path, so a failure deep in a pipeline is far harder to read than a blocking stack, which is why disciplined `onFailure()` handling and operator-level naming matter. Error handling itself is declarative, never `try/catch`: an unhandled failure in a pipeline propagates to the subscriber and, if nothing handles it, can be dropped silently, so every pipeline needs an explicit failure path.
+
+When is the complexity worth it? Reach for full reactive when you genuinely need streaming responses (server-sent events, gRPC streaming), real backpressure against an unsteerable firehose, or massive fan-out concurrency where even cheap threads strain. For ordinary CRUD whose bottleneck is the database, the reactive tax (cold-stream bugs, context loss, opaque stack traces) buys little, and on Java 21 virtual threads deliver the same I/O concurrency in readable blocking style. That trade-off is developed further in the closing decision section.
+
+---
+
 ## GraalVM native image: the payoff and the pain
 
 Native image is the feature that justifies these frameworks for serverless. GraalVM's `native-image` tool performs closed-world static analysis: it walks all reachable code from `main`, compiles it ahead of time to a standalone executable, and discards everything unreachable. The result starts in single-digit milliseconds and runs with a fraction of the JVM's memory, because there is no class loading, no JIT, and no bytecode interpreter at runtime.
