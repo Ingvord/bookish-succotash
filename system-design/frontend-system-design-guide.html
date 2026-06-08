@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Frontend System Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #2e5280;
+  --accent-soft:  #2e528014;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Frontend Engineer</div>
+    <h1>Frontend System Design</h1>
+    <div class="sub">Architecting the client application for a combined coding and system design round: a framework to drive the conversation, rendering and data strategy, scale, and two worked examples shaped like the real role.</div>
+  </header>
+  <main>
+<h2>How this round runs</h2>
+<p>You have 45 minutes with Benjamin covering coding and system design together, which is tight, so the design portion is likely 15 to 25 minutes and may grow directly out of the coding task. Treat them as connected: the component you code is often the seed of the system you then design.</p>
+<p>This is frontend system design, and the distinction matters. Backend system design asks how to scale services and data across many machines. Frontend system design asks how to architect the client application: which rendering strategy, where state lives, how data is fetched and cached, how components compose, and how the whole thing performs and stays accessible at scale. You will reason across the client-server boundary, because you cannot design caching or data fetching without understanding the API, but the artifact you are designing is the frontend.</p>
+<p>What Benjamin is evaluating is whether you drive the conversation: clarify the problem, structure an answer, make decisions with explicit tradeoffs, and go deep where he steers you. Listing technologies is not the signal. Reasoning about tradeoffs and failure modes is.</p>
+<hr>
+<h2>1. A framework to drive any frontend design question</h2>
+<p>Have a spine to structure the conversation so you never freeze on a blank prompt. A reliable one is requirements, architecture, data, interface, optimizations.</p>
+<p><strong>Requirements.</strong> Separate functional (what it does) from non-functional (how fast, which devices, what scale, accessibility, internationalization, offline). Clarify scope and constraints before designing anything, and restate them so the interviewer confirms you are solving the right problem. This step alone separates senior candidates from junior ones, because juniors start drawing immediately.</p>
+<p><strong>Architecture.</strong> The high-level component breakdown and the data flow between pieces. Draw it. A simple boxes-and-arrows sketch anchors the rest of the discussion.</p>
+<p><strong>Data.</strong> The client data model and, crucially, where each piece of state lives. Frontend state falls into four kinds, covered in section 4, and putting each in the right place is most of frontend architecture.</p>
+<p><strong>Interface.</strong> Two contracts. The server API your client consumes (endpoints, request and response shapes), and the component APIs between your own pieces (props, events, slots).</p>
+<p><strong>Optimizations.</strong> The deep dives: rendering strategy, caching, performance, accessibility, error handling, real-time. Spend the most time here and let the interviewer's interest steer which ones.</p>
+<p>Throughout, state assumptions out loud and name tradeoffs rather than silently picking. &quot;I will use cursor pagination here, which gives stable infinite scroll but makes jumping to page ten harder, and that tradeoff is fine for this feed&quot; is the staff-level move.</p>
+<hr>
+<h2>2. Rendering strategy: the first architectural decision</h2>
+<p>Where a page renders shapes everything downstream, so decide it early and justify it. There are four strategies and the choice is a function of SEO needs, data freshness, interactivity, and infrastructure cost.</p>
+<p><strong>Client-side rendering (CSR).</strong> The server sends an empty shell and JavaScript builds the page in the browser. What it gives you: cheap hosting and rich interactivity. The catch: poor SEO and a slow first paint, because the user waits for the bundle to download and execute before seeing content. Right for authenticated dashboards behind a login, where SEO is irrelevant.</p>
+<p><strong>Server-side rendering (SSR).</strong> The server renders HTML per request, then the client hydrates it. What it gives you: fast first paint and full SEO with fresh data. The catch: server cost per request and hydration complexity, including hydration mismatches when the server and client render differently. Right for pages that need both SEO and current data, like a marketplace product page with live pricing.</p>
+<p><strong>Static site generation (SSG).</strong> Pages are rendered once at build time and served as static files. What it gives you: the fastest possible delivery from a CDN and trivial scaling. The catch: content is frozen until the next build, so it suits content that changes rarely. Right for marketing and documentation pages.</p>
+<p><strong>Incremental or on-demand rendering (ISR).</strong> A middle ground: static pages that regenerate on a schedule or on first request after invalidation. It gives near-static speed with bounded staleness, which fits a large catalog where pages change occasionally but rebuilding everything constantly is wasteful.</p>
+<p>Modern refinements worth naming: streaming SSR sends HTML in chunks so the user sees content before all data resolves, and islands or partial hydration ship interactivity only for the components that need it, leaving the rest as static HTML.</p>
+<p>For a B2B marketplace like this role, the likely answer is per-route: server-render or incrementally render the public catalog, company, and product pages for SEO and first paint, and client-render the authenticated dashboard where SEO does not matter. Nuxt lets you choose per route, so you are not forced into one mode for the whole app.</p>
+<hr>
+<h2>3. Data fetching and caching</h2>
+<p>The single insight that organizes this topic: server state and client state are different things and should be handled by different tools. Server state is data you do not own, fetched asynchronously, that can go stale and must be synchronized. Client state is data you own and control synchronously. Conflating them, for example storing fetched API data in a plain global store and managing loading and staleness by hand, is the most common frontend architecture mistake.</p>
+<p>For server state, use a data layer built for it, such as TanStack Query (vue-query in a Vue app). It gives you caching keyed by the request, background revalidation, deduplication of in-flight requests, and a clear loading and error model, so you stop hand-rolling all of that in a store.</p>
+<p>Caching has layers, and you should be able to name them. HTTP caching with <code>Cache-Control</code> and <code>ETag</code> lets the browser and CDN avoid redundant transfers; stale-while-revalidate serves cached content instantly and refreshes in the background. The client query cache holds fetched data keyed by query, so navigating back to a list is instant. Cache invalidation is the hard part: name your strategy, whether that is time-based expiry, explicit invalidation on mutation, or revalidation on focus.</p>
+<p>Two patterns come up repeatedly. Optimistic updates apply a change in the UI immediately and roll back if the server rejects it, which makes an app feel instant, at the cost of handling the rollback correctly. Request cancellation prevents a slow earlier response from overwriting a newer one, the out-of-order response bug, which you fix with an AbortController per request. That last one bridges directly to the coding portion.</p>
+<p>Pagination is an architecture choice. Offset pagination (page numbers) is simple and supports jumping to any page and SSR-friendly URLs, but it breaks when items are inserted mid-list. Cursor pagination is stable under insertion and ideal for infinite scroll, but cannot jump to an arbitrary page. State which and why.</p>
+<hr>
+<h2>4. State management at scale</h2>
+<p>Frontend state is four distinct kinds, and architecture is mostly about putting each in the right place rather than dumping everything into one global store.</p>
+<p><strong>Local component state</strong> is data only one component cares about, like whether a dropdown is open. Keep it in the component with <code>ref</code>.</p>
+<p><strong>Shared client state</strong> is data several components need that you own, like the current theme or a shopping cart. This is what Pinia is for.</p>
+<p><strong>Server state</strong> is fetched data, handled by the query layer from section 3, not by a plain store.</p>
+<p><strong>URL state</strong> is the one people forget, and it is the most powerful for this role. Filters, search terms, sort order, and the current page belong in the URL query string. Putting them there makes views shareable and bookmarkable, makes the browser back button work correctly, and gives you a single source of truth that survives a refresh. For a search and listing page, URL state is the backbone, not an afterthought.</p>
+<p>The decision rule: ask who needs this state and how long it should live. One component and transient goes local. Many components and app-lived goes Pinia. Fetched from a server goes in the query cache. Should survive a refresh or be shareable goes in the URL.</p>
+<hr>
+<h2>5. Component architecture and the design system</h2>
+<p>Design components as contracts. Data flows down through props, changes flow up through events, and slots let a parent inject structure. A small, predictable surface is what makes a component reusable, and a forest of boolean flags is the smell to avoid: collapse <code>isPrimary</code>, <code>isSecondary</code>, <code>isGhost</code> into one <code>variant</code> union.</p>
+<p>Separate components that hold data and logic from components that only render, the container and presentational split, so the rendering pieces stay reusable and testable in isolation.</p>
+<p>For this role specifically, the multi-brand design system is a stated responsibility, so be ready to design one. Drive appearance from design tokens exposed as CSS custom properties, switch the token set per brand at a single theme boundary, and keep structure and behavior shared across brands. Scoped slots let each brand override how an item renders while the component keeps owning the structure, which is the seam that makes one system serve several brands without forking. Bake accessibility into the primitives so every consumer inherits it rather than reimplementing it.</p>
+<hr>
+<h2>6. Scaling the frontend across teams and codebases</h2>
+<p>The posting asks for consistency across many codebases, so expect a question about scale in the organizational sense.</p>
+<p>The default answer is a monorepo with shared packages: the design system, utilities, and configuration live as versioned internal packages that every app consumes, so a token change or a lint rule propagates everywhere from one source. Consistency comes from shared tooling and shared primitives, not from documents people are asked to follow.</p>
+<p>Micro-frontends come up as the scaling question's trap. They let independent teams deploy independently, which is genuinely useful when several teams own large, separable parts of a product on different release cadences. The cost is real: duplicated dependencies, runtime integration complexity, and the very consistency problem you were trying to solve. Name the cost and say that for most products a well-factored monorepo is simpler and better, and reach for micro-frontends only when team independence outweighs the integration tax.</p>
+<p>Build performance and code splitting belong here too: route-level lazy loading keeps the initial bundle small, and a bundle budget enforced in continuous integration stops regressions before they ship.</p>
+<hr>
+<h2>7. Performance as an architectural concern</h2>
+<p>Treat performance as a design input, not a cleanup task. Anchor it to the Core Web Vitals as budgets: Largest Contentful Paint under 2.5 seconds, Interaction to Next Paint under 200 milliseconds, Cumulative Layout Shift under 0.1, at the 75th percentile of real users. Verify the current thresholds before the interview, since they shift.</p>
+<p>The architectural levers: code splitting and route-level lazy loading to shrink the initial download, a performance budget in continuous integration to hold the line, responsive and lazy-loaded images, and avoiding layout shift by reserving space for media and dynamic content.</p>
+<p>The lever most relevant to a B2B catalog is list virtualization. A search result set or a data table can hold thousands of rows, and rendering them all destroys performance. Virtualization (windowing) mounts only the rows currently visible plus a small buffer, keeping the DOM small regardless of result count. Raise this proactively for any &quot;design a list of many items&quot; prompt.</p>
+<p>Watch the network waterfall: fetch independent data in parallel rather than chaining requests, prefetch the likely next navigation, and avoid the pattern where each request waits for the previous one to discover what to fetch next.</p>
+<hr>
+<h2>8. Cross-cutting concerns</h2>
+<p>These are the deep dives that signal breadth when the interviewer probes.</p>
+<p><strong>Internationalization.</strong> This role is European and multi-brand, so locale handling is likely in scope. Cover locale in the URL or domain, translated message bundles loaded per locale, rendering the correct locale during SSR, and formatting numbers, dates, and currency with the <code>Intl</code> APIs rather than by hand. Mention awareness of right-to-left layouts.</p>
+<p><strong>Accessibility at scale.</strong> Semantic HTML first, ARIA only to fill gaps, keyboard operability, and focus management for overlays. The leverage point is baking it into the design system so every consumer inherits accessible primitives.</p>
+<p><strong>Error handling and resilience.</strong> Treat loading, empty, and error as first-class states for every async view, not afterthoughts. Use error boundaries so one failed component does not blank the page, retry with backoff for transient failures, and fallback UI that degrades gracefully when part of a page fails, such as results rendering even if the facets request fails.</p>
+<p><strong>Observability.</strong> Real user monitoring, web-vitals reporting, and error tracking such as Sentry, so you learn about problems from data rather than from complaints. Feature flags for safe rollout.</p>
+<p><strong>Security.</strong> Escape by default, treat <code>v-html</code> as the dangerous escape hatch and sanitize untrusted HTML, and add a Content Security Policy as defense in depth.</p>
+<hr>
+<h2>9. Worked example: design the product search and listing page</h2>
+<p>This is the most likely prompt for a B2B marketplace, so walk it end to end with the framework.</p>
+<p><strong>Requirements.</strong> Functional: a search box, faceted filters (category, location, attributes), a results grid, sorting, pagination or infinite scroll, and shareable result views. Non-functional: strong SEO for public pages, fast first paint, a large catalog with many concurrent users, accessible, and multi-language. Clarify the scale (tens of thousands of products) and confirm SEO matters, because that decides the rendering strategy.</p>
+<p><strong>Architecture.</strong> Sketch the component tree and data flow.</p>
+<pre><code class="hljs" data-lang="text">URL  ?q=pumps&amp;category=industrial&amp;sort=relevance&amp;page=2
+     (single source of truth for the shareable view)
+       |
+       v
+SearchPage             (route component, server-rendered on first load)
+  |- SearchBar         debounced input, emits the query
+  |- FilterPanel       facets fetched from the server, emits filter changes
+  |- ResultsGrid
+  |    \- ProductCard  (x N, only the visible window is mounted)
+  |- Pagination / InfiniteScroll
+
+Data flow on every query or filter change:
+  update URL params  -&gt;  query key changes
+  data layer checks the cache:
+     hit   -&gt; render cached results, revalidate in background (SWR)
+     miss  -&gt; fetch /api/search, aborting any in-flight request first
+  results render; the likely next page is prefetched
+</code></pre>
+<p><strong>Data.</strong> Results and facets are server state, held in the query cache keyed by the full query (search term plus filters plus sort plus page), so revisiting a previous query is instant. Filters, sort, and page are URL state, so views are shareable and the back button works. Almost nothing needs a global store here, which is the point: most of this page's state belongs in the URL and the query cache, not in Pinia.</p>
+<p><strong>Interface.</strong> The server API is a search endpoint taking the query, filters, sort, and a cursor or page, returning results plus total count plus the facet counts, and possibly a separate facets endpoint. The component APIs: <code>SearchBar</code> takes the current query and emits changes, <code>FilterPanel</code> takes available facets and selected values and emits changes, <code>ResultsGrid</code> takes the result list, <code>ProductCard</code> takes one product, <code>Pagination</code> takes total and current page and emits navigation.</p>
+<p><strong>Optimizations.</strong> Server-render the first results page for SEO and fast first paint, then handle subsequent filtering with client fetches. Debounce the search input and cancel in-flight requests so a slow earlier response cannot overwrite a newer one. Virtualize the results grid so a large result set keeps the DOM small. Cache results by query key with stale-while-revalidate and prefetch the next page. Keep filters and sort in the URL for shareable, refresh-safe views. Announce result updates through an <code>aria-live</code> region and keep the filter controls keyboard operable. Localize content and format currency and numbers with <code>Intl</code>. Design the empty, error, and partial-failure states explicitly, so no results, a network error with retry, and a failed facets request that still shows results all behave well.</p>
+<p><strong>Tradeoffs to voice.</strong> Infinite scroll feels modern but hurts SEO and the back button, while numbered pages are shareable and crawlable, so for a public catalog lean toward pages or a hybrid. Server rendering costs more per request but is non-negotiable if these pages must rank. Aggressive client caching improves perceived speed but risks showing stale prices, so tune revalidation accordingly.</p>
+<hr>
+<h2>10. Worked example: typeahead, the bridge to the coding task</h2>
+<p>This smaller design connects directly to the coding portion, because in a combined round the coding task may be the typeahead and the design discussion extends it to production quality.</p>
+<p><strong>Requirements.</strong> Suggestions as the user types, fast, keyboard accessible, and correct under slow or out-of-order network responses.</p>
+<p><strong>Design.</strong> Debounce the input so you fetch on a pause rather than every keystroke, and enforce a minimum query length. Cancel the previous request with an AbortController on each new keystroke, which both saves work and fixes the out-of-order response bug where a slow earlier result overwrites a newer one. Cache recent queries client-side so backspacing is instant. Make it an accessible combobox: arrow keys to move through suggestions, Enter to select, Escape to close, with the right ARIA roles and an <code>aria-live</code> count. Handle the loading, empty, and error states. If you want to rank or highlight matches, mention it as an enhancement.</p>
+<p>The bridge sentence to use in the room: &quot;The debounce and cancellation we just coded are the core of this; making it production-grade adds the cache, the accessibility, and the loading and empty states.&quot;</p>
+<hr>
+<h2>11. How to answer well in a combined 45-minute round</h2>
+<p>Budget the time. Spend two or three minutes clarifying requirements, about five on the high-level architecture and the rendering decision, and the rest on one or two deep dives the interviewer cares about. Do not attempt to cover everything; depth on what he asks beats shallow breadth.</p>
+<p>Drive the conversation. Structure your answer out loud, sketch the boxes and arrows, decide with explicit tradeoffs, and check in with the interviewer, for example &quot;I can go deeper on the caching strategy or the rendering choice, which is more useful to you.&quot; Because the round combines coding and design, connect the two: let the design grow from the code you wrote, or note how you would implement a piece you just designed.</p>
+<p>The staff-level signal across all of it is the same one from the other guides: explain the mechanism, name the tradeoff, and connect a decision to the failure mode it prevents. A candidate who says &quot;I will cache the results&quot; is junior. One who says &quot;I will cache by query key with stale-while-revalidate, accepting that prices may be briefly stale, and revalidate on window focus to bound that staleness&quot; is the one who proceeds to the next level.</p>
+
+  </main>
+</div>
+</body>
+</html>
