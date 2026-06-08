@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Depth That Survives Probing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #8a2436;
+  --accent-soft:  #8a243614;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Level</div>
+    <h1>Depth That Survives Probing</h1>
+    <div class="sub">The staff-level rejection pattern: claims that collapse under deeper questioning. How to back every architecture, leadership, and AI claim with the concrete technical mechanism that made it real.</div>
+  </header>
+  <main>
+<h2>The pattern: they probe one level deeper than you expect</h2>
+<p>At the staff level the headline is not the test. Whatever you claim, the interviewer drills down one level, then another, and the claim either bottoms out in a concrete technical mechanism or it collapses into something weaker than it sounded. The most common staff rejection is not a wrong answer. It is a strong-sounding claim that turns out to have nothing underneath it: a redesign that was really a set of suggestions, leadership that was really meeting coordination, AI fluency that was really prompt-and-hope.</p>
+<p>The principle that prevents this: every claim you make should have, one or two levels below it, a specific mechanism you can describe and ideally an outcome you can quantify. The headline draws the question; the depth wins or loses the round. Prepare the depth, not the headline.</p>
+<p>This is the interview version of the rule that runs through good technical writing: do not stop at what something is, reach the mechanism and the evidence. In a conversation the interviewer forces that for you by asking &quot;how,&quot; and a staff candidate has already been there.</p>
+<hr>
+<h2>1. Claims versus mechanisms</h2>
+<p><strong>What.</strong> A claim is what you accomplished. A mechanism is how you made it real and how you know it worked. Under probing, only the mechanism survives.</p>
+<p><strong>Why it matters.</strong> Anyone can adopt a pattern or state an intention. What distinguishes a staff engineer is turning intention into something that holds without them: a tool, a check, a contract, a measurement. The interviewer is testing for that, so they keep asking &quot;how&quot; until they hit either a mechanism or the bottom of your knowledge.</p>
+<p><strong>Catch.</strong> The trap is that intentions sound like accomplishments. &quot;I introduced best practices,&quot; &quot;I established conventions,&quot; &quot;I redesigned the architecture,&quot; all sound substantial and all collapse the moment someone asks how the practice was enforced, what made the convention stick, or what the redesign changed in concrete terms. If your answer to &quot;how&quot; is another intention, you have not reached the mechanism yet.</p>
+<p>The preparation drill: for every project you plan to mention, write the one-line headline, then force yourself to write the three layers beneath it. The decision, the mechanism that implemented it, and the evidence it worked. If you cannot fill three layers, the interviewer will reach the bottom before you want them to, and the claim will reread as smaller than you meant.</p>
+<pre><code class="hljs" data-lang="text">Headline:   &quot;I improved consistency across our frontend teams.&quot;
+Layer 1:    the decision  -&gt; what specifically, and why that over alternatives
+Layer 2:    the mechanism -&gt; the tool, check, contract, or package that enforced it
+Layer 3:    the evidence  -&gt; the metric or signal that showed it worked
+</code></pre>
+<hr>
+<h2>2. Technical leadership versus coordination</h2>
+<p>The distinction that decides a staff verdict. Coordination is aligning people: running the meetings, writing the document, getting agreement on a convention. It is real work and it matters, but it is not what the title tests. Technical leadership is building the technical means that make the right thing happen by default, so it holds when you are not in the room.</p>
+<p>The sharpest way to hold the line in your own head: a best practice that depends on people remembering to follow it is coordination. The same practice encoded so it cannot be violated is technical leadership. The interviewer is listening for which one you actually did.</p>
+<p>The technical means that turn a practice into something enforced, stated generally so it transfers to any architecture or standards effort:</p>
+<ul>
+<li>Automated enforcement: lint rules, type checks, continuous-integration gates, pre-commit hooks, custom static analysis that fail the build when the rule is broken.</li>
+<li>Contracts: typed interfaces, schema validation, API contracts, and contract tests that make a violation a compile or test failure rather than a runtime surprise.</li>
+<li>Shared primitives: a design system or utility library as a versioned package, shared configuration, and scaffolds or generators that make the correct structure the path of least resistance.</li>
+<li>Migration mechanisms: codemods and incremental adoption paths, so teams move without manual rewrites and the old pattern actually disappears.</li>
+<li>Governance encoded as code: ownership rules, dependency boundaries, architectural fitness functions, and performance or bundle budgets enforced in continuous integration.</li>
+<li>Evidence: dashboards and metrics that show adoption rose and the target outcome improved, so the impact is measured rather than asserted.</li>
+</ul>
+<p>The reframe move in the room: when asked about a standards or architecture effort, lead with the mechanism and the evidence, not the pattern. Not &quot;we adopted X,&quot; but &quot;we made X the default by encoding it in Y, and the violations in CI dropped from many per week to near zero over the quarter.&quot; The pattern is the setup; the mechanism and the number are the answer.</p>
+<hr>
+<h2>3. A worked reframe: from pattern to enforcement</h2>
+<p>Take a generic claim and watch it move from collapsing to holding. The topic is consistency across teams, but the shape applies to any leadership claim.</p>
+<p>The version that collapses under probing:</p>
+<pre><code class="hljs" data-lang="text">&quot;I led a redesign of our frontend architecture to improve consistency.
+ I introduced shared patterns and best practices, documented our
+ conventions, and the teams adopted them.&quot;
+</code></pre>
+<p>Press on it once and it reveals itself: patterns, a document, and getting agreement. That is coordination, and there is no evidence it stuck. This is exactly the read that ends a staff interview.</p>
+<p>The version that holds:</p>
+<pre><code class="hljs" data-lang="text">&quot;Consistency was failing because the conventions lived in a wiki nobody
+ read. I moved enforcement into the toolchain: a shared lint and TypeScript
+ config so cross-team imports were type-checked, the design system as a
+ versioned package so a token change shipped to every app in one release,
+ and a CI gate that failed any build crossing a module boundary. I wrote
+ codemods so teams adopted incrementally without manual rewrites. It was
+ measurable: boundary violations in CI fell to near zero over a quarter,
+ and the design-token drift we tracked fell with it.&quot;
+</code></pre>
+<p>What changed is exactly the method from section 1. The decision stayed the same; the answer added the mechanism that enforced it (lint, config, package, CI gate), the mechanism that migrated to it (codemods), and the evidence it worked (the CI metric and the drift tracking). Same project, an order of magnitude more convincing, and now it reads as technical leadership rather than coordination.</p>
+<hr>
+<h2>4. AI maturity versus enthusiasm</h2>
+<p>The second face of the same pattern. Enthusiasm is the headline: you are excited about AI, you built a demo, you use it daily. Maturity is the mechanism: you understand how to engineer with AI reliably, and you are aware of how the field has moved. Under probing, enthusiasm without maturity reads the same way coordination without leadership does, as motion without substance.</p>
+<p>The distinction to internalize: vibe coding prompts a model, accepts what comes back, and ships it, trusting that it looked right. AI engineering treats the model as one component in a system that is fed the right inputs, given the right capabilities, constrained so wrong output is caught automatically, and measured so quality is known rather than hoped. The first is a starting point. The second is what a staff candidate is expected to articulate.</p>
+<p>The honesty guard matters here as much as anywhere: if your practice really has been mostly experimental, say so and describe how you would put the engineering scaffolding around it, rather than inflating it into expertise the probe will deflate. A grounded &quot;here is where I am and here is where I would take it&quot; beats a claim that collapses.</p>
+<hr>
+<h2>5. The AI engineering harness</h2>
+<p>The generalizable framework behind that maturity, and a useful mental model regardless of this one interview. A harness is the scaffolding you build around a model so its output is reliable. It has four parts, and naming them is the difference between sounding current and sounding a year behind.</p>
+<p><strong>Context: what the model can see.</strong> The quality of output is mostly a function of the quality of the inputs. Curating the right files, examples, conventions, and current state into the model's window, rather than dumping everything or too little, is the lever that moves results most. The broad shift has been from crafting clever one-shot prompts toward engineering the context the model works from.</p>
+<p><strong>Tools: what the model can do.</strong> Giving a model the ability to read files, run code, query a database, or browse, through tool use and protocols like MCP, lets it act on the real environment instead of guessing from a frozen snapshot. An assistant that can read your actual code and run your actual tests produces grounded output; one that cannot is improvising.</p>
+<p><strong>Constraints: what keeps the output correct.</strong> This is the same idea as technical means from section 2, applied to AI. Types, tests, linters, and schemas automatically grade what the model produces, so a wrong answer is rejected by the system rather than caught by luck. Enabling strong typing and a real test suite is what makes AI output safe to accept at speed, because the guardrails do the checking.</p>
+<p><strong>Evaluation: how you know it works.</strong> Evals are systematic, repeatable measurement of output quality against a set of examples, the move from &quot;this one result looked right&quot; to &quot;it passes the suite we measure against.&quot; Maturity is treating AI changes the way you treat code changes: measured, not eyeballed.</p>
+<p>The signal this sends: you think about AI as an engineering system with inputs, capabilities, guardrails, and measurement, not as a box you prompt and trust. Keep your awareness of the field at the level of these concepts and the general direction of travel, toward agentic, tool-using, evaluated workflows, rather than memorizing product names that will be stale by the interview. Verify the current specifics close to the day.</p>
+<hr>
+<h2>6. How to prepare and how to answer under probing</h2>
+<p>The preparation is the three-layer drill from section 1, run against everything you might say. For each project, can you name the decision, the mechanism, and the evidence. For your AI practice, can you speak to context, tools, constraints, and evaluation, and describe how the field has moved. Where you cannot, either build the missing depth before the interview or scope the claim down to what you can defend.</p>
+<p>In the room, the rule is simple: when the interviewer pushes deeper, move toward the concrete, not the abstract. &quot;Tell me more&quot; should make your answer more specific, the exact check, the exact contract, the exact number, not more adjectives. Every level of probing should reveal more substance, which is only possible if the substance is actually there. That is why this is a preparation problem more than a performance one. You cannot improvise depth you did not build; you can only reveal depth you did.</p>
+<hr>
+<h2>7. The pre-interview audit</h2>
+<p>Run every claim you intend to make through this before the day.</p>
+<pre><code class="hljs" data-lang="text">For each project or accomplishment:
+[ ] Can I state the decision and why I chose it over the alternatives?
+[ ] Can I name the technical mechanism that enforced or implemented it?
+[ ] Can I give a metric or concrete signal that it worked?
+[ ] Does it read as technical leadership, or only as coordination?
+[ ] If only coordination, have I scoped the claim honestly?
+
+For AI experience:
+[ ] Can I speak to context, tools, constraints, and evaluation?
+[ ] Can I describe the general direction the field has moved?
+[ ] Do I have a story that shows judgment and guardrails, not just a demo?
+[ ] Am I claiming maturity I can defend, or scoping to what is real?
+
+Across the board:
+[ ] For every headline, can I go three layers deep before hitting bottom?
+[ ] When pushed, does my answer get more concrete rather than more vague?
+</code></pre>
+<p>If a claim fails this audit, the probe will find the same crack the audit did. Fix it by building the depth or narrowing the claim, never by polishing the headline.</p>
+
+  </main>
+</div>
+</body>
+</html>
