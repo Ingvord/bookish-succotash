@@ -403,26 +403,33 @@ td code{ font-size:.84em; background:#edeff7; border-color:#d8dcec; }
 <p><strong>Real-time transport choices.</strong> Polling is simplest and wasteful, Server-Sent Events give one-way server-to-client streaming over HTTP, and WebSockets give full duplex for chat and collaboration. Pick the lightest one that meets the need.</p>
 <p><strong>Client storage options.</strong> Cookies travel with every request and suit auth tokens with <code>HttpOnly</code> and <code>SameSite</code>. <code>localStorage</code> and <code>sessionStorage</code> are synchronous string stores for small data, and IndexedDB is the asynchronous database for large or structured client data.</p>
 <hr>
-<h2>8. Security</h2>
+<h2>8. Build tooling and modules</h2>
+<p>These came up in a live round and are quick-fire knowledge checks. Give the mechanism in a sentence or two; the dedicated modules-and-build guide carries the depth.</p>
+<p><strong>What is the difference between CommonJS and ES Modules?</strong> CommonJS (<code>require</code> and <code>module.exports</code>) is dynamic and synchronous, resolved at runtime, so an import can be conditional or computed. ES Modules (<code>import</code> and <code>export</code>) are static and analyzable at parse time, asynchronous, with live bindings and strict mode by default. ESM is the standard in browsers and modern Node.</p>
+<p><strong>Which is more efficient for tree-shaking, and why?</strong> ES Modules, decisively. Tree-shaking is dead-code elimination, which requires the bundler to prove an export is unused, and ESM's static structure makes that provable. CommonJS's dynamic <code>require</code> and runtime-assembled exports do not, so unused CommonJS code generally ships. The levers: prefer a library's ESM build (<code>lodash-es</code> over <code>lodash</code>), use named imports, and set <code>&quot;sideEffects&quot;: false</code>.</p>
+<p><strong>Why is Vite so fast?</strong> Two separate mechanisms, and naming the distinction is the senior answer. In development it does not bundle at all: it serves native ES Modules and transforms files on demand, so startup is near-constant regardless of app size, with dependencies pre-bundled once. In production it bundles with a Rust-native engine. As of Vite 8 (March 2026) a single Rust bundler, Rolldown, handles both dev and build, replacing the older esbuild-plus-Rollup split and reporting roughly 10 to 30 times faster production builds. Verify the current engine, since it has changed more than once.</p>
+<p><strong>Difference between dependencies, devDependencies, and peerDependencies?</strong> <code>dependencies</code> are needed at runtime and install with your package. <code>devDependencies</code> are build and test tooling, skipped by production installs and by consumers. <code>peerDependencies</code> are provided by the host so a single shared instance is used. The classic bug to mention: putting a framework like Vue in a component library's <code>dependencies</code> gives consumers a second Vue instance, which breaks reactivity and provide/inject; it belongs in <code>peerDependencies</code>.</p>
+<hr>
+<h2>9. Security</h2>
 <p><strong>How do you prevent XSS.</strong> Never inject untrusted strings as HTML. Frameworks escape interpolated text by default, so the danger is the escape hatch: Vue's <code>v-html</code> and React's <code>dangerouslySetInnerHTML</code>. If you must render user HTML, sanitize it with a vetted library such as DOMPurify, and add a Content Security Policy as defense in depth.</p>
 <pre><code class="hljs" data-lang="">Content-Security-Policy: default-src 'self'; script-src 'self'
 </code></pre>
 <p><strong>How do you prevent CSRF.</strong> Mark session cookies <code>SameSite=Lax</code> or <code>Strict</code>, and for state-changing requests use anti-CSRF tokens or require a custom header that a cross-site form cannot set.</p>
 <p><strong>Supply chain and dependencies.</strong> Pin versions, commit the lockfile, audit dependencies, and treat a transitive package as code you ship, because it is.</p>
 <hr>
-<h2>9. Vue-specific knowledge</h2>
+<h2>10. Vue-specific knowledge</h2>
 <p><strong>How does Vue 3 reactivity work.</strong> It wraps state in a <code>Proxy</code> that tracks which effect is running when a property is read and re-runs those effects when the property is written. That is the <code>reactive</code> and <code>effect</code> pair from the coding section, and <code>ref</code> is the same idea boxed for primitives.</p>
 <p><strong>Composition API versus Options API, and why Composition at scale.</strong> Options groups code by kind (data, methods, computed), which scatters one feature across the file as a component grows. Composition groups by feature and extracts reusable logic into composables, which is why it is the default for large components and a design system.</p>
 <p><strong>Quick hits they may fire.</strong> <code>:key</code> must be a stable id so the diff matches nodes correctly. <code>nextTick</code> waits for the DOM to flush after a state change. <code>provide</code> and <code>inject</code> distribute values like theme without prop drilling. Scoped slots let a consumer control rendering while the component owns structure, which is the seam a multi-brand design system needs. Pinia is the state library, with <code>storeToRefs</code> to keep reactivity when destructuring.</p>
 <p><strong>SSR and hydration.</strong> With Nuxt, the server renders HTML and the client hydrates it. A hydration mismatch happens when the client's first render differs from the server's, caused by browser-only branches, dates, or random values during render, so gate browser-only code behind <code>onMounted</code> or <code>import.meta.client</code>.</p>
 <p><strong>Vue performance levers.</strong> <code>v-once</code> for static subtrees, <code>v-memo</code> to skip re-render unless dependencies change, <code>shallowRef</code> for large objects you replace wholesale, <code>defineAsyncComponent</code> for lazy loading, and <code>KeepAlive</code> to cache toggled components.</p>
 <hr>
-<h2>10. Testing</h2>
+<h2>11. Testing</h2>
 <p><strong>What is your testing strategy.</strong> A pyramid: many fast unit tests, fewer integration tests, and a thin layer of end-to-end tests for critical user journeys. Heavy reliance on slow end-to-end tests is a smell.</p>
 <p><strong>What do you test in a component.</strong> Behavior through the public interface, meaning rendered output and emitted events, not internal refs or private methods. Testing internals makes refactors break tests that should not break.</p>
 <p><strong>Tooling and pitfalls.</strong> Vue Test Utils with <code>mount</code> or <code>shallowMount</code>, Vitest as the runner on a Vite project, and Cypress for end-to-end. Mock the network at the boundary, for example with MSW, rather than stubbing deep internals. Flaky tests usually come from real timers, unawaited async, or shared state, so use fake timers, await DOM updates, and isolate each test.</p>
 <hr>
-<h2>11. Architecture and design systems</h2>
+<h2>12. Architecture and design systems</h2>
 <p>This is where a staff candidate is really assessed. The posting asks for consistency across many codebases and a multi-brand design system, so expect open-ended design questions.</p>
 <p><strong>How would you design a reusable component API.</strong> Keep the surface small and predictable: props for input, events for output, slots for composition. Prefer composition over a forest of boolean flags, expose design tokens rather than hard-coded values, and document the contract. A component is a contract, and stability of that contract is what makes it reusable.</p>
 <p><strong>How do you support multiple brands from one system.</strong> Drive appearance from design tokens as CSS custom properties, switch the token set per brand at the theme boundary, and keep structure and behavior shared. Scoped slots and sensible defaults let each brand override rendering without forking the component.</p>
@@ -430,14 +437,14 @@ td code{ font-size:.84em; background:#edeff7; border-color:#d8dcec; }
 <p><strong>How would you migrate a large legacy frontend.</strong> Incrementally. Establish the target, carve a seam, migrate route by route or component by component behind a consistent interface, keep both running during the transition, and avoid a big-bang rewrite that stalls feature work. Your 18 years across Angular, Webix, and ExtJS is direct evidence you have done this under real constraints.</p>
 <p><strong>When would you reach for micro-frontends.</strong> Only when independent teams need independent deploy cadences on a large product, and you accept the cost in shared-dependency duplication, runtime integration, and consistency overhead. For most products a well-factored monorepo is simpler and better.</p>
 <hr>
-<h2>12. AI-assisted development</h2>
+<h2>13. AI-assisted development</h2>
 <p>The posting explicitly wants a proven record of using AI to solve practical problems and improve team efficiency, so prepare a concrete, honest narrative rather than a slogan. Cover where you apply it (scaffolding, tests, refactors, exploring an unfamiliar API, reviewing diffs), how you keep it safe (treat output as a draft, lean on types and tests as guardrails, review every line you ship), and how it helped the team (faster onboarding to a codebase, less boilerplate, more time on design). The signal they want is judgment: you know what to delegate and what to verify, not that you accept whatever the model emits.</p>
 <hr>
-<h2>13. Staff-level and behavioral questions</h2>
+<h2>14. Staff-level and behavioral questions</h2>
 <p>Expect a few of these, and answer with specifics and tradeoffs.</p>
 <p>&quot;Tell me about the most complex project you owned end to end.&quot; Pick one long-running project, state the constraints, the decisions you made, and what you would change. &quot;Describe a technical disagreement and how you resolved it.&quot; Show that you can disagree, then commit, and that you optimize for the outcome over being right. &quot;How do you raise engineering standards on a team.&quot; Talk about shared tooling, review culture, and pragmatic standards that people actually adopt. &quot;How do you decide between two approaches under time pressure.&quot; Show a framework: reversible decisions move fast, one-way doors get more rigor.</p>
 <hr>
-<h2>14. How to answer well</h2>
+<h2>15. How to answer well</h2>
 <p>Three habits carry the round. Think aloud, because they are evaluating reasoning, not just the final answer. Ask before assuming, because clarifying the requirement is itself a senior signal. And connect each answer to a real failure mode you have seen, because lived experience explained calmly reads as more senior than reciting definitions. When you hit a caveat, say what happens, why the platform does that, and where it bites in production.</p>
 
   </main>

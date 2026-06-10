@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Vue Interview Prep</title>
+<title>From Webix, ExtJS &amp; Angular to Vue 3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -126,85 +126,176 @@ code.hljs {
   /* purposely ignored */
   
 }
-:root{
-  --ink:#1c1b19; --muted:#5f5c55; --paper:#ffffff;
-  --accent:#0f6e62; --accent-soft:#0f6e6214;
-  --rule:#e7e3da; --code-bg:#f6f8fa; --code-border:#e1e6ea; --code-tag:#eef1f4;
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #0f6e62;
+  --accent-soft:  #0f6e6214;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
 }
-*{ box-sizing:border-box; }
-html{ -webkit-text-size-adjust:100%; }
-body{
-  margin:0; background:var(--paper); color:var(--ink);
-  font-family:"Newsreader", Georgia, "Times New Roman", serif;
-  font-size:18px; line-height:1.72;
-  print-color-adjust:exact; -webkit-print-color-adjust:exact;
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
-.wrap{ max-width:52rem; margin:0 auto; padding:3.5rem 1.6rem 6rem; }
 
-.doc-header{ border-bottom:3px solid var(--ink); padding-bottom:1.4rem; margin-bottom:2.6rem; }
-.kicker{ font-family:"JetBrains Mono", ui-monospace, monospace; font-size:.7rem;
-  letter-spacing:.2em; text-transform:uppercase; color:var(--accent); }
-h1{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:2.7rem;
-  line-height:1.08; margin:.5rem 0 0; letter-spacing:-.015em; }
-.doc-header .sub{ color:var(--muted); font-size:1.02rem; margin-top:.85rem; line-height:1.55; }
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
 
-h2{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:1.72rem;
-  margin:3.2rem 0 1rem; padding-bottom:.42rem; border-bottom:1px solid var(--rule);
-  letter-spacing:-.01em; }
-h3{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:1.22rem;
-  margin:2.1rem 0 .55rem; }
-p{ margin:0 0 1rem; }
-a{ color:var(--accent); text-decoration:none; border-bottom:1px solid var(--accent-soft); }
-strong{ font-weight:650; color:#141312; }
-ul,ol{ margin:0 0 1rem; padding-left:1.3rem; }
-li{ margin:.25rem 0; }
-hr{ border:none; border-top:1px solid var(--rule); margin:2.6rem 0; }
-
-/* inline code */
-code{ font-family:"JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
-  font-size:.84em; background:var(--code-bg); border:1px solid var(--code-border);
-  border-radius:4px; padding:.06em .34em; color:#0b4f47; }
-
-/* code blocks */
-pre{ position:relative; margin:1.1rem 0 1.5rem; background:var(--code-bg);
-  border:1px solid var(--code-border); border-left:3px solid var(--accent);
-  border-radius:8px; padding:1rem 1.15rem; overflow-x:auto; }
-pre code.hljs{ background:transparent; border:none; padding:0; color:#24292e;
-  font-size:.8rem; line-height:1.6; display:block; }
-pre code[data-lang]:not([data-lang=""]):before{
-  content: attr(data-lang); position:absolute; top:0; right:0;
-  font-family:"JetBrains Mono", monospace; font-size:.58rem; letter-spacing:.12em;
-  text-transform:uppercase; color:var(--muted); background:var(--code-tag);
-  border:1px solid var(--code-border); border-top:none; border-right:none;
-  border-bottom-left-radius:6px; padding:.22em .6em; }
-
-/* tables */
-table{ border-collapse:collapse; width:100%; margin:1.3rem 0; font-size:.82rem; }
-th,td{ border:1px solid var(--rule); padding:.5rem .68rem; text-align:left; vertical-align:top; }
-th{ background:var(--accent); color:#fff; font-family:"JetBrains Mono", monospace;
-  font-size:.66rem; letter-spacing:.04em; text-transform:uppercase; font-weight:500; }
-tbody tr:nth-child(even){ background:#faf9f6; }
-td code{ font-size:.8em; background:#eef2f1; border-color:#dce4e2; }
-
-@page{ margin:16mm; }
-@media print{
-  body{ font-size:10.5pt; }
-  .wrap{ max-width:none; padding:0; }
-  *{ print-color-adjust:exact; -webkit-print-color-adjust:exact; }
-  a{ color:var(--ink); border:none; }
-  pre code.hljs{ white-space:pre-wrap; word-break:break-word; }  /* wrap long lines so nothing clips on paper */
-  pre, table{ break-inside:auto; }
-  tr{ break-inside:avoid; }
-  h1,h2,h3{ break-after:avoid; }
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
 }
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="doc-header">
-    <div class="kicker">Interview Preparation &middot; Staff Frontend Engineer</div>
+    <div class="kicker">Interview Preparation · Staff Frontend Engineer</div>
     <h1>From Webix, ExtJS &amp; Angular to Vue 3</h1>
-    <div class="sub">Framework mapping, a runnable cookbook, four build toolchains, and production deployment. Targeting Vue 3.5, Vite 8, Pinia, Vitest.</div>
+    <div class="sub">Mapping from Webix, ExtJS, and Angular to Vue 3, a runnable cookbook, a hooks-versus-composables comparison, four build toolchains, testing, and production deployment.</div>
   </header>
   <main>
 <h1>Vue Interview Prep: From Webix / ExtJS / Angular to Vue 3</h1>
@@ -462,7 +553,7 @@ td code{ font-size:.8em; background:#eef2f1; border-color:#dce4e2; }
 <p>The Vue habit to internalize: derive the view from state with <code>computed</code>, do not imperatively poke a widget.</p>
 <hr>
 <h2>5. Vue cookbook: runnable mini-apps</h2>
-<p>This is the section an interviewer probes hardest, because it separates people who have used Vue from people who understand its reactivity model. Each item states the concept in prose first, then gives a complete <code>.vue</code> component you can drop into the Vite scaffold from section 6 and run. Read the prose, then trace the code against it.</p>
+<p>This is the section an interviewer probes hardest, because it separates people who have used Vue from people who understand its reactivity model. Each item states the concept in prose first, then gives a complete <code>.vue</code> component you can drop into the Vite scaffold from section 7 and run. Read the prose, then trace the code against it.</p>
 <h3>5.1 <code>ref</code> vs <code>reactive</code>, and why destructuring breaks reactivity</h3>
 <p>Reach for <code>ref</code> by default, for both primitives and objects. It behaves predictably everywhere: you read and write <code>.value</code> in script, and Vue auto-unwraps it in the template. <code>reactive</code> exists for objects only, and it carries a sharp edge that shows up constantly in interviews. A <code>reactive</code> object is a Proxy, and reactivity lives on the proxy, not on the values inside it. The moment you destructure it, you copy the current values out and sever the link to the proxy, so those copies never update again. <code>toRefs</code> fixes this by wrapping each property in its own ref that stays connected to the source.</p>
 <p>The practical rule: default to <code>ref</code>, and if you do use <code>reactive</code>, never destructure it without <code>toRefs</code>.</p>
@@ -771,7 +862,78 @@ td code{ font-size:.8em; background:#eef2f1; border-color:#dce4e2; }
 </code></pre>
 <p><code>storeToRefs</code> is the detail that catches people: destructuring the store directly would break reactivity on <code>items</code> and <code>total</code>, exactly as destructuring a <code>reactive</code> object does, and <code>storeToRefs</code> is the fix.</p>
 <hr>
-<h2>6. Project scaffolds: the same TODO app, four toolchains</h2>
+<h2>6. React hooks versus Vue composables</h2>
+<p>The job touches both React and Vue, so this comparison is a common probe. Hooks and composables solve the same problem, reusing stateful logic across components, and both replaced older patterns (mixins in Vue, higher-order components and render props in React). Both are plain functions you call from a component. Every difference between them flows from one thing: the render model.</p>
+<p>A React component function re-runs top to bottom on every render, so its hooks run on every render too, and React preserves state between renders through an internal slot keyed by call order. That single fact explains the Rules of Hooks (call them unconditionally, at the top level, in the same order every render), the dependency arrays on <code>useEffect</code>, and the existence of <code>useMemo</code> and <code>useCallback</code> to avoid recomputing or recreating values each render.</p>
+<p>A Vue composable runs once, during <code>setup</code>. It creates reactive state with <code>ref</code> or <code>reactive</code>, returns it, and Vue tracks dependencies at the value level through its Proxy-based reactivity, re-rendering only what actually changed. Because the body does not re-run on updates, there are no dependency arrays, no <code>useMemo</code> or <code>useCallback</code>, and <code>computed</code> caches and re-tracks automatically.</p>
+<p>The mapping:</p>
+<table>
+<thead>
+<tr>
+<th>React</th>
+<th>Vue</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>useState</code></td>
+<td><code>ref</code> / <code>reactive</code></td>
+<td>Vue state is mutable through <code>.value</code>; React state is immutable with a setter</td>
+</tr>
+<tr>
+<td><code>useEffect</code></td>
+<td><code>watch</code> / <code>watchEffect</code>, plus <code>onMounted</code> / <code>onUnmounted</code></td>
+<td>Vue separates lifecycle from reactivity and needs no dependency array</td>
+</tr>
+<tr>
+<td><code>useMemo</code></td>
+<td><code>computed</code></td>
+<td><code>computed</code> auto-tracks dependencies and caches; no deps array</td>
+</tr>
+<tr>
+<td><code>useCallback</code></td>
+<td>rarely needed</td>
+<td><code>setup</code> runs once, so functions are already stable</td>
+</tr>
+<tr>
+<td><code>useContext</code></td>
+<td><code>inject</code> (with <code>provide</code>)</td>
+<td>same dependency-injection idea</td>
+</tr>
+<tr>
+<td><code>useRef</code> for a DOM node</td>
+<td>template <code>ref</code></td>
+<td></td>
+</tr>
+<tr>
+<td>a custom <code>useX</code> hook</td>
+<td>a <code>useX</code> composable</td>
+<td>both are functions returning state</td>
+</tr>
+</tbody>
+</table>
+<p>The same <code>useCounter</code> in each:</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// React: the hook runs on every render; deps arrays tell React what to memoize</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">useCounter</span>(<span class="hljs-params">initial = <span class="hljs-number">0</span></span>) {
+  <span class="hljs-keyword">const</span> [count, setCount] = <span class="hljs-title function_">useState</span>(initial)
+  <span class="hljs-keyword">const</span> increment = <span class="hljs-title function_">useCallback</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">setCount</span>(<span class="hljs-function"><span class="hljs-params">c</span> =&gt;</span> c + <span class="hljs-number">1</span>), [])
+  <span class="hljs-keyword">const</span> double = <span class="hljs-title function_">useMemo</span>(<span class="hljs-function">() =&gt;</span> count * <span class="hljs-number">2</span>, [count])
+  <span class="hljs-keyword">return</span> { count, increment, double }
+}
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// Vue: setup runs once; computed auto-tracks; no deps arrays, no useCallback</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">useCounter</span>(<span class="hljs-params">initial = <span class="hljs-number">0</span></span>) {
+  <span class="hljs-keyword">const</span> count = <span class="hljs-title function_">ref</span>(initial)
+  <span class="hljs-keyword">const</span> <span class="hljs-title function_">increment</span> = (<span class="hljs-params"></span>) =&gt; count.<span class="hljs-property">value</span>++
+  <span class="hljs-keyword">const</span> double = <span class="hljs-title function_">computed</span>(<span class="hljs-function">() =&gt;</span> count.<span class="hljs-property">value</span> * <span class="hljs-number">2</span>)
+  <span class="hljs-keyword">return</span> { count, increment, double }
+}
+</code></pre>
+<p>Two catches worth naming. First, stale closures are a frequent React bug and rarely a Vue one. Because a React hook re-runs and its callbacks capture that render's values, a callback can read outdated state unless you manage it with a dependency array or a ref, whereas a Vue composable reads through a stable <code>ref</code>, so the value is always current. Second, both have a &quot;call it at the top, synchronously&quot; rule, but for different reasons. React's comes from the call-order slot mechanism. Vue's is narrower: a composable that registers a lifecycle hook or calls <code>inject</code> must run synchronously during <code>setup</code>, because it needs the active component instance, so you cannot call such a composable after an <code>await</code> or conditionally.</p>
+<p>The interview one-liner: both are functions for reusing stateful logic, and the difference is the render model. React re-runs the component and the hook every render, which is why it needs dependency arrays, the Rules of Hooks, and <code>useMemo</code> and <code>useCallback</code>. Vue runs <code>setup</code> once and tracks reactivity at the value level, so a composable needs none of those, and stale closures are far less of a problem.</p>
+<hr>
+<h2>7. Project scaffolds: the same TODO app, four toolchains</h2>
 <p>All four build or serve the same component. Save this as <code>src/TodoApp.vue</code> and reuse it (the no-bundler variant inlines an equivalent, since it has no SFC compiler).</p>
 <pre><code class="hljs" data-lang="vue"><span class="hljs-comment">&lt;!-- src/TodoApp.vue --&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
@@ -1037,12 +1199,12 @@ td code{ font-size:.8em; background:#eef2f1; border-color:#dce4e2; }
 </code></pre>
 <p>Run dev: <code>npm run dev</code> bundles, serves on <code>http://localhost:3000</code> via BrowserSync, and live-reloads on change. Build: <code>npm run build</code>. The framing for an interviewer: Gulp earns its place as the orchestrator for a multi-step asset pipeline (Sass, image optimization, copying, bundling). It delegates module bundling to a real bundler rather than doing it alone.</p>
 <hr>
-<h2>7. Local development servers</h2>
+<h2>8. Local development servers</h2>
 <p><strong>Vite dev server</strong> (<code>vite</code>). Serves source as native ES modules with on-demand transform, so startup is near-instant and stays flat as the project grows. Hot module replacement is built in and precise. API proxying via <code>server.proxy</code>. This is the default you should reach for.</p>
 <p><strong>webpack-dev-server</strong> (<code>webpack serve</code>). Bundles the app in memory and serves from memory, with HMR enabled by <code>hot: true</code>. Cold start and rebuilds get slower as the graph grows, since it bundles up front. API proxying via <code>devServer.proxy</code>. Still common in established codebases.</p>
 <p>Both share the same dev concerns: enable HMR, proxy your backend to avoid CORS, bind a stable port, and keep source maps on in development. The practical difference is startup and rebuild speed, where Vite wins because it does not bundle during development.</p>
 <hr>
-<h2>8. Production deployment best practices</h2>
+<h2>9. Production deployment best practices</h2>
 <p>Lead with these in an architecture discussion. They are staff-level signals.</p>
 <p><strong>Build correctly.</strong> Ship a bundled, minified, tree-shaken build from the runtime-only Vue (never the in-browser compiler or full build). Set the Vue feature flags (<code>__VUE_OPTIONS_API__</code>, <code>__VUE_PROD_DEVTOOLS__</code>, <code>__VUE_PROD_HYDRATION_MISMATCH_DETAILS__</code>) to <code>false</code> so dev code is removed. Set <code>NODE_ENV=production</code>.</p>
 <p><strong>Split and lazy-load.</strong> Use dynamic <code>import()</code> for route-level components and <code>defineAsyncComponent</code> for heavy widgets, so the initial bundle stays small. Measure with <code>rollup-plugin-visualizer</code> (Vite) or <code>webpack-bundle-analyzer</code>, and hold a performance budget in CI.</p>
@@ -1081,7 +1243,7 @@ td code{ font-size:.8em; background:#eef2f1; border-color:#dce4e2; }
 }
 </code></pre>
 <hr>
-<h2>9. Testing (the job names Jest and Cypress)</h2>
+<h2>10. Testing (the job names Jest and Cypress)</h2>
 <p>Unit and component tests use <strong>Vue Test Utils</strong> (<code>@vue/test-utils</code>) with <code>mount</code> (full render) or <code>shallowMount</code> (stub children). The idiomatic runner today is <strong>Vitest</strong>, which shares Jest's API and runs faster on Vite projects. Position it as: you set up Jest and Cypress before, and on a Vite/Vue codebase you reach for Vitest for the same reasons with a familiar API.</p>
 <pre><code class="hljs" data-lang="js"><span class="hljs-keyword">import</span> { mount } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@vue/test-utils&#x27;</span>
 <span class="hljs-keyword">import</span> <span class="hljs-title class_">TodoApp</span> <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;../src/TodoApp.vue&#x27;</span>
@@ -1095,18 +1257,18 @@ td code{ font-size:.8em; background:#eef2f1; border-color:#dce4e2; }
 </code></pre>
 <p>End-to-end and component testing use <strong>Cypress</strong> (you have done this). Test behavior through the rendered output and emitted events, not internal refs.</p>
 <hr>
-<h2>10. Live-coding katas to drill this week</h2>
+<h2>11. Live-coding katas to drill this week</h2>
 <p>Build each from scratch in a Vite scaffold until it is reflexive:</p>
 <ol>
 <li>Counter with reset and a <code>computed</code> doubled value.</li>
 <li>Debounced search filter using <code>watch</code> with a cleared timeout.</li>
 <li>A reusable <code>&lt;BaseInput&gt;</code> with <code>defineModel</code>, used twice in a parent.</li>
-<li>The TODO app in section 6, with a <code>computed</code> remaining count and stable keys.</li>
+<li>The TODO app in section 7, with a <code>computed</code> remaining count and stable keys.</li>
 <li>A <code>useFetch</code> composable exposing <code>data</code>, <code>error</code>, <code>loading</code>.</li>
 <li>A Pinia store with state, a getter, and an action, consumed by two components.</li>
 </ol>
 <hr>
-<h2>11. Framing your background (staff-level signal)</h2>
+<h2>12. Framing your background (staff-level signal)</h2>
 <p>Lead with what already matches the posting. Do not apologize for the Vue ramp.</p>
 <ul>
 <li>&quot;Use AI to solve practical problems and improve team efficiency&quot; is a stated requirement. Your AI-assisted frontend work is direct evidence. Have a concrete story: what you delegated to the agent, where you reviewed and corrected, what shipped.</li>
