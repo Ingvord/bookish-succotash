@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Apache Kafka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #3f5566;
+  --accent-soft:  #3f556614;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Apache Kafka</h1>
+    <div class="sub">The log abstraction: partitions, consumer groups, ISR, at-least-once vs exactly-once delivery, log compaction, consumer-lag diagnosis, and ordering guarantees.</div>
+  </header>
+  <main>
+<h2>How to use this guide</h2>
+<p>Kafka interview questions probe one of two things: whether you understand the log
+abstraction well enough to reason from first principles about ordering, delivery,
+and scaling; or whether you have operated Kafka and can name what breaks and why. A
+definition answer (&quot;Kafka is a distributed message broker&quot;) scores at the floor.
+The production-anchor question (&quot;have you hit this?&quot;) separates preparation from
+experience.</p>
+<p>This guide covers Apache Kafka 4.x. Kafka 4.0 removed ZooKeeper; all clusters now
+run in KRaft mode. <code>exactly_once_v2</code> is the current recommended setting for
+exactly-once Kafka Streams. Kafka 4.2.0 is the current stable release (February
+2026).</p>
+<hr>
+<h2>The mental model: a partitioned, ordered, durable log</h2>
+<p>The reframe that makes every Kafka concept fall into place: Kafka is not a message
+queue. It is a distributed commit log. A topic is a named log, partitioned for
+parallelism. Within a partition, every record has an immutable offset. Consumers
+read by storing and advancing an offset, not by the broker deleting the record.
+Records stay in the log until they age out (retention) or are compacted away.</p>
+<p>Consequences of this model:</p>
+<ul>
+<li>The same data can be read by multiple independent consumers without the broker
+tracking who has read what. Adding a consumer does not slow down existing ones.</li>
+<li>A consumer can replay by resetting its offset. This is how you backfill a new
+downstream system or recover from a processing bug.</li>
+<li>The broker is simpler (no per-consumer delivery state) and therefore faster.
+The consumer owns its offset, which moves complexity to the right place.</li>
+</ul>
+<p>The contrast with a traditional queue: a queue typically deletes a message once
+consumed and tracks which consumer holds each message. Kafka does neither. This
+means Kafka cannot do fine-grained per-message negative acknowledgement the way
+RabbitMQ can, but it scales to much higher throughput with simpler broker internals.</p>
+<hr>
+<h2>Topics, partitions, and offsets</h2>
+<p>A <strong>topic</strong> is a named feed of records. It is divided into <strong>partitions</strong>, each of
+which is an ordered, immutable log stored on one broker (replicated to others).
+Within a partition, records have sequential <strong>offsets</strong> starting at 0.</p>
+<p>Partitions are the unit of parallelism and the unit of ordering. Kafka guarantees
+order only within a partition, not across partitions of the same topic. If you need
+all events for a given user, account, or instrument to be processed in order, you
+must route them to the same partition by setting the key to the distinguishing
+field. The producer hashes the key to select a partition: <code>murmur2(key) mod num_partitions</code>.
+Records with no key are distributed round-robin.</p>
+<p>Partitions are also the unit of replication. Each partition has one leader replica
+(which handles all reads and writes) and zero or more follower replicas on other
+brokers. The set of replicas that are caught up to the leader is the ISR
+(In-Sync Replicas).</p>
+<pre><code class="hljs" data-lang="text">Topic: orders  (3 partitions, replication-factor 3)
+
+Partition 0:  [offset 0] [offset 1] [offset 2] ...   leader: broker-1
+              replicas: broker-2 (follower), broker-3 (follower)
+
+Partition 1:  [offset 0] [offset 1] ...               leader: broker-2
+              replicas: broker-1, broker-3
+
+Partition 2:  [offset 0] [offset 1] ...               leader: broker-3
+              replicas: broker-1, broker-2
+</code></pre>
+<hr>
+<h2>ISR and what happens when a broker falls out</h2>
+<p>The <strong>ISR</strong> (In-Sync Replicas) is the set of replicas that are fully caught up to
+the leader within <code>replica.lag.time.max.ms</code> (default: 30 seconds). The leader
+tracks each follower's progress. A follower that falls behind (because the broker
+is overloaded, a network partition, or a GC pause) is removed from the ISR.</p>
+<p>Durability depends on the ISR. The producer setting <code>acks=all</code> (or <code>acks=-1</code>) means
+&quot;wait for all in-sync replicas to acknowledge before returning success.&quot; If the ISR
+shrinks to 1 (just the leader), <code>acks=all</code> is effectively <code>acks=1</code>, so the leader
+failing immediately after ack would lose the record.</p>
+<p>The <code>min.insync.replicas</code> setting guards against this: with <code>min.insync.replicas=2</code>
+and <code>acks=all</code>, a produce request fails if fewer than 2 replicas are in-sync,
+forcing the producer to retry rather than silently writing to a barely-replicated
+partition.</p>
+<p>When the leader broker fails, one ISR follower is elected as the new leader by the
+KRaft controller. Replicas not in the ISR (&quot;unclean&quot;) are not eligible for
+election unless <code>unclean.leader.election.enable=true</code> (off by default), which would
+risk data loss.</p>
+<hr>
+<h2>Consumer groups: parallel consumption</h2>
+<p>A <strong>consumer group</strong> is a set of consumers that together read all partitions of a
+topic. The broker assigns partitions to consumers within a group: each partition is
+read by exactly one consumer in the group at a time. Consumers in the same group do
+not see the same record twice.</p>
+<p><strong>Maximum parallelism</strong> is bounded by the number of partitions. If a topic has 12
+partitions and a consumer group has 12 consumers, each consumer reads 1 partition.
+Adding a 13th consumer leaves it idle. If you want more parallelism than the
+current partition count allows, you must increase the partition count (a
+non-reversible operation that requires re-hashing key-based partitioning).</p>
+<p><strong>Independent consumer groups</strong> each maintain their own offsets. Two consumer groups
+on the same topic read independently, from potentially different positions. This is
+how Kafka supports fan-out: a billing service and an analytics service can each
+consume the same topic at their own pace.</p>
+<p><strong>Rebalancing</strong> happens when a consumer joins or leaves the group, or a consumer
+fails to send a heartbeat within <code>session.timeout.ms</code>. During a rebalance, all
+consumers in the group stop consuming (the &quot;stop the world&quot; rebalance), partitions
+are reassigned, and consumers resume. A rebalance is the main source of consumer-lag
+spikes and is worth monitoring. Kafka's cooperative rebalancing (KIP-429, enabled
+by default in recent clients) reduces stop-the-world time by only reassigning
+partitions that actually need to move.</p>
+<pre><code class="hljs" data-lang="text">Topic: events (4 partitions)
+
+Consumer group A (3 consumers):
+  consumer-1: partitions 0, 1
+  consumer-2: partition 2
+  consumer-3: partition 3
+
+Consumer group B (2 consumers):
+  consumer-4: partitions 0, 2
+  consumer-5: partitions 1, 3
+  (group A and B are fully independent)
+</code></pre>
+<hr>
+<h2>Delivery semantics: at-least-once vs exactly-once</h2>
+<p>Kafka's delivery semantics are determined by producer configuration and consumer
+commit strategy.</p>
+<p><strong>At-most-once</strong> delivery means the producer does not retry failed sends and the
+consumer commits offsets before processing. Records can be lost (send fails and is
+not retried; consumer commits and then crashes before processing). This is rarely
+acceptable.</p>
+<p><strong>At-least-once</strong> delivery means the producer retries on failure (<code>retries &gt; 0</code>,
+now the default) and the consumer commits offsets after processing. Records can be
+duplicated: the broker receives the record, acks, the ack is lost in the network,
+the producer retries, and the broker stores a second copy. The consumer side: the
+consumer processes, crashes before committing, restarts, and re-reads the same
+record. At-least-once is the default behavior and the right choice when idempotent
+downstream processing is cheap.</p>
+<p><strong>Exactly-once</strong> means each record is processed exactly once end-to-end. Kafka's
+implementation requires two components:</p>
+<p><strong>Idempotent producer:</strong> enabled with <code>enable.idempotence=true</code> (default since
+Kafka 3.0). Each producer instance gets a PID (producer ID) and each record gets a
+sequence number per partition. The broker deduplicates retried records using the
+PID and sequence number.</p>
+<p><strong>Transactions:</strong> a producer wraps a batch of writes (across multiple partitions
+and topics) in a transaction. <code>beginTransaction</code>, writes, <code>commitTransaction</code>
+atomically: consumers with <code>isolation.level=read_committed</code> only see committed
+transactions. Aborted transactions are invisible. Kafka Streams uses transactions
+internally; the setting <code>processing.guarantee=exactly_once_v2</code> enables this.</p>
+<p>The cost of exactly-once: transactions add latency (the coordinator must log the
+transaction begin/commit to a durable topic), reduce throughput (smaller batches
+due to fencing checks), and require <code>read_committed</code> isolation on consumers
+(which filters out in-flight transaction data). For Kafka Streams, <code>exactly_once_v2</code>
+(introduced in 2.5) is recommended over the older <code>exactly_once</code> because it uses
+one transaction per partition rather than one per task, reducing coordinator load.</p>
+<hr>
+<h2>Log compaction vs retention</h2>
+<p>Kafka topics have two cleanup strategies.</p>
+<p><strong>Retention</strong> (the default) deletes segments older than <code>retention.ms</code> (default:
+7 days) or larger than <code>retention.bytes</code>. It is right for event streams where older
+data is simply not needed: application logs, metrics, raw clickstreams.</p>
+<p><strong>Log compaction</strong> retains the latest record for each key, discarding older records
+with the same key. The log becomes a snapshot of the current value per key. It is
+right for changelog topics: a database change-event stream, a user-profile update
+stream, or a cache-invalidation changelog. A consumer that joins late and reads the
+compacted topic gets the current state without replaying the full history.</p>
+<p>The catch: compaction is not immediate. Kafka's cleaner thread runs in the
+background and compacts the &quot;dirty&quot; (unconsumed) portion of the log. Consumers may
+see duplicate keys before compaction runs, and a tombstone record (a record with a
+null value) marks a key as deleted; the tombstone itself is retained for
+<code>delete.retention.ms</code> (default: 24 hours) before being removed, to give consumers
+time to read the deletion event.</p>
+<hr>
+<h2>Consumer lag: how to diagnose and fix</h2>
+<p><strong>Consumer lag</strong> is the number of records in the partition that the consumer group
+has not yet processed: <code>(latest offset) - (committed offset)</code>. Lag growing means
+the consumer is processing more slowly than new records arrive.</p>
+<p><strong>Diagnosis steps:</strong></p>
+<ol>
+<li><strong>Measure lag precisely.</strong> Use <code>kafka-consumer-groups.sh --describe</code> or a
+monitoring system (Kafka JMX, Prometheus+Grafana) to see lag per consumer group
+per partition. Uneven lag across partitions often points to a hotspot: one
+partition receives disproportionate volume because all records share the same
+key.</li>
+<li><strong>Check consumer throughput.</strong> Is processing time per record increasing? A slow
+downstream call (database, API) blocks the consumer thread and reduces
+throughput. Add per-record processing timing.</li>
+<li><strong>Check partition count vs consumer count.</strong> If the topic has 4 partitions and
+the consumer group has 1 instance, adding 3 more instances (up to 4) doubles or
+quadruples throughput.</li>
+<li><strong>Check GC pauses.</strong> A JVM consumer that pauses for GC may exceed
+<code>session.timeout.ms</code> and trigger a rebalance, stalling consumption for seconds.</li>
+<li><strong>Check network and disk I/O on the broker.</strong> A lagging ISR follower can slow
+the leader if <code>acks=all</code> is set (the leader waits for in-sync replicas).</li>
+<li><strong>Check rebalance frequency.</strong> Frequent rebalances (every few minutes) indicate
+session timeouts (tune <code>heartbeat.interval.ms</code> and <code>session.timeout.ms</code>) or
+consumer crashes.</li>
+</ol>
+<p><strong>Fixes in order of invasiveness:</strong></p>
+<ul>
+<li>Tune batch size and <code>max.poll.records</code> to reduce per-poll overhead.</li>
+<li>Add consumer instances (up to partition count).</li>
+<li>Increase partition count (irreversible; requires verifying key-based routing still
+distributes correctly).</li>
+<li>Move slow processing off the Kafka thread (async dispatch to a thread pool, re-ingest
+results).</li>
+</ul>
+<hr>
+<h2>Ordering guarantees</h2>
+<p>Kafka guarantees strict ordering within a partition. To guarantee that all events
+for a logical entity (a user, an instrument, an order) are processed in order, all
+events for that entity must go to the same partition. You achieve this by setting
+the record key to the entity identifier and relying on the default <code>murmur2(key) mod num_partitions</code> assignment.</p>
+<p>The catch: if you increase the partition count, the hash assignment changes. An
+entity that was on partition 2 moves to partition 5. If in-flight records are
+already in partition 2 and new records go to partition 5, a consumer group
+processes them on different threads and ordering is no longer guaranteed for records
+spanning the partition boundary. The operational practice is to drain a topic to
+zero lag before repartitioning, or to use a separate topic and migration window.</p>
+<p>For cross-partition ordering (events from multiple entities that must be globally
+ordered), Kafka does not help directly. You need a single partition (losing
+parallelism), a sequence number embedded in the records (ordering in the consumer),
+or an external coordination mechanism.</p>
+<hr>
+<h2>Message queue vs event log</h2>
+<p>This is the architectural question that the &quot;messaging and data&quot; section of a
+system-design interview builds around.</p>
+<p>A <strong>message queue</strong> (RabbitMQ, SQS, ActiveMQ) is designed for task distribution:
+a message is delivered to one consumer, acknowledged when processed, and then
+deleted. The broker tracks delivery state per message. Adding consumers speeds up
+processing. Loss is avoided by acknowledgements. It suits: background job
+processing, work distribution to a fleet of workers, RPC-over-queue patterns.</p>
+<p>An <strong>event log</strong> (Kafka) records what happened and holds it durably. Many consumers
+read independently. Adding a consumer does not speed up any other consumer. Data is
+retained by time or compaction, not by delivery. It suits: building read models from
+a shared event source, audit logs, event-sourcing, CDC (change-data capture),
+streaming analytics.</p>
+<p>The distinction matters architecturally when you need fan-out (multiple independent
+pipelines on the same events) or replay (rebuilding a service from scratch from
+historical data). A queue cannot do either without significant extra engineering. An
+event log does both natively. Kafka is the wrong choice when you need per-message
+TTL, sophisticated dead-letter handling, priority queues, or per-message
+negative-acknowledgement, where a traditional queue is simpler.</p>
+<hr>
+<h2>Common interview questions</h2>
+<p><strong>What is a consumer group and what problem does it solve?</strong>
+Testing: core Kafka partitioning model.
+A consumer group is a set of consumers that together read all partitions of a
+topic, each partition assigned to exactly one consumer at a time. It scales
+consumption horizontally without duplicate processing within the group. Independent
+groups read the same topic fully independently. Maximum parallelism equals the
+number of partitions; additional consumers beyond that are idle.</p>
+<p><strong>What is the difference between at-least-once and exactly-once delivery in Kafka?
+What does exactly-once cost you?</strong>
+Testing: operational delivery semantics knowledge.
+At-least-once is the default: producers retry on failure, consumers commit after
+processing. Duplicates are possible (retried send, consumer crash before commit).
+Exactly-once requires an idempotent producer (deduplication by PID and sequence
+number) plus transactions (atomic cross-partition writes, <code>read_committed</code> consumer
+isolation). It costs latency (transaction coordinator overhead), lower throughput
+(fencing checks), and <code>read_committed</code> consumers filtering in-flight data.</p>
+<p><strong>A Kafka consumer is falling behind. How do you diagnose and fix it?</strong>
+Testing: production operations knowledge.
+Measure lag per partition with <code>kafka-consumer-groups.sh</code>. Uneven lag suggests a
+partition hotspot (one key dominating). Check processing time per record for slow
+downstream calls. Verify consumer count vs partition count (max parallelism = number
+of partitions). Check GC pauses causing session timeouts and rebalances. Check
+broker I/O. Fix in order: tune <code>max.poll.records</code>, add consumers up to partition
+count, increase partition count if needed (irreversible, check key routing).</p>
+<p><strong>What is log compaction and when would you use it over retention?</strong>
+Testing: log design knowledge.
+Log compaction retains the latest record per key, discarding older records with the
+same key. Use it for changelog topics: database CDC, user profile snapshots, cache
+invalidation changelogs. A late-joining consumer reads current state without
+replaying full history. Use retention for event streams where old data is simply not
+needed (logs, raw events). Tombstone records (null value) mark deletions.</p>
+<p><strong>What determines the maximum parallelism of a Kafka consumer group?</strong>
+Testing: fundamental constraint.
+The number of partitions in the topic. Each partition is consumed by at most one
+consumer in a group at a time. A 12-partition topic with 12 consumers: full
+parallelism. A 13th consumer is idle. Increasing partition count allows more
+parallelism but is irreversible and disrupts key-based routing for in-flight records.</p>
+<p><strong>What is ISR and what happens when a broker falls out of it?</strong>
+Testing: replication and durability model.
+ISR (In-Sync Replicas) is the set of replicas caught up to the leader within
+<code>replica.lag.time.max.ms</code>. With <code>acks=all</code>, the leader waits for all ISR members to
+acknowledge. If a follower falls behind (overload, network, GC), it is removed from
+the ISR; <code>acks=all</code> then requires fewer acknowledgements, reducing durability.
+<code>min.insync.replicas=2</code> prevents writes when too few replicas are in-sync, forcing
+producers to retry rather than silently accepting low-durability writes. On leader
+failure, only ISR members are eligible for election by default.</p>
+<p><strong>How would you use Kafka to guarantee per-instrument event ordering?</strong>
+Testing: application of the partition model.
+Set the record key to the instrument identifier. The producer hashes the key to
+select a partition: all events for the same instrument always land in the same
+partition and are processed in offset order by the consumer. Within a partition,
+Kafka guarantees order. The catch: if you increase the partition count, the
+key-to-partition mapping changes; drain to zero lag before repartitioning. Cross-
+instrument global ordering cannot be guaranteed by Kafka alone; it requires a single
+partition (losing parallelism) or application-level sequencing.</p>
+<p><strong>What is the difference between a message queue and an event log? When does the
+distinction matter architecturally?</strong>
+Testing: system-design vocabulary.
+A message queue delivers each message to one consumer and deletes it on
+acknowledgement; the broker tracks per-message delivery state. An event log
+(Kafka) retains records by time or compaction; any number of independent consumers
+read from any offset. The distinction matters when you need fan-out (multiple
+independent pipelines on the same events) or replay (rebuilding a service from
+historical data), both of which a queue handles poorly. Kafka is the wrong choice
+when you need per-message TTL, priority queues, or fine-grained per-message
+negative-acknowledgement.</p>
+
+  </main>
+</div>
+</body>
+</html>

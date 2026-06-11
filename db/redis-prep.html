@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Redis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #9d3658;
+  --accent-soft:  #9d365814;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Redis</h1>
+    <div class="sub">The in-memory data-structure model: RDB vs AOF persistence, eviction policies and the noeviction default, Pub/Sub vs Streams, cluster sharding, stampede prevention, and rate-limiter implementation.</div>
+  </header>
+  <main>
+<h2>How to use this guide</h2>
+<p>Redis questions in a backend interview are almost never about commands. They are
+about the mechanical consequences of Redis's design: what happens under memory
+pressure, why Pub/Sub loses messages, what cluster does to atomicity, and how you
+prevent a cache stampede at 3 AM. The production-anchor signal the interviewer is
+looking for is a failure mode you have actually encountered, not a definition you
+recited.</p>
+<p>This guide covers Redis 8.x (open-source). RDB/AOF defaults, eviction policy
+names, and cluster topology are verified against the current documentation.</p>
+<hr>
+<h2>The mental model: a single-threaded data-structure server</h2>
+<p>Redis is a RAM-first, single-threaded key-value store. Every command executes
+sequentially in one thread (the event loop), so there are no concurrent writes and
+no data races. This makes Redis fast (no lock overhead) and simple to reason about:
+at the granularity of a single command, Redis is always consistent.</p>
+<p>The catch is that &quot;single command&quot; granularity does not mean &quot;multi-command
+sequence is atomic.&quot; Two clients can interleave commands between your <code>GET</code> and
+<code>SET</code>. The tools for multi-command atomicity are transactions (<code>MULTI/EXEC</code>) and
+Lua scripts, both of which block the event loop for their duration. This is why a
+long Lua script is dangerous: it freezes all other clients until it finishes.</p>
+<p>Redis 6.0 added I/O threading (multiple threads handle network I/O while the event
+loop remains single-threaded for command execution). This improves throughput on
+network-bound workloads without changing the atomicity model.</p>
+<hr>
+<h2>Persistence: RDB vs AOF</h2>
+<p>Redis is an in-memory store, but it can persist data to disk. Two mechanisms exist.</p>
+<p><strong>RDB (Redis Database snapshot)</strong> writes a point-in-time binary snapshot of the
+entire dataset to disk. By default, Redis performs snapshots on a schedule: after
+900 seconds if at least 1 key changed, after 300 seconds if at least 10 keys
+changed, and after 60 seconds if at least 10,000 keys changed. A snapshot is also
+triggered by <code>BGSAVE</code>. The snapshot forks the process and uses copy-on-write to
+avoid blocking the server.</p>
+<p>RDB is compact, fast to restore, and cheap in normal operation. The catch: you can
+lose up to the last snapshot's worth of writes. If Redis crashes 5 minutes into a
+900-second snapshot window and only 2 keys changed, you lose nothing; if it crashes
+59 seconds into a 60-second window with 10,000 key changes, you lose all of them.</p>
+<p><strong>AOF (Append-Only File)</strong> logs every write command as it executes. On restart,
+Redis replays the AOF to rebuild state. AOF is disabled by default. When enabled,
+the <code>appendfsync</code> setting controls the durability-performance tradeoff:</p>
+<ul>
+<li><code>always</code>: fsync after every command. Maximum durability, lowest throughput.</li>
+<li><code>everysec</code> (recommended when using AOF): fsync once per second. At most one
+second of data loss on crash.</li>
+<li><code>no</code>: let the OS flush when it wants. Fastest, most exposure.</li>
+</ul>
+<p>The catch with AOF: the file grows unboundedly. Redis rewrites (compacts) it
+automatically, but large AOF files slow restart time. Modern Redis uses
+<code>aof-use-rdb-preamble yes</code> (the default when AOF is on): the rewrite writes an RDB
+snapshot as the base and appends only recent commands, combining fast startup with
+fine-grained durability.</p>
+<p><strong>For session state on a standard backend service:</strong> use AOF with <code>appendfsync everysec</code>.
+Session loss is visible to users; a one-second data-loss window is usually
+acceptable, and the session can be re-established by re-login. Use RDB-only only if
+session loss on restart is tolerable (cache-type usage). For primary data stores,
+enable both (<code>aof-use-rdb-preamble yes</code>).</p>
+<hr>
+<h2>Memory limits and eviction policies</h2>
+<p>Redis is an in-memory store. When it exhausts available RAM, it must do something
+with new write requests. The <code>maxmemory</code> directive sets the limit; when reached,
+<code>maxmemory-policy</code> controls the response. The default policy is <strong><code>noeviction</code></strong>:
+Redis returns an error to any write command that would allocate memory. No data is
+lost, but the caller gets an error.</p>
+<p>The eight eviction policies break into three families:</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Policies</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No eviction</td>
+<td><code>noeviction</code></td>
+<td>Primary data stores; losing keys is unacceptable</td>
+</tr>
+<tr>
+<td>Volatile (only keys with TTL)</td>
+<td><code>volatile-lru</code>, <code>volatile-lfu</code>, <code>volatile-random</code>, <code>volatile-ttl</code></td>
+<td>Mixed cache and persistent data; expire the cache keys, keep the rest</td>
+</tr>
+<tr>
+<td>All-keys</td>
+<td><code>allkeys-lru</code>, <code>allkeys-lfu</code>, <code>allkeys-random</code></td>
+<td>Pure cache; any key can be evicted</td>
+</tr>
+</tbody>
+</table>
+<p><code>lru</code> (Least Recently Used) evicts the key not used longest. <code>lfu</code> (Least
+Frequently Used) evicts the key used least often; more accurate for frequency-skewed
+workloads (a key used once last second is evicted before a key used a thousand times
+last year). <code>volatile-ttl</code> evicts the key with the shortest remaining TTL first.</p>
+<p>Redis's LRU implementation is approximate: it samples a configurable number of keys
+(default: 5, set by <code>maxmemory-samples</code>) and evicts the best candidate among the
+sample. This avoids maintaining a full LRU list and is accurate enough in practice.</p>
+<p>The catch: <code>allkeys-lru</code> looks safe for a cache, but if you store a mix of
+durable (session) and cache data under the same Redis instance, it will evict
+session keys too. Always use <code>volatile-*</code> policies for mixed workloads, and set
+TTLs on cache keys but not on durable keys.</p>
+<pre><code class="hljs" data-lang=""># redis.conf: pure cache configuration
+maxmemory 4gb
+maxmemory-policy allkeys-lfu
+maxmemory-samples 10
+</code></pre>
+<hr>
+<h2>Pub/Sub vs Streams</h2>
+<p>Both support the &quot;publish an event, multiple consumers receive it&quot; model, but they
+are fundamentally different in durability.</p>
+<p><strong>Pub/Sub</strong> is fire-and-forget. A publisher sends to a channel; every active
+subscriber receives it. If a subscriber is offline or slow, the message is gone.
+There is no buffer, no replay, no consumer group. It is appropriate for
+notifications where loss is acceptable (cache invalidation signals, presence
+updates) but not for anything requiring guaranteed delivery or at-least-once
+processing.</p>
+<p><strong>Redis Streams</strong> (available since Redis 5.0) are an append-only log with consumer
+groups, acknowledgement, and replay. Each entry gets a unique ID. Consumer groups
+allow multiple independent consumers to read from the stream; each consumer gets a
+different subset of messages (like Kafka consumer groups). Unacknowledged messages
+stay in the &quot;Pending Entries List&quot; and can be re-delivered after a timeout.</p>
+<p>Streams wins over Pub/Sub when: you need at-least-once delivery, consumers can be
+temporarily offline, you need to replay from an offset, or multiple independent
+consumer groups must process the same event stream independently.</p>
+<p>The catch: Streams have a memory cost proportional to their length. Set <code>MAXLEN</code>
+(or <code>MAXLEN ~</code> for approximate trimming) to bound the size, accepting that old
+entries are dropped. Unlike Kafka, Redis Streams do not persist beyond <code>maxmemory</code>
+constraints or the configured trim.</p>
+<pre><code class="hljs" data-lang=""># Pub/Sub: no delivery guarantees
+PUBLISH notifications &quot;user:42:logged-in&quot;
+
+# Streams: with consumer group and ACK
+XADD events * type login user_id 42
+XGROUP CREATE events workers $ MKSTREAM
+XREADGROUP GROUP workers consumer-1 COUNT 10 BLOCK 2000 STREAMS events &gt;
+# After processing: XACK events workers &lt;message-id&gt;
+</code></pre>
+<hr>
+<h2>Redis Cluster</h2>
+<p>A standalone Redis instance is bounded by one server's RAM and one CPU's single-thread
+throughput. Redis Cluster shards data across multiple nodes using a fixed 16384
+hash slots. Each key is assigned to a slot via <code>CRC16(key) mod 16384</code>. Each master
+node owns a range of slots. Masters can have replica nodes.</p>
+<p>When a client sends a command for a key on a different node, the server responds
+with a <code>MOVED</code> redirect telling the client which node owns that slot. Smart clients
+cache the slot map and route directly.</p>
+<p>Failure handling: if a master fails, its replicas hold an election among themselves.
+If a replica wins, it is promoted to master and the cluster updates the slot map.
+The process takes a few seconds; during that time, commands to the failed shard
+return errors. The cluster requires at least 3 masters (6 nodes total for HA with
+one replica each) to form a quorum.</p>
+<p>The catch for atomicity: multi-key commands (<code>MSET</code>, <code>MGET</code>, Lua scripts, <code>MULTI/EXEC</code>)
+only work when all keys map to the same hash slot. Cross-slot operations fail. The
+workaround is hash tags: placing <code>{same-tag}</code> in the key name forces all keys with
+that tag to the same slot (<code>{user:42}:session</code> and <code>{user:42}:cart</code> land on the
+same node). Overusing one hash tag creates a hotspot.</p>
+<hr>
+<h2>Cache stampede and how to prevent it</h2>
+<p>A cache stampede (also called thundering herd) happens when a hot key expires and
+many concurrent requests miss the cache simultaneously. All of them hit the backing
+store in parallel, potentially overwhelming it. The key is the first request to
+populate the cache; everyone else should wait, not issue duplicate queries.</p>
+<p><strong>Prevention strategies:</strong></p>
+<p><strong>Mutex/single-flight lock:</strong> when a request misses, it acquires a Redis lock
+(<code>SET key:lock 1 NX EX 5</code>) before querying the backing store. Other requests that
+miss while the lock is held either wait briefly or serve the stale value. The
+first acquirer refreshes the cache and releases the lock.</p>
+<p><strong>Probabilistic early refresh (jitter):</strong> extend the effective TTL before expiry.
+A request checking the cache computes a probability of recomputing that increases
+as the key approaches expiry. The exact formula: recompute if
+<code>(ttl_remaining / original_ttl) &lt; random(0, 1)</code>. This spreads the refresh across
+multiple requests over time rather than a single thunderclap.</p>
+<p><strong>Stale-while-revalidate:</strong> serve the stale value immediately and trigger a
+background refresh. Requires storing the expiry time alongside the value so the
+application knows to refresh, even while serving stale data.</p>
+<p>TTL jitter (randomizing cache expiry times by ±10%) prevents <strong>cache avalanche</strong>
+(many keys expiring simultaneously), which is the population-level version of the
+same problem.</p>
+<hr>
+<h2>Rate limiting with Redis</h2>
+<p>A rate limiter using Redis typically uses one of two algorithms.</p>
+<p><strong>Fixed-window counter:</strong> store a counter per client per time window
+(<code>INCR user:42:2026-06-12:14:23</code>). If the counter exceeds the limit, reject.
+Reset on window rollover. Simple but has a boundary burst problem: a client can
+send limit requests at the end of window N and limit requests at the start of
+window N+1, creating 2x the limit in a short period.</p>
+<p><strong>Sliding-window log / token bucket with Lua:</strong> more accurate. A Lua script is
+atomic in Redis (blocks the event loop for its duration), so a check-and-increment
+or check-and-consume can be done without a race condition between <code>GET</code> and <code>SET</code>.</p>
+<pre><code class="hljs" data-lang="lua"><span class="hljs-comment">-- Sliding window using sorted set (score = timestamp)</span>
+<span class="hljs-keyword">local</span> key = KEYS[<span class="hljs-number">1</span>]
+<span class="hljs-keyword">local</span> now = <span class="hljs-built_in">tonumber</span>(ARGV[<span class="hljs-number">1</span>])
+<span class="hljs-keyword">local</span> window = <span class="hljs-built_in">tonumber</span>(ARGV[<span class="hljs-number">2</span>])
+<span class="hljs-keyword">local</span> limit = <span class="hljs-built_in">tonumber</span>(ARGV[<span class="hljs-number">3</span>])
+<span class="hljs-comment">-- Remove entries outside the window</span>
+redis.call(<span class="hljs-string">&#x27;ZREMRANGEBYSCORE&#x27;</span>, key, <span class="hljs-number">0</span>, now - window)
+<span class="hljs-keyword">local</span> count = redis.call(<span class="hljs-string">&#x27;ZCARD&#x27;</span>, key)
+<span class="hljs-keyword">if</span> count &lt; limit <span class="hljs-keyword">then</span>
+  redis.call(<span class="hljs-string">&#x27;ZADD&#x27;</span>, key, now, now)
+  redis.call(<span class="hljs-string">&#x27;EXPIRE&#x27;</span>, key, window / <span class="hljs-number">1000</span>)
+  <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>  <span class="hljs-comment">-- allowed</span>
+<span class="hljs-keyword">end</span>
+<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>  <span class="hljs-comment">-- rejected</span>
+</code></pre>
+<p>Why Lua: two separate commands (<code>ZCARD</code> then <code>ZADD</code>) can be interleaved by another
+client between them. Lua executes atomically. An alternative is Redis transactions
+(<code>MULTI/EXEC</code>), but transactions require a <code>WATCH</code> to detect conflicts and retry,
+adding latency. Lua is simpler for this pattern.</p>
+<p>The operational catch: a long-running Lua script holds the event loop. Keep scripts
+short (tens of microseconds) and never call <code>redis.call</code> in a loop over large data.</p>
+<hr>
+<h2>EXPIRE vs EXPIREAT</h2>
+<p><code>EXPIRE key seconds</code> sets a TTL relative to now. <code>EXPIREAT key unix-timestamp</code> sets
+an absolute expiry.</p>
+<p>The distinction matters in two scenarios. First, <strong>coordinated expiry</strong>: if ten
+services each cache the same data and you want them all to expire at midnight for a
+daily rotation, <code>EXPIREAT</code> with the midnight timestamp achieves that without drift.
+<code>EXPIRE 86400</code> would drift by the number of seconds each cached it after midnight.</p>
+<p>Second, <strong>TTL after restore</strong>: when migrating or restoring a dataset, <code>EXPIREAT</code>
+preserves the original expiry semantics. <code>EXPIRE</code> relative to now would extend all
+TTLs to match the restore time rather than the original creation time.</p>
+<p>The catch: server clock skew. <code>EXPIREAT</code> depends on the wall clock. If the Redis
+server's clock is out of sync with the application server's clock, keys may expire
+earlier or later than intended. <code>EXPIRE</code> is immune to this because it is relative.</p>
+<hr>
+<h2>Common interview questions</h2>
+<p><strong>What is the difference between Redis RDB and AOF persistence? Which would you use
+for session state?</strong>
+Testing: operational knowledge of the durability tradeoff.
+RDB writes periodic binary snapshots (default schedule: 900/300/60 second
+intervals). AOF logs every write command, disabled by default; <code>appendfsync everysec</code>
+gives at-most-one-second data loss. For session state: AOF with <code>everysec</code> because
+session loss is visible to users and a one-second loss window is usually acceptable.
+Modern Redis uses both with <code>aof-use-rdb-preamble yes</code> for fast startup plus
+fine-grained durability.</p>
+<p><strong>What happens when Redis runs out of memory? What eviction policies exist and when
+would you choose each?</strong>
+Testing: whether you know the default behavior.
+The default policy is <code>noeviction</code>: Redis returns an error on write commands that
+would allocate memory. No data is lost. For a pure cache, <code>allkeys-lru</code> or
+<code>allkeys-lfu</code> evicts keys to make room; <code>lfu</code> is better for frequency-skewed
+workloads. For mixed cache-and-persistent data, use <code>volatile-lru</code> with TTLs on
+cache keys but not on durable keys, so only cache keys are eligible for eviction.</p>
+<p><strong>What is the difference between Redis Pub/Sub and Redis Streams? When does Streams
+win?</strong>
+Testing: whether you have hit message-loss in production.
+Pub/Sub is fire-and-forget: a subscriber that is offline misses messages, no
+replay, no consumer group. Streams are an append-only log with consumer groups, ACK,
+and replay. Streams wins whenever you need at-least-once delivery, consumers can be
+temporarily offline, or multiple independent pipelines must process the same events.</p>
+<p><strong>What is a Redis cluster and how does it handle node failure?</strong>
+Testing: whether you understand slot-based sharding.
+Cluster distributes 16384 hash slots across master nodes. On master failure, the
+replicas elect a new master in a few seconds; commands to that shard fail during
+the election. Multi-key operations (MGET, Lua) must have all keys in the same slot
+or they fail. Hash tags (<code>{tag}</code>) force co-location, but overusing one tag creates
+a hotspot.</p>
+<p><strong>What is cache stampede and how do you prevent it?</strong>
+Testing: production failure mode knowledge.
+A stampede is when a hot key expires and many concurrent requests all miss and hit
+the backing store simultaneously. Prevent it with a distributed mutex (first miss
+acquires a Redis lock; others wait or serve stale), probabilistic early refresh
+(recompute with increasing probability as TTL drops), or stale-while-revalidate
+(serve stale immediately, refresh in background).</p>
+<p><strong>You are using Redis as a rate limiter. Walk me through the implementation.</strong>
+Testing: atomicity reasoning.
+Use a sliding window with a sorted set or a token bucket. The critical requirement
+is atomic check-and-update: two separate commands (<code>GET</code> then <code>SET</code>) can be
+interleaved. Use a Lua script (executes atomically in the event loop) or a Redis
+transaction (<code>WATCH/MULTI/EXEC</code>). Lua is simpler. The script removes expired
+entries from the window, counts what remains, and either adds the new entry
+(allowed) or rejects. Keep the Lua script short; it blocks all other clients for
+its duration.</p>
+<p><strong>What is the difference between EXPIRE and EXPIREAT? Where does the choice matter?</strong>
+Testing: edge-case awareness.
+<code>EXPIRE</code> sets a relative TTL in seconds from now. <code>EXPIREAT</code> sets an absolute Unix
+timestamp. Use <code>EXPIREAT</code> when multiple services must expire the same data at a
+fixed wall-clock time (e.g., midnight rotation) or when restoring data and
+preserving original expiry semantics. <code>EXPIRE</code> is immune to server clock skew;
+<code>EXPIREAT</code> depends on the wall clock being in sync.</p>
+
+  </main>
+</div>
+</body>
+</html>

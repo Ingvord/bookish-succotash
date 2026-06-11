@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Relational Databases: PostgreSQL & MySQL/MariaDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #6b3585;
+  --accent-soft:  #6b358514;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Relational Databases: PostgreSQL & MySQL/MariaDB</h1>
+    <div class="sub">Query planner mechanics, MVCC, WAL, VACUUM, locking, connection pooling, sharding, and the two slow-query diagnosis playbooks every senior engineer needs.</div>
+  </header>
+  <main>
+<h2>How to use this guide</h2>
+<p>You are preparing for a round that assumes you have run relational databases in
+production. The questions are not about syntax; they are about what happens when
+things go wrong, what the trade-offs are, and whether you can name the mechanism
+behind a slow query or a failed transaction. This guide covers PostgreSQL as the
+primary target, with a MySQL/MariaDB delta at the end. Both PostgreSQL 17 and the
+current LTS, MySQL 8.4, are the reference versions.</p>
+<p>Read the playbooks section last: they give you a framework for the two most common
+&quot;walk me through your investigation&quot; questions. The &quot;Common interview questions&quot;
+section at the end mirrors the rapid-fire shape of the actual screen.</p>
+<hr>
+<h2>The mental model: what a query planner does</h2>
+<p>Before any question about indexes or slow queries, you need one reframe: the
+database does not execute the SQL you wrote; it executes the plan the query planner
+chose, and the planner makes that choice based on statistics, not certainty.</p>
+<p>The planner holds a statistics catalog (called <code>pg_statistic</code> in Postgres) that
+stores histograms of column value distributions, the number of distinct values, and
+the fraction that are null. Given a query, it generates candidate plans, estimates
+the cost of each in abstract units (disk pages read plus CPU), and picks the
+cheapest. Its cost estimate is only as good as the statistics are fresh.</p>
+<p>That is the root cause of the most common class of production issue: the planner
+chooses a bad plan not because the index is missing but because stale statistics
+made a table look small when it is now large, or the value distribution changed so
+that what was selective yesterday is now a near-full-scan today. The answer to
+&quot;query was fast last week, slow today&quot; almost always starts here.</p>
+<hr>
+<h2>Sequential scan vs index scan</h2>
+<p>These are the two main access paths, and the planner chooses between them using its
+selectivity estimate.</p>
+<p>A <strong>sequential scan</strong> reads every page of the table in storage order. It uses
+prefetch-friendly sequential I/O and needs no extra structure. For a query that
+returns a large fraction of the rows, it is faster than an index scan because the
+index would require a random-read per matching row.</p>
+<p>An <strong>index scan</strong> reads the index structure (a B-tree by default) to find matching
+row pointers, then fetches those rows from the heap (the table storage). Each row
+fetch is a random read. It is faster when the query is highly selective, meaning
+only a small fraction of rows match.</p>
+<p>The crossover point is approximately 5 to 10 percent of rows, but the exact
+threshold depends on the physical layout of the table. If matching rows are
+clustered together on disk (the table was recently loaded in order, or a <code>CLUSTER</code>
+command was run), random reads are cheaper and the index wins at a higher
+selectivity. If the table is fragmented, the random-read cost is higher and the
+planner may prefer a sequential scan sooner.</p>
+<p>There is a third path, the <strong>index-only scan</strong> (or &quot;covering index&quot;), where all
+columns the query needs are in the index itself. Postgres can satisfy the query
+without touching the heap at all, skipping the random-read penalty entirely. This
+is the most efficient path for selective queries on large tables.</p>
+<pre><code class="hljs" data-lang="sql"><span class="hljs-comment">-- Force an index-only scan possibility: include both filter and projection columns</span>
+<span class="hljs-keyword">CREATE</span> INDEX <span class="hljs-keyword">ON</span> orders (created_at, status, total)
+  <span class="hljs-keyword">WHERE</span> status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;pending&#x27;</span>;
+<span class="hljs-comment">-- EXPLAIN will show &quot;Index Only Scan&quot; if the visibility map allows it</span>
+EXPLAIN (ANALYZE, BUFFERS)
+  <span class="hljs-keyword">SELECT</span> total <span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">WHERE</span> created_at <span class="hljs-operator">&gt;</span> now() <span class="hljs-operator">-</span> <span class="hljs-type">interval</span> <span class="hljs-string">&#x27;1 day&#x27;</span>
+    <span class="hljs-keyword">AND</span> status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;pending&#x27;</span>;
+</code></pre>
+<p>The key diagnostic: <code>EXPLAIN ANALYZE</code> shows which plan was chosen and the actual
+versus estimated row counts. A large gap between them is the tell for stale
+statistics.</p>
+<hr>
+<h2>MVCC: the mechanism behind read consistency</h2>
+<p>MVCC (Multi-Version Concurrency Control) solves a hard problem: how do you let
+readers and writers proceed in parallel without either blocking the other or
+reading a partially-written state?</p>
+<p>The answer is that the database keeps multiple versions of each row. When a
+transaction writes a row, it does not overwrite the old value; it creates a new
+version stamped with its transaction ID. Readers see the version that was current
+at their transaction start, determined by whether each version's create and delete
+transaction IDs fall within the reader's snapshot. A long-running reader will
+continue to see the snapshot it started with even if many writes happen behind it.</p>
+<p>The catch is that old versions accumulate. Postgres calls them dead tuples. A row
+updated ten times has ten versions on disk, but only one is live for any current
+transaction. The rest are dead tuples consuming space and degrading scan
+performance because every sequential scan has to skip over them. MVCC also causes
+the &quot;transaction ID wraparound&quot; problem: Postgres uses 32-bit transaction IDs, so
+after 2 billion transactions a wraparound would make old visible rows appear to be
+in the future. Postgres prevents this with VACUUM.</p>
+<p>MySQL's InnoDB implements MVCC differently: old versions live in the undo log
+rather than inline in the heap. The effect on readers is similar (snapshot
+isolation), but the cleanup mechanism differs (purge thread vs Postgres VACUUM).</p>
+<hr>
+<h2>WAL: durability on disk</h2>
+<p>WAL (Write-Ahead Log) is how the database guarantees that a committed transaction
+survives a crash. Before any data page is modified on disk, the modification is
+first written sequentially to the WAL. If the server crashes and restarts, it
+replays the WAL from the last checkpoint to reconstruct any in-memory changes that
+had not been flushed to the data files.</p>
+<p>Why sequential before random? Writing sequentially to the WAL is fast because it is
+an append, and the OS can batch the flush. Writing the modified data pages is slow
+because they are scattered across the file. WAL lets Postgres acknowledge a commit
+to the client as soon as the WAL record is on disk, without waiting for the slower
+random write to the data file.</p>
+<p>WAL has two major operational uses beyond crash recovery. First, it is the
+mechanism for replication: streaming replication ships WAL records to standby
+servers, which replay them to stay in sync. Second, it is the raw material for
+point-in-time recovery: archive all WAL records and you can reconstruct the
+database at any past moment.</p>
+<p>The catch: WAL is append-only and never shrinks by default. <code>wal_level</code>, <code>archive_mode</code>,
+and replication slots determine how long WAL is retained. A replication slot that
+no standby is consuming will cause WAL to accumulate indefinitely and fill the disk.
+This is a common production incident.</p>
+<hr>
+<h2>VACUUM and autovacuum</h2>
+<p>VACUUM does two distinct jobs. First, it marks dead tuples (old row versions from
+MVCC) as free space so that future inserts can reuse the pages. Second, and more
+urgently, it advances the &quot;oldest transaction ID seen&quot; counter to prevent wraparound.</p>
+<p>Autovacuum runs these jobs automatically in the background based on thresholds: when
+the number of dead tuples in a table exceeds <code>autovacuum_vacuum_threshold</code> plus
+<code>autovacuum_vacuum_scale_factor</code> times the table size, a VACUUM run is triggered.</p>
+<p>VACUUM becomes operationally important in three situations:</p>
+<p><strong>Bloat on write-heavy tables.</strong> A table that is updated or deleted frequently
+accumulates dead tuples faster than autovacuum can reclaim them, especially under
+load. Pages fill with dead tuples, scans slow down because they must skip the dead
+rows, and the table file grows even as the live row count stays constant. A sign:
+the table size (from <code>pg_relation_size</code>) is much larger than the live row count
+would justify.</p>
+<p><strong>Wraparound prevention.</strong> Every table has an age measured in transaction IDs.
+When a table's age approaches 2 billion, Postgres enters an emergency
+&quot;wraparound safe mode&quot; and will refuse all writes until VACUUM runs on that table.
+This is a real production outage scenario. Monitoring <code>pg_stat_user_tables.n_dead_tup</code>
+and <code>pg_stat_user_tables.last_autovacuum</code> is standard practice.</p>
+<p><strong>Post-bulk-load.</strong> After a large INSERT or COPY, the table has no dead tuples but
+the statistics are stale. Running <code>ANALYZE</code> (statistics only) or <code>VACUUM ANALYZE</code>
+after a bulk load is a standard maintenance step.</p>
+<pre><code class="hljs" data-lang="sql"><span class="hljs-comment">-- Check for bloated tables</span>
+<span class="hljs-keyword">SELECT</span> relname, n_dead_tup, n_live_tup,
+       round(n_dead_tup <span class="hljs-operator">*</span> <span class="hljs-number">100.0</span> <span class="hljs-operator">/</span> <span class="hljs-built_in">NULLIF</span>(n_live_tup <span class="hljs-operator">+</span> n_dead_tup, <span class="hljs-number">0</span>), <span class="hljs-number">1</span>) <span class="hljs-keyword">AS</span> pct_dead,
+       last_autovacuum
+<span class="hljs-keyword">FROM</span> pg_stat_user_tables
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> n_dead_tup <span class="hljs-keyword">DESC</span>
+LIMIT <span class="hljs-number">10</span>;
+</code></pre>
+<hr>
+<h2>Deadlocks</h2>
+<p>A deadlock occurs when two transactions each hold a lock the other needs, so both
+wait forever. The database detects the cycle (typically within a second) and
+terminates one transaction with an error, releasing its locks so the other can
+proceed. The terminated transaction must be retried by the application.</p>
+<p>The pattern to know: deadlocks on the same table almost always mean two transactions
+are acquiring row locks in different orders. Transaction A locks row 1 then row 2;
+transaction B locks row 2 then row 1. They meet in the middle. The standard fix is
+to ensure all transactions that touch multiple rows do so in a consistent, canonical
+order (by primary key, for example).</p>
+<p>The log entry to look for in Postgres: <code>ERROR: deadlock detected</code>, followed by a
+detail showing the two transactions and the locks. The <code>log_lock_waits</code> setting
+(default: off) logs lock waits that exceed <code>deadlock_timeout</code> (default: 1 second)
+and is worth enabling in production.</p>
+<hr>
+<h2>Locking: optimistic vs pessimistic</h2>
+<p>Both strategies manage concurrent access to the same data, but they differ in when
+the lock is acquired and what happens under contention.</p>
+<p><strong>Pessimistic locking</strong> acquires a lock before reading the row, using <code>SELECT ... FOR UPDATE</code>. No other transaction can modify the row until the lock is released at commit. It is safe: you are guaranteed the data has not changed. The cost is contention: high-traffic rows become a bottleneck, and long transactions with <code>FOR UPDATE</code> can cascade into lock chains.</p>
+<p><strong>Optimistic locking</strong> reads the row without locking, performs business logic, then
+re-reads at update time and aborts if the data changed. The usual mechanism is a
+version column: <code>UPDATE ... SET version = version + 1 WHERE id = ? AND version = ?</code>.
+If zero rows are updated, someone else changed it and the application retries. No
+lock is held during the read or the business logic, so concurrency is high. The
+cost is retry complexity and write amplification on contended rows.</p>
+<p>Choose pessimistic when the conflict rate is high (multiple writers on the same row
+frequently, e.g., an inventory reservation) or when the business logic is expensive
+to redo. Choose optimistic when reads vastly outnumber writes on a row and retries
+are cheap, e.g., updating a user profile.</p>
+<pre><code class="hljs" data-lang="sql"><span class="hljs-comment">-- Pessimistic: lock the row for the duration of the transaction</span>
+<span class="hljs-keyword">BEGIN</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> accounts <span class="hljs-keyword">WHERE</span> id <span class="hljs-operator">=</span> <span class="hljs-number">42</span> <span class="hljs-keyword">FOR</span> <span class="hljs-keyword">UPDATE</span>;
+<span class="hljs-comment">-- ... business logic ...</span>
+<span class="hljs-keyword">UPDATE</span> accounts <span class="hljs-keyword">SET</span> balance <span class="hljs-operator">=</span> balance <span class="hljs-operator">-</span> <span class="hljs-number">100</span> <span class="hljs-keyword">WHERE</span> id <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;
+<span class="hljs-keyword">COMMIT</span>;
+
+<span class="hljs-comment">-- Optimistic: read, check, conditional update</span>
+<span class="hljs-comment">-- Application reads: SELECT id, balance, version FROM accounts WHERE id = 42</span>
+<span class="hljs-comment">-- Application updates:</span>
+<span class="hljs-keyword">UPDATE</span> accounts
+<span class="hljs-keyword">SET</span> balance <span class="hljs-operator">=</span> balance <span class="hljs-operator">-</span> <span class="hljs-number">100</span>, version <span class="hljs-operator">=</span> version <span class="hljs-operator">+</span> <span class="hljs-number">1</span>
+<span class="hljs-keyword">WHERE</span> id <span class="hljs-operator">=</span> <span class="hljs-number">42</span> <span class="hljs-keyword">AND</span> version <span class="hljs-operator">=</span> <span class="hljs-number">3</span>;
+<span class="hljs-comment">-- If 0 rows updated: conflict, retry the whole read-compute-write cycle</span>
+</code></pre>
+<hr>
+<h2>Connection pooling</h2>
+<p>Postgres creates a new OS process for each client connection. Each process costs
+about 5 to 10 MB of RAM and has startup overhead. A naive application that opens a
+connection per request or holds connections open during slow I/O will exhaust
+<code>max_connections</code> (default: 100, often raised to 200-400) and cause connection
+errors under load.</p>
+<p>A connection pool sits between the application and the database. It maintains a
+fixed set of server connections and multiplexes application requests across them.
+The most widely used tools are <strong>PgBouncer</strong> (transaction-level pooling, the
+common production choice) and <strong>pgpool-II</strong> (also handles read/write splitting).
+ORMs have their own built-in pools but they are per-process and can still exhaust
+the database limit on multi-process deployments.</p>
+<p>The sizing rule of thumb: the Postgres documentation suggests one connection per
+CPU core for CPU-bound workloads, with total connections rarely exceeding 200-400
+even on large servers. Above that, the context-switching overhead in the OS
+outweighs the parallelism benefit.</p>
+<p>The catch: PgBouncer transaction-level pooling is incompatible with prepared
+statements in some configurations (each statement is prepared on whatever backend
+connection happens to be used) and with <code>SET</code> commands, advisory locks, and <code>LISTEN/NOTIFY</code>
+that must persist across multiple statements.</p>
+<hr>
+<h2>Index strategy</h2>
+<p>The default Postgres index is a B-tree, which supports equality (<code>=</code>) and range
+(<code>&lt;</code>, <code>&gt;</code>, <code>BETWEEN</code>), and works with <code>ORDER BY</code>. The B-tree covers the vast
+majority of use cases.</p>
+<p>Other types to know: <strong>GIN</strong> (Generalized Inverted Index) for full-text search,
+JSONB containment, and array operators. <strong>GiST</strong> for geometric types and
+exclusion constraints. <strong>BRIN</strong> (Block Range Index) for very large tables where
+data is naturally ordered by insert (timestamps, sequential IDs), because BRIN
+stores only the min/max per range of pages instead of individual row pointers, so
+it is tiny and fast to maintain at the cost of less precision.</p>
+<p><strong>Partial indexes</strong> cover only the rows where a predicate is true. An index on
+<code>(created_at) WHERE status = 'pending'</code> is small, fast to update, and highly
+selective for the exact query it targets.</p>
+<p><strong>Composite indexes</strong> serve queries that filter on multiple columns. The column
+order matters: a composite index on <code>(a, b)</code> can answer queries on <code>a</code> alone or on
+<code>(a, b)</code> together, but not on <code>b</code> alone (the &quot;leftmost prefix rule&quot;).</p>
+<p>The planner will skip an index when the query uses a function on the indexed column
+(<code>WHERE lower(email) = 'foo'</code> ignores an index on <code>email</code>; you need a functional
+index: <code>CREATE INDEX ON users (lower(email))</code>). It will also skip an index if the
+type coercion between the literal and the column type prevents a match.</p>
+<hr>
+<h2>Sharding: scaling writes horizontally</h2>
+<p>Sharding splits data across multiple database instances (shards) so that each
+handles a fraction of the total write load. Reads often go to the same shard as the
+write, since the row's location is known.</p>
+<p><strong>Hash sharding</strong> applies a hash function to the shard key (typically a user ID or
+account ID) and assigns the result to a shard bucket. Distribution is uniform and
+predictable. Adding a new shard requires rehashing and migrating rows, which is
+expensive. Consistent hashing reduces migration cost by remapping only the keys
+assigned to the added/removed node.</p>
+<p><strong>Range sharding</strong> assigns rows to shards by a continuous key range (e.g., users
+0-999999 go to shard 0, 1000000-1999999 to shard 1). Adding a new shard is
+simple: split a range. The catch is <strong>hotspots</strong>: if nearly all activity is in the
+most recent range (for a date-keyed table, the current day), one shard handles most
+writes while the others are idle.</p>
+<p>The operational cost of sharding is high: cross-shard joins must be done in the
+application, cross-shard transactions require distributed coordination (two-phase
+commit), and schema migrations must be applied to every shard. Postgres 17's native
+declarative partitioning handles hash and range partitioning within a single
+instance, which covers many &quot;I need sharding&quot; use cases at much lower complexity.</p>
+<hr>
+<h2>MySQL/MariaDB: the key delta</h2>
+<p>The primary production MySQL storage engine is <strong>InnoDB</strong>, which uses MVCC (with
+old versions in the undo log rather than the heap), row-level locking, B-tree
+clustered primary key indexes (the entire row lives in the primary key leaf, unlike
+Postgres's heap), and ACID transactions. InnoDB's clustered index means that a
+primary key lookup is a single tree traversal to the row, while a secondary index
+lookup requires two traversals (secondary index to primary key, then primary key to
+row), a property called a &quot;double lookup&quot; that affects index design.</p>
+<p><strong>Replication</strong> is MySQL's strength. MySQL's binary log (binlog) is the replication
+mechanism and is separate from InnoDB's redo log. Traditional MySQL replication is
+statement-based or row-based; Group Replication and InnoDB Cluster add multi-primary
+synchronous replication for near-five-nines availability.</p>
+<p><strong>MySQL 8.4 LTS</strong> (released April 2024, supported to April 2032) is the current
+production recommendation. MySQL 8.0 reached EOL in April 2026. MySQL 9.x is the
+Innovation track with shorter support. <strong>MariaDB</strong> is a community fork with
+compatible wire protocol and its own storage engine ecosystem; its optimizer and
+replication differ from MySQL in ways that matter at scale.</p>
+<p><strong>Differences that bite in production:</strong></p>
+<ul>
+<li>MySQL's default transaction isolation level is <code>REPEATABLE READ</code>; Postgres defaults
+to <code>READ COMMITTED</code>. <code>REPEATABLE READ</code> in MySQL means a transaction sees the same
+snapshot for its lifetime, which can cause &quot;phantom read&quot; surprises when
+long-running transactions see stale data.</li>
+<li>MySQL has no <code>VACUUM</code>; InnoDB's purge thread handles old undo log versions
+automatically, but long-running transactions prevent purge and grow the undo
+tablespace.</li>
+<li>Case sensitivity in identifiers and collation defaults differ between MySQL and
+Postgres, a source of subtle bugs in migration.</li>
+</ul>
+<hr>
+<h2>Diagnosis playbooks</h2>
+<h3>Low CPU but slow queries</h3>
+<p>The query is waiting on something other than compute. Work through this checklist
+in order:</p>
+<ol>
+<li><strong>Lock waits.</strong> Check <code>pg_locks</code> joined to <code>pg_stat_activity</code> for blocked
+queries. A query waiting for a lock shows <code>wait_event_type = 'Lock'</code>.</li>
+<li><strong>I/O.</strong> Check <code>pg_stat_bgwriter</code> for high <code>buffers_clean</code> and
+<code>pg_statio_user_tables</code> for high heap_blks_read (disk reads, not cache hits).
+Also check OS-level I/O with <code>iostat</code>.</li>
+<li><strong>Index usage.</strong> Run <code>EXPLAIN (ANALYZE, BUFFERS)</code> on the slow query. If it shows
+a sequential scan on a large table, check for a missing index, a function
+preventing index use, or stale statistics.</li>
+<li><strong>Connection count.</strong> If <code>pg_stat_activity</code> shows many <code>idle in transaction</code>
+connections, they may be holding locks or exhausting the pool.</li>
+</ol>
+<h3>Fast last week, slow today</h3>
+<p>Nothing in the code changed, but the query degraded. The culprits in order of
+likelihood:</p>
+<ol>
+<li><strong>Stale statistics / plan change.</strong> The table grew or the value distribution
+shifted, the planner chose a different plan. Run <code>EXPLAIN (ANALYZE, BUFFERS)</code> and
+compare estimated vs actual rows. If they diverge, run <code>ANALYZE tablename</code> and
+re-check.</li>
+<li><strong>Table bloat.</strong> Check <code>n_dead_tup</code> vs <code>n_live_tup</code> in <code>pg_stat_user_tables</code>.
+If the table is large with many dead tuples, run <code>VACUUM ANALYZE</code>.</li>
+<li><strong>New data patterns.</strong> A new customer or batch load changed the data
+distribution. A once-selective value is now common; a partial index no longer
+covers the hot path.</li>
+<li><strong>Lock contention from a new background job.</strong> Check <code>pg_locks</code> and
+<code>pg_stat_activity</code> for recently added jobs or scheduled tasks.</li>
+<li><strong>Hardware or configuration change.</strong> Check if <code>shared_buffers</code>, <code>work_mem</code>, or
+<code>effective_cache_size</code> changed. A reduction in <code>effective_cache_size</code> makes the
+planner pessimistic about what fits in the OS cache and may prefer sequential
+scans.</li>
+</ol>
+<hr>
+<h2>Common interview questions</h2>
+<p><strong>What is the difference between an index scan and a sequential scan? When does
+Postgres choose one over the other?</strong>
+Testing: whether you understand the planner's cost model.
+A sequential scan reads all pages in order; an index scan traverses the B-tree then
+fetches rows by random-read. The planner chooses based on selectivity: if only a
+small fraction of rows match (roughly under 5-10 percent), the index's random reads
+cost less than reading all pages; above that, sequential I/O wins. The exact
+threshold depends on table layout and the <code>effective_cache_size</code> setting.</p>
+<p><strong>What is MVCC and what problem does it solve?</strong>
+Testing: whether you know why readers do not block writers.
+MVCC keeps multiple versions of each row. Readers see the version that was live at
+their transaction start and never block on writers because they are not touching the
+current version. Writers create new versions rather than overwriting. The catch is
+dead tuple accumulation: old versions must be cleaned up by VACUUM.</p>
+<p><strong>What is WAL and why does it matter for durability?</strong>
+Testing: operational knowledge of the commit path.
+WAL (Write-Ahead Log) is a sequential log written before any data page is modified.
+A commit is acknowledged once the WAL record is on disk, not when the data page is
+flushed. On crash, Postgres replays the WAL to recover. WAL also drives replication
+(streaming WAL to standbys) and point-in-time recovery (archiving WAL records).</p>
+<p><strong>What does VACUUM do and when does it become operationally important?</strong>
+Testing: whether you have run Postgres in production at scale.
+VACUUM marks dead tuples (old MVCC row versions) as reusable space and advances the
+transaction ID counter to prevent wraparound. It becomes critical when: a
+write-heavy table accumulates bloat faster than autovacuum handles it, causing slow
+scans and growing file size; or when a table's age approaches the 2-billion-ID
+wraparound limit, which causes Postgres to refuse writes until VACUUM runs.</p>
+<p><strong>What is a deadlock and how does the database resolve it?</strong>
+Testing: whether you know the mechanism and the fix.
+A deadlock is a cycle: transaction A holds lock X and waits for Y; transaction B
+holds Y and waits for X. The database detects the cycle (within <code>deadlock_timeout</code>,
+default 1 second) and kills one transaction with an error, releasing its locks. The
+fix is canonical lock ordering: ensure all transactions that lock multiple rows do
+so in the same order.</p>
+<p><strong>Connection pooling: what is it and why does it exist?</strong>
+Testing: operational understanding of Postgres connection cost.
+Postgres spawns an OS process per connection, costing 5-10 MB RAM and startup time.
+Under load, a naive one-connection-per-request application exhausts <code>max_connections</code>
+and gets errors. A pool (PgBouncer, pgpool) maintains a fixed set of server
+connections and multiplexes application requests across them. Transaction-level
+pooling (PgBouncer's default) is most efficient but incompatible with prepared
+statements in some configurations.</p>
+<p><strong>Optimistic vs pessimistic locking: when would you choose each?</strong>
+Testing: whether you think about contention.
+Pessimistic (<code>SELECT ... FOR UPDATE</code>) acquires the lock before reading; safe but
+serializes all concurrent writers on that row. Optimistic reads freely and does a
+conditional update on a version column, retrying on conflict; high concurrency but
+adds retry logic. Use pessimistic when conflict rate is high or the business logic
+is expensive to redo (inventory reservation). Use optimistic when reads dwarf writes
+and retries are cheap (profile update).</p>
+<p><strong>Explain database sharding. What are the trade-offs of hash vs range sharding?</strong>
+Testing: whether you understand the full cost.
+Sharding splits data across instances by a shard key. Hash sharding distributes
+uniformly but requires rehashing to add shards. Range sharding splits on key ranges
+(easier to add shards) but creates hotspots if activity concentrates in one range
+(e.g., current date). The cross-cutting cost of both: no cross-shard joins in the
+database, cross-shard transactions require distributed coordination, and schema
+migrations must hit every shard.</p>
+<p><strong>A query was fast last week and is slow today. Nothing in the code changed. What
+do you investigate?</strong>
+Testing: whether you think like a DBA, not a developer.
+First, run <code>EXPLAIN ANALYZE</code> on the slow query and look for a plan change or a
+large gap between estimated and actual row counts, which signals stale statistics.
+Run <code>ANALYZE</code> on the table and re-check. Second, look for table bloat via
+<code>n_dead_tup</code> in <code>pg_stat_user_tables</code>. Third, check for new lock contention from a
+recently added job. Fourth, check if a data distribution shift made a selective
+value common enough that the planner stopped using the index.</p>
+
+  </main>
+</div>
+</body>
+</html>

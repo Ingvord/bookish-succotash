@@ -128,58 +128,160 @@ code.hljs {
 }
 
 :root {
-  --ink: #1c1b19; --muted: #5f5c55; --paper: #ffffff;
-  --accent: #0a6b82; --accent-soft: #0a6b8214;
-  --rule: #e7e3da; --code-bg: #f6f8fa; --code-border: #e1e6ea; --code-tag: #eef1f4;
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #0a6b82;
+  --accent-soft:  #0a6b8214;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--paper); color: var(--ink);
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
   font-family: "Newsreader", Georgia, "Times New Roman", serif;
-  font-size: 18px; line-height: 1.72;
-  print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
 .wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
-.doc-header { border-bottom: 3px solid var(--ink); padding-bottom: 1.4rem; margin-bottom: 2.6rem; }
-.kicker { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .7rem;
-  letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
-h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 2.7rem;
-  line-height: 1.08; margin: .5rem 0 0; letter-spacing: -.015em; }
-.doc-header .sub { color: var(--muted); font-size: 1.02rem; margin-top: .85rem; line-height: 1.55; }
-h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.72rem;
-  margin: 3.2rem 0 1rem; padding-bottom: .42rem; border-bottom: 1px solid var(--rule); letter-spacing: -.01em; }
-h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.22rem; margin: 2.1rem 0 .55rem; }
-p { margin: 0 0 1rem; }
-a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
 strong { font-weight: 650; color: #141312; }
 ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
 li { margin: .25rem 0; }
 hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
-code { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
-  font-size: .84em; background: var(--code-bg); border: 1px solid var(--code-border);
-  border-radius: 4px; padding: .06em .34em; color: var(--ink); }
-pre { position: relative; margin: 1.1rem 0 1.5rem; background: var(--code-bg);
-  border: 1px solid var(--code-border); border-left: 3px solid var(--accent);
-  border-radius: 8px; padding: 1rem 1.15rem; overflow-x: auto; }
-pre code.hljs { background: transparent; border: none; padding: 0; color: #24292e;
-  font-size: .8rem; line-height: 1.6; display: block; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
 pre code[data-lang]:not([data-lang=""])::before {
-  content: attr(data-lang); position: absolute; top: 0; right: 0;
-  font-family: "JetBrains Mono", monospace; font-size: .58rem; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--muted); background: var(--code-tag);
-  border: 1px solid var(--code-border); border-top: none; border-right: none;
-  border-bottom-left-radius: 6px; padding: .22em .6em; }
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
 table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
-th, td { border: 1px solid var(--rule); padding: .5rem .68rem; text-align: left; vertical-align: top; }
-th { background: var(--accent); color: #fff; font-family: "JetBrains Mono", monospace;
-  font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; font-weight: 500; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
 tbody tr:nth-child(even) { background: #faf9f6; }
 td code { font-size: .84em; }
+
+/* ---------- print ---------- */
 @page { margin: 16mm; }
 @media print {
   body { font-size: 10.5pt; }
   .wrap { max-width: none; padding: 0; }
   * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
   pre code.hljs { white-space: pre-wrap; word-break: break-word; }
   pre, table { break-inside: auto; }
   tr { break-inside: avoid; }
@@ -367,16 +469,20 @@ quarkus build --native
 <p>Close the loop on framework choice. Quarkus leans on familiar standards (CDI, JAX-RS, Hibernate) with an exceptional dev-mode experience and the broadest extension catalog of the two, which lowers the ramp for a team coming from Jakarta EE. Micronaut's purpose-built compile-time DI gives the cleanest reflection-free story and turns wiring mistakes into compile errors, which some teams prize. Both are correct choices; the wrong move in an interview is to claim one is universally superior. The senior framing is: same core thesis (build-time over runtime), pick on ecosystem fit and team familiarity, and reach for native image only when the workload's lifecycle actually rewards it.</p>
 <hr>
 <h2>Common interview questions</h2>
-<p>These recur whenever a role mentions Quarkus, Micronaut, or &quot;cloud-native JVM.&quot; Lead with the mechanism, then the trade-off.</p>
-<p><strong>Why do Quarkus and Micronaut move work to build time?</strong> The classic stacks do dependency injection, proxying, and configuration at runtime through reflection and classpath scanning, which runs on every startup, keeps metadata resident, and is invisible to ahead-of-time compilers. Doing that wiring at build time instead yields fast startup, a small memory floor, and code that GraalVM can compile to a native image.</p>
-<p><strong>What is the closed-world assumption in native image, and why does it break reflection?</strong> GraalVM statically analyzes everything reachable from <code>main</code> and discards the rest, so anything reached only reflectively, by dynamic proxy, or by loading a resource by name is invisible to the analysis, gets pruned, and fails at runtime. This is exactly why these frameworks exist in their current form: because they wire everything at build time, they know what is reflectively reachable and generate the native metadata for you.</p>
-<p><strong>Will a native image always be faster than the JVM?</strong> No. It starts in milliseconds and uses far less memory, but at steady state a JIT-warmed JVM can match or beat it on peak throughput, because the JIT profiles the running code and optimizes hot paths that ahead-of-time compilation must guess at. Native wins on cold start and density; the warmed JVM can win on sustained throughput.</p>
-<p><strong>Quarkus or Micronaut, what is the real difference?</strong> Both share the build-time thesis. Quarkus builds on familiar standards (CDI, JAX-RS, Hibernate) with an exceptional live-reload dev mode and the broader extension catalog. Micronaut wrote its own compile-time DI from scratch, giving the cleanest reflection-free story and turning missing-bean errors into compile errors. Neither is universally superior; pick on ecosystem fit and team familiarity.</p>
-<p><strong>Explain the threading contract.</strong> A handler returning a reactive type (<code>Uni</code>/<code>Multi</code> on Quarkus) is assumed non-blocking and runs on the I/O event loop, where you must never block; a handler returning a plain value runs on a worker thread where blocking is allowed. Override the inference with <code>@Blocking</code>/<code>@NonBlocking</code> on Quarkus or <code>@ExecuteOn</code> on Micronaut, and remember Quarkus detects many blocking calls on the I/O thread at runtime and throws, which is a guardrail.</p>
-<p><strong>Uni versus Multi (or Mono versus Flux)?</strong> <code>Uni</code> carries a single asynchronous value or failure; <code>Multi</code> carries a stream of zero-to-many items with backpressure. Reactor's equivalents are <code>Mono</code> and <code>Flux</code>. Use <code>Uni</code> for one result (a lookup), <code>Multi</code> for a stream (server-sent events, a paged feed).</p>
-<p><strong>What is the most common reactive bug?</strong> Forgetting that a <code>Uni</code>/<code>Multi</code> is lazy and cold: it describes a pipeline and does nothing until subscribed. A <code>Uni</code> you create but forget to return or subscribe to is a silent no-op, with no exception and no execution, which has no analogue in blocking code.</p>
-<p><strong>How do you keep a reactive endpoint actually non-blocking?</strong> Use non-blocking data access end to end (Hibernate Reactive, the Vert.x reactive SQL client, or R2DBC) so nothing on the path blocks the event loop. A reactive endpoint that calls a blocking JDBC driver stalls every request on that loop and performs worse than plain blocking would; if you only have a blocking driver, mark the work <code>@Blocking</code> so it runs off the loop.</p>
-<p><strong>When is full reactive worth it over virtual threads?</strong> Reach for reactive when you genuinely need streaming responses, real backpressure against an unsteerable firehose, or massive fan-out concurrency. For ordinary CRUD bottlenecked on the database, the reactive tax (cold-stream bugs, context loss, opaque stack traces) buys little, and on Java 21 virtual threads deliver the same I/O concurrency in readable blocking style.</p>
+<p>These recur whenever a role mentions Quarkus, Micronaut, or &quot;cloud-native JVM,&quot; in the shape interviewers grade: the question, what they are really testing, the concise answer, then the trade-off. Lead with the mechanism.</p>
+<p><strong>Why do Quarkus and Micronaut move work to build time?</strong> <em>Testing whether you grasp the core thesis, not just the brand names.</em> The classic stacks do dependency injection, proxying, and configuration at runtime through reflection and classpath scanning, which runs on every startup, keeps metadata resident, and is invisible to ahead-of-time compilers. Doing that wiring at build time instead yields fast startup, a small memory floor, and code that GraalVM can compile to a native image.</p>
+<p><strong>What is the closed-world assumption in native image, and why does it break reflection?</strong> <em>Testing whether you understand the native-image constraint that defines the stack.</em> GraalVM statically analyzes everything reachable from <code>main</code> and discards the rest, so anything reached only reflectively, by dynamic proxy, or by loading a resource by name is invisible to the analysis, gets pruned, and fails at runtime. This is exactly why these frameworks exist in their current form: because they wire everything at build time, they know what is reflectively reachable and generate the native metadata for you.</p>
+<p><strong>Will a native image always be faster than the JVM?</strong> <em>Testing whether you resist hype and reason about workload lifecycle.</em> No. It starts in milliseconds and uses far less memory, but at steady state a JIT-warmed JVM can match or beat it on peak throughput, because the JIT profiles the running code and optimizes hot paths that ahead-of-time compilation must guess at. Native wins on cold start and density; the warmed JVM can win on sustained throughput.</p>
+<p><strong>Quarkus or Micronaut, what is the real difference?</strong> <em>Testing whether you can compare without declaring a false winner.</em> Both share the build-time thesis. Quarkus builds on familiar standards (CDI, JAX-RS, Hibernate) with an exceptional live-reload dev mode and the broader extension catalog. Micronaut wrote its own compile-time DI from scratch, giving the cleanest reflection-free story and turning missing-bean errors into compile errors. Neither is universally superior; pick on ecosystem fit and team familiarity.</p>
+<p><strong>Explain the threading contract.</strong> <em>Testing whether you know what runs on the event loop and what must not.</em> A handler returning a reactive type (<code>Uni</code>/<code>Multi</code> on Quarkus) is assumed non-blocking and runs on the I/O event loop, where you must never block; a handler returning a plain value runs on a worker thread where blocking is allowed. Override the inference with <code>@Blocking</code>/<code>@NonBlocking</code> on Quarkus or <code>@ExecuteOn</code> on Micronaut, and remember Quarkus detects many blocking calls on the I/O thread at runtime and throws, which is a guardrail.</p>
+<p><strong>Uni versus Multi (or Mono versus Flux)?</strong> <em>Testing basic reactive vocabulary fluency.</em> <code>Uni</code> carries a single asynchronous value or failure; <code>Multi</code> carries a stream of zero-to-many items with backpressure. Reactor's equivalents are <code>Mono</code> and <code>Flux</code>. Use <code>Uni</code> for one result (a lookup), <code>Multi</code> for a stream (server-sent events, a paged feed).</p>
+<p><strong>What is the most common reactive bug?</strong> <em>Testing whether you have actually shipped reactive code.</em> Forgetting that a <code>Uni</code>/<code>Multi</code> is lazy and cold: it describes a pipeline and does nothing until subscribed. A <code>Uni</code> you create but forget to return or subscribe to is a silent no-op, with no exception and no execution, which has no analogue in blocking code.</p>
+<p><strong>How do you keep a reactive endpoint actually non-blocking?</strong> <em>Testing whether you know reactive is all-or-nothing on the data path.</em> Use non-blocking data access end to end (Hibernate Reactive, the Vert.x reactive SQL client, or R2DBC) so nothing on the path blocks the event loop. A reactive endpoint that calls a blocking JDBC driver stalls every request on that loop and performs worse than plain blocking would; if you only have a blocking driver, mark the work <code>@Blocking</code> so it runs off the loop.</p>
+<p><strong>When is full reactive worth it over virtual threads?</strong> <em>Testing whether you reach for reactive by need, not by default.</em> Reach for reactive when you genuinely need streaming responses, real backpressure against an unsteerable firehose, or massive fan-out concurrency. For ordinary CRUD bottlenecked on the database, the reactive tax (cold-stream bugs, context loss, opaque stack traces) buys little, and on Java 21 virtual threads deliver the same I/O concurrency in readable blocking style.</p>
+<hr>
+<h2>In the room: framing this at the interview</h2>
+<p>The single idea an interviewer wants to hear you articulate is the thesis these frameworks share: move dependency injection, configuration, and proxying from runtime to build time, which is what unlocks fast startup, a small memory floor, and GraalVM native images. If you can state that in one breath and then explain how it cascades (build-time wiring means no runtime reflection, which means native image works, which means millisecond cold starts and high replica density), you have demonstrated the mental model the rest of the conversation tests.</p>
+<p>The two traps to avoid sound like overclaiming. Do not say native image is simply faster: be the candidate who says it wins on cold start and density while a JIT-warmed JVM can win on sustained peak throughput, and tie the choice to workload lifecycle. Do not declare Quarkus or Micronaut the winner: frame them as the same thesis with different ergonomics (standards and dev-mode versus bespoke compile-time DI) and pick on team fit. And when reactive comes up, show range by noting that on Java 21+ virtual threads cover most I/O concurrency in readable blocking style, so full reactive is for streaming, backpressure, and extreme fan-out, not a default. That blend of enthusiasm and restraint is exactly the senior signal.</p>
 
   </main>
 </div>

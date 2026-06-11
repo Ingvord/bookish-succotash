@@ -128,58 +128,160 @@ code.hljs {
 }
 
 :root {
-  --ink: #1c1b19; --muted: #5f5c55; --paper: #ffffff;
-  --accent: #2e5280; --accent-soft: #2e528014;
-  --rule: #e7e3da; --code-bg: #f6f8fa; --code-border: #e1e6ea; --code-tag: #eef1f4;
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #2e5280;
+  --accent-soft:  #2e528014;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--paper); color: var(--ink);
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
   font-family: "Newsreader", Georgia, "Times New Roman", serif;
-  font-size: 18px; line-height: 1.72;
-  print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
 .wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
-.doc-header { border-bottom: 3px solid var(--ink); padding-bottom: 1.4rem; margin-bottom: 2.6rem; }
-.kicker { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .7rem;
-  letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
-h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 2.7rem;
-  line-height: 1.08; margin: .5rem 0 0; letter-spacing: -.015em; }
-.doc-header .sub { color: var(--muted); font-size: 1.02rem; margin-top: .85rem; line-height: 1.55; }
-h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.72rem;
-  margin: 3.2rem 0 1rem; padding-bottom: .42rem; border-bottom: 1px solid var(--rule); letter-spacing: -.01em; }
-h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.22rem; margin: 2.1rem 0 .55rem; }
-p { margin: 0 0 1rem; }
-a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
 strong { font-weight: 650; color: #141312; }
 ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
 li { margin: .25rem 0; }
 hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
-code { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
-  font-size: .84em; background: var(--code-bg); border: 1px solid var(--code-border);
-  border-radius: 4px; padding: .06em .34em; color: var(--ink); }
-pre { position: relative; margin: 1.1rem 0 1.5rem; background: var(--code-bg);
-  border: 1px solid var(--code-border); border-left: 3px solid var(--accent);
-  border-radius: 8px; padding: 1rem 1.15rem; overflow-x: auto; }
-pre code.hljs { background: transparent; border: none; padding: 0; color: #24292e;
-  font-size: .8rem; line-height: 1.6; display: block; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
 pre code[data-lang]:not([data-lang=""])::before {
-  content: attr(data-lang); position: absolute; top: 0; right: 0;
-  font-family: "JetBrains Mono", monospace; font-size: .58rem; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--muted); background: var(--code-tag);
-  border: 1px solid var(--code-border); border-top: none; border-right: none;
-  border-bottom-left-radius: 6px; padding: .22em .6em; }
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
 table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
-th, td { border: 1px solid var(--rule); padding: .5rem .68rem; text-align: left; vertical-align: top; }
-th { background: var(--accent); color: #fff; font-family: "JetBrains Mono", monospace;
-  font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; font-weight: 500; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
 tbody tr:nth-child(even) { background: #faf9f6; }
 td code { font-size: .84em; }
+
+/* ---------- print ---------- */
 @page { margin: 16mm; }
 @media print {
   body { font-size: 10.5pt; }
   .wrap { max-width: none; padding: 0; }
   * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
   pre code.hljs { white-space: pre-wrap; word-break: break-word; }
   pre, table { break-inside: auto; }
   tr { break-inside: avoid; }
@@ -203,7 +305,7 @@ td code { font-size: .84em; }
 <hr>
 <h2>The GIL: the constraint behind every scaling decision</h2>
 <p>The Global Interpreter Lock is the Python fact every staff interview expects you to handle correctly. In CPython, one lock allows only one thread to execute Python bytecode at a time, so threads do not give you parallel CPU execution; a multithreaded pure-Python computation runs no faster than single-threaded. This is why Python web apps scale CPU work across <em>processes</em>, not threads, and why the production deployment is &quot;N worker processes,&quot; one per core or so.</p>
-<p>State the nuance, because it is what separates a memorized answer from understanding. The GIL is released during blocking I/O (socket reads, file reads) and inside many C extensions (NumPy, database drivers), so threads <em>do</em> help I/O-bound and native-compute workloads even though they never help pure-Python CPU loops. And the landscape is shifting: Python 3.13 ships an experimental free-threaded build (PEP 703) that can disable the GIL, and the async model sidesteps the GIL for I/O concurrency entirely by using one thread and an event loop instead of many threads. The senior framing: the GIL caps pure-Python CPU parallelism within a process, so you scale CPU with processes and scale I/O with async, and you offload heavy CPU work out of the web process altogether.</p>
+<p>State the nuance, because it is what separates a memorized answer from understanding. The GIL is released during blocking I/O (socket reads, file reads) and inside many C extensions (NumPy, database drivers), so threads <em>do</em> help I/O-bound and native-compute workloads even though they never help pure-Python CPU loops. And the landscape is shifting: the free-threaded build that landed experimentally in Python 3.13 (PEP 703) was promoted to officially supported in Python 3.14 (PEP 779, October 2025), bringing the single-threaded overhead down to roughly 5 to 10 percent, though some C-extension packages still re-enable the GIL until they are made thread-safe. The async model, separately, sidesteps the GIL for I/O concurrency entirely by using one thread and an event loop instead of many threads. The senior framing: until free-threading is ubiquitous, the GIL still caps pure-Python CPU parallelism within a standard process, so you scale CPU with processes and scale I/O with async, and you offload heavy CPU work out of the web process altogether.</p>
 <hr>
 <h2>Project bootstrap: a typed FastAPI service</h2>
 <p>A clean bootstrap demonstrates the type-driven model end to end. Pydantic models define the contract, path operations declare their inputs and outputs, and FastAPI validates, serializes, and documents from those declarations.</p>

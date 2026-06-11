@@ -128,58 +128,160 @@ code.hljs {
 }
 
 :root {
-  --ink: #1c1b19; --muted: #5f5c55; --paper: #ffffff;
-  --accent: #8a2436; --accent-soft: #8a243614;
-  --rule: #e7e3da; --code-bg: #f6f8fa; --code-border: #e1e6ea; --code-tag: #eef1f4;
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #8a2436;
+  --accent-soft:  #8a243614;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--paper); color: var(--ink);
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
   font-family: "Newsreader", Georgia, "Times New Roman", serif;
-  font-size: 18px; line-height: 1.72;
-  print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
 .wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
-.doc-header { border-bottom: 3px solid var(--ink); padding-bottom: 1.4rem; margin-bottom: 2.6rem; }
-.kicker { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .7rem;
-  letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
-h1 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 2.7rem;
-  line-height: 1.08; margin: .5rem 0 0; letter-spacing: -.015em; }
-.doc-header .sub { color: var(--muted); font-size: 1.02rem; margin-top: .85rem; line-height: 1.55; }
-h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.72rem;
-  margin: 3.2rem 0 1rem; padding-bottom: .42rem; border-bottom: 1px solid var(--rule); letter-spacing: -.01em; }
-h3 { font-family: "Fraunces", Georgia, serif; font-weight: 600; font-size: 1.22rem; margin: 2.1rem 0 .55rem; }
-p { margin: 0 0 1rem; }
-a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
 strong { font-weight: 650; color: #141312; }
 ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
 li { margin: .25rem 0; }
 hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
-code { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
-  font-size: .84em; background: var(--code-bg); border: 1px solid var(--code-border);
-  border-radius: 4px; padding: .06em .34em; color: var(--ink); }
-pre { position: relative; margin: 1.1rem 0 1.5rem; background: var(--code-bg);
-  border: 1px solid var(--code-border); border-left: 3px solid var(--accent);
-  border-radius: 8px; padding: 1rem 1.15rem; overflow-x: auto; }
-pre code.hljs { background: transparent; border: none; padding: 0; color: #24292e;
-  font-size: .8rem; line-height: 1.6; display: block; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
 pre code[data-lang]:not([data-lang=""])::before {
-  content: attr(data-lang); position: absolute; top: 0; right: 0;
-  font-family: "JetBrains Mono", monospace; font-size: .58rem; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--muted); background: var(--code-tag);
-  border: 1px solid var(--code-border); border-top: none; border-right: none;
-  border-bottom-left-radius: 6px; padding: .22em .6em; }
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
 table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
-th, td { border: 1px solid var(--rule); padding: .5rem .68rem; text-align: left; vertical-align: top; }
-th { background: var(--accent); color: #fff; font-family: "JetBrains Mono", monospace;
-  font-size: .66rem; letter-spacing: .04em; text-transform: uppercase; font-weight: 500; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
 tbody tr:nth-child(even) { background: #faf9f6; }
 td code { font-size: .84em; }
+
+/* ---------- print ---------- */
 @page { margin: 16mm; }
 @media print {
   body { font-size: 10.5pt; }
   .wrap { max-width: none; padding: 0; }
   * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
   pre code.hljs { white-space: pre-wrap; word-break: break-word; }
   pre, table { break-inside: auto; }
   tr { break-inside: avoid; }
@@ -199,7 +301,7 @@ td code { font-size: .84em; }
 <h2>The application-server model, and when to still choose it</h2>
 <p>Jakarta EE (formerly Java EE, before Oracle handed the platform to the Eclipse Foundation) is a set of specifications, not a product. You write against the API, and a compliant runtime supplies the implementation. That indirection is the whole philosophy: your war file should run on TomEE, Payara, WildFly, or Open Liberty without code changes, because every server ships vendor implementations of the same <code>jakarta.*</code> interfaces.</p>
 <p>At staff level the interviewer wants to hear <em>why</em> this model exists and <em>when</em> it stops paying off. The application server centralizes cross-cutting infrastructure (connection pools, transaction managers, security realms, thread pools) so that many deployed applications share one tuned runtime. That was a strong fit when one server hosted dozens of internal apps. It is a weaker fit when you ship one service per container, because the container already gives you isolation and the orchestrator already gives you scaling, so the server's multi-tenancy is dead weight.</p>
-<p>The single most important fact to state cleanly: as of Jakarta EE 9 the namespace migrated from <code>javax.*</code> to <code>jakarta.*</code>. This was a hard break caused by Oracle retaining the <code>javax</code> trademark. Any library, any tutorial, any Stack Overflow answer using <code>javax.servlet</code> or <code>javax.persistence</code> is pre-2020 and will not compile against a modern server. Jakarta EE 10 and 11 build on that namespace and add records support, CDI Lite, and alignment with newer Java LTS releases.</p>
+<p>The single most important fact to state cleanly: as of Jakarta EE 9 the namespace migrated from <code>javax.*</code> to <code>jakarta.*</code>. This was a hard break caused by Oracle retaining the <code>javax</code> trademark. Any library, any tutorial, any Stack Overflow answer using <code>javax.servlet</code> or <code>javax.persistence</code> is pre-2020 and will not compile against a modern server. Jakarta EE 11 is the current release (it shipped in June 2025), aligned with Java 21, and it adds the Jakarta Data specification and CDI Lite on top of that namespace; Jakarta EE 12 is targeted for 2026 with a Java 21 source baseline and Java 25 at runtime. When you see a guide pinning the API at 10 or earlier, it predates the current platform.</p>
 <pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Pre-Jakarta EE 9 (will NOT compile on a modern server)</span>
 <span class="hljs-keyword">import</span> javax.ws.rs.GET;
 <span class="hljs-keyword">import</span> javax.persistence.Entity;
@@ -217,7 +319,7 @@ td code { font-size: .84em; }
     <span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>jakarta.platform<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>jakarta.jakartaee-api<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
-      <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>10.0.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
+      <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>11.0.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span>
       <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>provided<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
   <span class="hljs-tag">&lt;/<span class="hljs-name">dependencies</span>&gt;</span>
@@ -345,7 +447,7 @@ List&lt;Order&gt; orders = em.createQuery(
 <hr>
 <h2>Concurrency: thread-per-request and the virtual-thread shift</h2>
 <p>The classic application server uses a thread-per-request model: a bounded pool of OS threads (Tomcat's connector defaults near 200) each handle one request start to finish, blocking on I/O. This is simple to reason about and it is why JPA and JDBC are written as blocking APIs. The cost is that a slow downstream dependency ties up a thread doing nothing, and once all 200 threads are parked on a slow call, the server stops accepting work even though the CPU is idle. This is thread-pool exhaustion, and it is the classic outage in this architecture.</p>
-<p>Java 21 virtual threads (Project Loom) change the calculus. A virtual thread is cheap (you can have millions), and a blocking call parks the virtual thread while freeing the underlying carrier OS thread. The blocking, readable, thread-per-request style now scales to high concurrency without the pool ceiling. On Tomcat/TomEE you enable a virtual-thread executor on the connector, and your existing blocking JAX-RS and JPA code benefits with no rewrite.</p>
+<p>Virtual threads (Project Loom), generally available since Java 21 and carried forward through the current LTS (Java 25, released September 2025), change the calculus. A virtual thread is cheap (you can have millions), and a blocking call parks the virtual thread while freeing the underlying carrier OS thread. The blocking, readable, thread-per-request style now scales to high concurrency without the pool ceiling. On Tomcat/TomEE you enable a virtual-thread executor on the connector, and your existing blocking JAX-RS and JPA code benefits with no rewrite.</p>
 <pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Tomcat 10.1+ : back the connector with a virtual-thread executor</span>
 connector.getProtocolHandler()
     .setExecutor(Executors.newVirtualThreadPerTaskExecutor());
@@ -515,18 +617,22 @@ serverChannel.register(selector, SelectionKey.OP_ACCEPT);
 <p>Know when to walk away from this stack. Choose Jakarta EE or TomEE when you have an existing EE estate, a team fluent in it, standards-portability requirements, or container-managed JTA across multiple datasources that you do not want to hand-roll. Reach for the cloud-native JVM stacks (Quarkus, Micronaut) when startup time and memory footprint are first-class concerns, typically for serverless or aggressive horizontal autoscaling, where a 5-second startup and a 512 MB floor are liabilities. Being able to draw that line, with numbers, is the difference between knowing the framework and owning the decision.</p>
 <hr>
 <h2>Common interview questions</h2>
-<p>These are the questions that recur for this stack. Answer them in a sentence or two, lead with the mechanism, and finish with the catch.</p>
-<p><strong>What actually changed between Java EE and Jakarta EE?</strong> Governance moved from Oracle to the Eclipse Foundation, and because Oracle kept the <code>javax</code> trademark, Jakarta EE 9 renamed every API package from <code>javax.*</code> to <code>jakarta.*</code>. That namespace switch is a hard, compile-breaking change, so any code or tutorial using <code>javax.servlet</code> or <code>javax.persistence</code> predates 2020.</p>
-<p><strong>When would you choose an application server over Spring Boot or a cloud-native framework?</strong> When you have an existing EE estate and team fluency, a hard requirement for standards portability across vendors, or container-managed JTA spanning multiple datasources that you would otherwise hand-roll. Reach for Quarkus or Micronaut instead when startup time and memory footprint are first-class concerns, because a classic server's multi-second startup and large memory floor are liabilities under serverless or aggressive autoscaling.</p>
-<p><strong>Explain CDI scopes.</strong> <code>@ApplicationScoped</code> is one instance for the whole app (the default for stateless services), <code>@RequestScoped</code> is one per HTTP request, <code>@SessionScoped</code> is one per user session and must be <code>Serializable</code>, and <code>@Dependent</code> binds the bean's life to whatever injected it. The subtlety is that injecting a narrower scope into a wider one works only because CDI injects a client proxy that resolves the real instance per call.</p>
-<p><strong>Why can't a CDI bean be <code>final</code>?</strong> Because the container injects a client proxy that subclasses the bean to do scope resolution and interception, and you cannot subclass a <code>final</code> class. The same proxying is why beans need a no-arg constructor.</p>
-<p><strong>What is the N+1 problem and how do you fix it?</strong> You load a list, then touch a lazy association per element, triggering one query per row on top of the original. Fix it with a <code>join fetch</code> or an entity graph that loads the association in the first query; do not make everything <code>EAGER</code>, which reintroduces N+1 globally.</p>
-<p><strong>Why does <code>@Transactional</code> sometimes not start a transaction?</strong> Self-invocation: when a method calls another <code>@Transactional</code> method on <code>this</code>, the call bypasses the proxy that applies the transaction interceptor, so no new transaction starts. Cross-bean calls go through the proxy and work; same-bean calls silently do not.</p>
-<p><strong>TomEE versus plain Tomcat?</strong> Plain Tomcat is a servlet container (Servlets, JSP, WebSocket). TomEE adds the Jakarta EE Web Profile on top: CDI, JPA, JAX-RS, JTA, and JMS, so you get container-managed transactions and datasources on Tomcat's small, fast base without assembling a framework yourself.</p>
-<p><strong>What breaks when you move work off the request thread?</strong> Everything thread-bound: the security principal, the JTA transaction, the CDI request scope, and the SLF4J MDC correlation ID all live in <code>ThreadLocal</code> and do not follow the work to another thread. You either propagate context explicitly or accept null principals, broken request-scoped lookups, and logs that lose their request ID.</p>
-<p><strong>How do virtual threads change the application-server model?</strong> A blocking call on a virtual thread parks the virtual thread and frees its carrier OS thread, so the readable thread-per-request style scales to high concurrency without the ~200-thread pool ceiling. The catch is pinning: inside a <code>synchronized</code> block or a native call the virtual thread pins its carrier, so a hot <code>synchronized</code> path negates the benefit and should become a <code>ReentrantLock</code>.</p>
-<p><strong>What is the difference between non-blocking I/O and a non-blocking algorithm?</strong> Non-blocking I/O is about throughput: one thread multiplexes many connections through a selector so it never parks waiting on a socket. A non-blocking algorithm is about coordination: threads cooperate through compare-and-swap retry loops instead of locks, so no thread can block the others. Same adjective, unrelated problems.</p>
-<p><strong>What is the ABA problem?</strong> A compare-and-swap checks the current value, not its history, so if another thread changes a slot from A to B and back to A, your CAS succeeds even though the world moved underneath you. It is harmless for a counter but corrupts pointer-based lock-free structures; the fix is to version the reference with <code>AtomicStampedReference</code> so the stamp, not just the value, must match.</p>
+<p>These are the questions that recur for this stack, in the shape interviewers grade: the question, what they are really testing, the concise answer, then the catch. Answer in a sentence or two, lead with the mechanism, finish with the tradeoff.</p>
+<p><strong>What actually changed between Java EE and Jakarta EE?</strong> <em>Testing whether your knowledge is post-2020 and post-Oracle, not stale.</em> Governance moved from Oracle to the Eclipse Foundation, and because Oracle kept the <code>javax</code> trademark, Jakarta EE 9 renamed every API package from <code>javax.*</code> to <code>jakarta.*</code>. That namespace switch is a hard, compile-breaking change, so any code or tutorial using <code>javax.servlet</code> or <code>javax.persistence</code> predates 2020.</p>
+<p><strong>When would you choose an application server over Spring Boot or a cloud-native framework?</strong> <em>Testing whether you pick architecture by tradeoff, not by fashion.</em> When you have an existing EE estate and team fluency, a hard requirement for standards portability across vendors, or container-managed JTA spanning multiple datasources that you would otherwise hand-roll. Reach for Quarkus or Micronaut instead when startup time and memory footprint are first-class concerns, because a classic server's multi-second startup and large memory floor are liabilities under serverless or aggressive autoscaling.</p>
+<p><strong>Explain CDI scopes.</strong> <em>Testing whether you understand the proxy that makes injection across scopes work.</em> <code>@ApplicationScoped</code> is one instance for the whole app (the default for stateless services), <code>@RequestScoped</code> is one per HTTP request, <code>@SessionScoped</code> is one per user session and must be <code>Serializable</code>, and <code>@Dependent</code> binds the bean's life to whatever injected it. The subtlety is that injecting a narrower scope into a wider one works only because CDI injects a client proxy that resolves the real instance per call.</p>
+<p><strong>Why can't a CDI bean be <code>final</code>?</strong> <em>Testing whether you know injection is proxy-based, not magic.</em> Because the container injects a client proxy that subclasses the bean to do scope resolution and interception, and you cannot subclass a <code>final</code> class. The same proxying is why beans need a no-arg constructor.</p>
+<p><strong>What is the N+1 problem and how do you fix it?</strong> <em>Testing whether you can spot the most common ORM performance bug.</em> You load a list, then touch a lazy association per element, triggering one query per row on top of the original. Fix it with a <code>join fetch</code> or an entity graph that loads the association in the first query; do not make everything <code>EAGER</code>, which reintroduces N+1 globally.</p>
+<p><strong>Why does <code>@Transactional</code> sometimes not start a transaction?</strong> <em>Testing whether you understand interceptors run through proxies.</em> Self-invocation: when a method calls another <code>@Transactional</code> method on <code>this</code>, the call bypasses the proxy that applies the transaction interceptor, so no new transaction starts. Cross-bean calls go through the proxy and work; same-bean calls silently do not.</p>
+<p><strong>TomEE versus plain Tomcat?</strong> <em>Testing whether you know what the EE Web Profile actually adds.</em> Plain Tomcat is a servlet container (Servlets, JSP, WebSocket). TomEE adds the Jakarta EE Web Profile on top: CDI, JPA, JAX-RS, JTA, and JMS, so you get container-managed transactions and datasources on Tomcat's small, fast base without assembling a framework yourself.</p>
+<p><strong>What breaks when you move work off the request thread?</strong> <em>Testing whether you have actually debugged async context loss.</em> Everything thread-bound: the security principal, the JTA transaction, the CDI request scope, and the SLF4J MDC correlation ID all live in <code>ThreadLocal</code> and do not follow the work to another thread. You either propagate context explicitly or accept null principals, broken request-scoped lookups, and logs that lose their request ID.</p>
+<p><strong>How do virtual threads change the application-server model?</strong> <em>Testing whether you are current and know the pinning catch.</em> A blocking call on a virtual thread parks the virtual thread and frees its carrier OS thread, so the readable thread-per-request style scales to high concurrency without the ~200-thread pool ceiling. The catch is pinning: inside a <code>synchronized</code> block or a native call the virtual thread pins its carrier, so a hot <code>synchronized</code> path negates the benefit and should become a <code>ReentrantLock</code>.</p>
+<p><strong>What is the difference between non-blocking I/O and a non-blocking algorithm?</strong> <em>Testing whether you can separate two ideas that share a name.</em> Non-blocking I/O is about throughput: one thread multiplexes many connections through a selector so it never parks waiting on a socket. A non-blocking algorithm is about coordination: threads cooperate through compare-and-swap retry loops instead of locks, so no thread can block the others. Same adjective, unrelated problems.</p>
+<p><strong>What is the ABA problem?</strong> <em>Testing the depth of your lock-free understanding, a senior-only probe.</em> A compare-and-swap checks the current value, not its history, so if another thread changes a slot from A to B and back to A, your CAS succeeds even though the world moved underneath you. It is harmless for a counter but corrupts pointer-based lock-free structures; the fix is to version the reference with <code>AtomicStampedReference</code> so the stamp, not just the value, must match.</p>
+<hr>
+<h2>In the room: framing this at the interview</h2>
+<p>What an interviewer is really probing with a Jakarta EE or TomEE candidate is not whether you can recite annotations; it is whether you understand the application-server model as a deliberate tradeoff and can say honestly when it stops paying off. Lead every answer with the mechanism, then name the catch, because the catch is where seniority shows. The three reframes that consistently land: the platform is a set of specifications with swappable vendor implementations (so &quot;portability&quot; is the point); almost everything is proxy-based (CDI scopes, <code>@Transactional</code>, why beans cannot be <code>final</code>), so the surprises all trace to the proxy; and the thread is a unit of context, so any async handoff loses the security, transaction, scope, and logging context bound to it.</p>
+<p>When asked to compare with Spring Boot or the cloud-native JVM stacks, do not get defensive about the older platform: frame it by lifecycle. Existing EE estate, standards portability, or container-managed JTA across datasources favor the app server; startup time, memory density, and scale-to-zero favor Quarkus or Micronaut. Bring numbers (a multi-second startup, a few-hundred-megabyte floor) so the comparison is concrete, and close by noting that Java 21+ virtual threads let this stack reclaim high-concurrency I/O without a reactive rewrite, which is the modern through-line that signals you are current rather than maintaining a legacy mental model.</p>
 
   </main>
 </div>
