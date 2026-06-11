@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Modules, Bundlers, and npm Dependencies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #7a5500;
+  --accent-soft:  #7a550014;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Frontend Engineer</div>
+    <h1>Modules, Bundlers, and npm Dependencies</h1>
+    <div class="sub">The module-and-build-ecosystem cluster from the live round: CommonJS versus ES Modules and tree-shaking, how Vite achieves its speed, and when to use runtime, dev, and peer dependencies.</div>
+  </header>
+  <main>
+<h2>How this fits</h2>
+<p>These three topics came up together for a reason: they are the module-and-build-ecosystem cluster, and they connect in a chain. The module format you write (CommonJS or ES Modules) determines whether a bundler can tree-shake your code. The bundler (Vite, and the Rust engine inside it) is what does that shaking and turns your modules into what ships. And npm dependency types are the packaging side of the same story, deciding what travels with your code and what the host provides. Understanding the chain, not just the three facts, is what reads as senior.</p>
+<p>A note on freshness: this is the fastest-moving corner of the frontend stack, and the bundler story in particular changed in early 2026. Verify the current state close to any interview, since the specifics here will keep shifting.</p>
+<hr>
+<h2>1. CommonJS versus ES Modules, and which one tree-shakes</h2>
+<p><strong>What they are.</strong> CommonJS (CJS) is Node's original module system: <code>require()</code> to import, <code>module.exports</code> to export. ES Modules (ESM) is the standardized system built into the language and the browser: <code>import</code> and <code>export</code>. Both load code from other files; the difference is when and how.</p>
+<p><strong>The mechanism, which is the whole answer.</strong> CommonJS is dynamic and synchronous. <code>require()</code> is an ordinary function call that can sit inside an <code>if</code>, take a computed path, or run anywhere in the file, and the exported shape is decided at runtime. ES Modules are static and asynchronous. Imports and exports must be top-level and are fixed at parse time, so a tool can read the source and know exactly what each module imports and exports without running it. Dynamic <code>import()</code> exists for the cases where you genuinely need runtime loading, but the static form is the default.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// CommonJS: dynamic, resolved at runtime</span>
+<span class="hljs-keyword">const</span> { debounce } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;lodash&#x27;</span>)
+<span class="hljs-keyword">if</span> (condition) { <span class="hljs-keyword">const</span> x = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./maybe&#x27;</span>) }   <span class="hljs-comment">// legal: require is just a call</span>
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = { foo }
+
+<span class="hljs-comment">// ES Modules: static, analyzable before running</span>
+<span class="hljs-keyword">import</span> { debounce } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;lodash-es&#x27;</span>
+<span class="hljs-keyword">export</span> { foo }
+<span class="hljs-comment">// import must be top-level; the shape is known at parse time</span>
+</code></pre>
+<p><strong>Why this decides tree-shaking.</strong> Tree-shaking is dead-code elimination: a bundler dropping exports nobody imports. It works only when the bundler can prove an export is unused, and that proof requires static structure. ESM provides it, so a bundler can see that you imported <code>used</code> and never <code>unused</code>, and remove the dead one. CommonJS defeats it, because <code>require</code> is dynamic and the exports object is assembled at runtime, so the bundler cannot safely prove any part is unreachable and generally keeps the whole module.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// utils.js (ESM)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">used</span>(<span class="hljs-params"></span>) { <span class="hljs-comment">/* ... */</span> }
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">unused</span>(<span class="hljs-params"></span>) { <span class="hljs-comment">/* large, imported nowhere */</span> }
+
+<span class="hljs-comment">// app.js</span>
+<span class="hljs-keyword">import</span> { used } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./utils.js&#x27;</span>
+<span class="hljs-comment">// A bundler can prove `unused` is dead and drop it from the output.</span>
+<span class="hljs-comment">// The CommonJS equivalent (module.exports = { used, unused }) usually ships</span>
+<span class="hljs-comment">// both, because require() is dynamic and the module&#x27;s shape is a runtime value.</span>
+</code></pre>
+<p>So the direct answer to &quot;which is more efficient for tree-shaking&quot; is ES Modules, decisively, because static imports allow static analysis and dead-code elimination, while CommonJS's dynamic nature does not. The practical levers that follow: prefer the ESM build of a library when one exists (<code>lodash-es</code> over <code>lodash</code>), use named imports rather than importing a whole namespace, and mark a package <code>&quot;sideEffects&quot;: false</code> in <code>package.json</code> so the bundler knows it can drop unused modules without breaking implicit setup code.</p>
+<p><strong>The catch worth knowing.</strong> Two more differences come up. ESM has live bindings while CommonJS copies values. An imported ESM binding is a live read-only view of the exporter's variable, so if the exporter mutates it, importers see the new value; a destructured <code>require</code> captures a snapshot at import time and never updates.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// counter.js (ESM)</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">let</span> count = <span class="hljs-number">0</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">inc</span>(<span class="hljs-params"></span>) { count++ }
+
+<span class="hljs-comment">// app.js</span>
+<span class="hljs-keyword">import</span> { count, inc } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./counter.js&#x27;</span>
+<span class="hljs-title function_">inc</span>()
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(count)   <span class="hljs-comment">// 1, ESM bindings are live</span>
+<span class="hljs-comment">// const { count, inc } = require(&#x27;./counter&#x27;) would log 0: a value snapshot</span>
+</code></pre>
+<p>And interop has sharp edges: ESM can import a CommonJS module (as a default import), but CommonJS cannot statically <code>require</code> an ESM module and must use dynamic <code>import()</code>. Node selects the mode by file extension (<code>.mjs</code> is ESM, <code>.cjs</code> is CommonJS) or the <code>&quot;type&quot;</code> field in <code>package.json</code>. Top-level <code>await</code> and <code>import.meta.url</code> are ESM only; <code>__dirname</code> and <code>__filename</code> are CommonJS only.</p>
+<hr>
+<h2>2. How Vite works, and why it is fast</h2>
+<p>The precise answer separates two things people conflate: the development server feeling instant and the production build being fast are different mechanisms.</p>
+<p><strong>Why the dev server is instant: it does not bundle.</strong> Traditional bundlers build the entire module graph before they can serve anything, so startup time grows with the size of the app. Vite does the opposite in development. It serves your source files over native ES Modules and lets the browser request them, transforming each file (TypeScript, JSX, a Vue SFC) on demand only when the browser actually asks for it. There is no upfront bundle, so the dev server starts in roughly constant time no matter how large the project is, and hot module replacement is precise because only the edited module is invalidated rather than a chunk rebuilt.</p>
+<p><strong>Dependency pre-bundling.</strong> There is one thing Vite does bundle in development: your <code>node_modules</code> dependencies, once, cached on disk. This exists for two reasons. First, many packages still ship CommonJS or have hundreds of internal files, and the pre-bundle converts them to ESM and collapses them into a few files, so importing one library does not trigger hundreds of separate browser requests. Second, it is a one-time cost the dev server then reuses.</p>
+<p><strong>Why builds are fast: a Rust-native bundler.</strong> For production you do want bundling, because shipping hundreds of separate module requests to real users is slow, and you want tree-shaking, minification, and code-splitting. The speed of that build comes from the bundler being written in a native language rather than JavaScript. The current state, as of Vite 8 in March 2026, is a single Rust bundler called Rolldown (built by VoidZero, the team behind Vite and Vue, using the Oxc compiler) that handles both the dev transforms and the production build, reported at 10 to 30 times faster than the previous production bundler.</p>
+<pre><code class="hljs" data-lang="text">Before Vite 8 (versions 2 to 7): two bundlers
+  development  -&gt;  esbuild   (native speed, dev transforms and pre-bundling)
+  production   -&gt;  Rollup    (JavaScript, mature, flexible, slower)
+
+Vite 8 (March 2026): one unified Rust bundler
+  development and production  -&gt;  Rolldown (+ Oxc compiler)
+  faster builds, and no more &quot;works in dev, breaks in prod&quot; from two pipelines
+</code></pre>
+<p>So the full answer to &quot;why is Vite fast at building bundles&quot; is two-part. In development it is fast because it does not build a bundle at all, serving native ES Modules and transforming on demand, with dependencies pre-bundled once by a native tool. In production it is fast because the bundling is done by a Rust-native engine rather than JavaScript. The staff-level version of this answer names that distinction rather than waving at &quot;Vite is fast,&quot; and notes that the dual-to-single bundler shift in Vite 8 also removed a class of dev-versus-production inconsistency bugs. The exact engine has changed more than once, so confirm the current one before you cite it.</p>
+<hr>
+<h2>3. npm dependencies: runtime, dev, and peer</h2>
+<p>The three buckets answer one question each: who needs this package, and when.</p>
+<p><strong><code>dependencies</code>: needed at runtime.</strong> Packages your shipped code actually imports and runs, such as <code>vue</code>, <code>pinia</code>, or <code>axios</code>. When someone installs your package, these install with it transitively, because the code does not work without them.</p>
+<p><strong><code>devDependencies</code>: needed only to build, test, or develop.</strong> Tooling that never runs in production, such as <code>vite</code>, <code>vitest</code>, <code>typescript</code>, <code>eslint</code>, and the <code>@types/*</code> packages. These are skipped by a production install (<code>npm install --omit=dev</code>) and, importantly, are not installed for someone who consumes your package as a dependency, because they only need your built output, not your toolchain.</p>
+<p><strong><code>peerDependencies</code>: provided by the host.</strong> A package you expect the consuming project to already have, so you use its single shared instance instead of bundling your own copy. This is for libraries and plugins: a Vue component library declares <code>vue</code> as a peer, a Vite plugin declares <code>vite</code> as a peer. The consumer supplies it.</p>
+<p><strong>When to use which.</strong> For an application, the rule is simple: anything the running app imports goes in <code>dependencies</code>, anything that only builds or tests it goes in <code>devDependencies</code>, and you rarely need peers at all.</p>
+<pre><code class="hljs" data-lang="json"><span class="hljs-comment">// an application&#x27;s package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;vue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^3.5.0&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;pinia&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^2.2.0&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;axios&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^1.7.0&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;vite&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^8.0.0&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;vitest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^2.0.0&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;typescript&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^5.6.0&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;eslint&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^9.0.0&quot;</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>For a library, the framework it plugs into goes in <code>peerDependencies</code>, usually paired with the same package in <code>devDependencies</code> so you can build and test against it locally, while small helpers it genuinely owns and ships go in <code>dependencies</code>.</p>
+<pre><code class="hljs" data-lang="json"><span class="hljs-comment">// a Vue component library&#x27;s package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;peerDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;vue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^3.5.0&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;vue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^3.5.0&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;vite&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^8.0.0&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;vitest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^2.0.0&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;@floating-ui/vue&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^1.0.0&quot;</span> <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p><strong>The catch, which is the staff-level and design-system-relevant part.</strong> Putting the framework in a library's <code>dependencies</code> instead of <code>peerDependencies</code> is a classic bug. Each consumer can then end up with its own copy of Vue alongside the app's copy, and two Vue instances break everything that relies on a single shared runtime: reactivity across the boundary, <code>provide</code> and <code>inject</code>, and the active component instance. The symptom is baffling, the cause is the dependency type, and the fix is making the framework a peer so the library uses the application's instance. This is precisely the kind of mechanism-level answer that survives probing, and it maps directly to a multi-brand design system where one shared framework instance across many consuming apps is non-negotiable.</p>
+<p>A practical aside on why the runtime-versus-dev split matters beyond tidiness: a smaller <code>dependencies</code> set means a smaller production install, a faster and more reproducible CI, and a smaller supply-chain attack surface, since every production dependency is code you ship and must trust.</p>
+<hr>
+<h2>4. How to answer these in the room</h2>
+<p>All three reward the same move: give the mechanism, not the label. For modules, do not stop at &quot;ESM is newer,&quot; explain that its static structure is what enables tree-shaking and that CommonJS's dynamic <code>require</code> is what prevents it. For Vite, do not stop at &quot;it is fast,&quot; separate the no-bundle dev server from the Rust-native production bundler and name the tradeoff each makes. For dependencies, do not stop at &quot;dev versus runtime,&quot; reach the peer-dependency case and the duplicate-instance bug it prevents, because that is the answer that shows you have actually shipped a library, not just installed one.</p>
+<p>Each of these also connects to a decision elsewhere in the stack: ESM is why your bundle is small, the Rust bundler is why your build budget holds, and peer dependencies are why a shared design system stays a single instance across apps. Drawing those connections is the difference between reciting three facts and showing you understand the system they belong to.</p>
+
+  </main>
+</div>
+</body>
+</html>
