@@ -428,6 +428,21 @@ td code { font-size: .84em; }
   }
 }
 </code></pre>
+<p><strong>Implement a worker pool (bounded concurrency).</strong> You have more items than you can process simultaneously: open sockets, API rate limits, DB connections. <code>Promise.all(items.map(fn))</code> fires everything at once and blows the limit; <code>for...of</code> with <code>await</code> is serial and wastes idle capacity. A worker pool sits in between: spawn N coroutines that share a cursor and each grab the next item after their previous <code>await</code> resolves. The pattern only helps I/O-bound work — for CPU-bound computation you need <code>worker_threads</code>.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">workerPool</span>(<span class="hljs-params">limit, items, fn</span>) {
+  <span class="hljs-keyword">const</span> results = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Array</span>(items.<span class="hljs-property">length</span>)
+  <span class="hljs-keyword">let</span> cursor = <span class="hljs-number">0</span>
+  <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">worker</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">while</span> (cursor &lt; items.<span class="hljs-property">length</span>) {
+      <span class="hljs-keyword">const</span> i = cursor++          <span class="hljs-comment">// safe: JS is single-threaded, no race</span>
+      results[i] = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fn</span>(items[i], i)
+    }
+  }
+  <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">all</span>(<span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>({ <span class="hljs-attr">length</span>: <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">min</span>(limit, items.<span class="hljs-property">length</span>) }, worker))
+  <span class="hljs-keyword">return</span> results
+}
+</code></pre>
+<p>Key points to land: <code>cursor++</code> is atomic because only one coroutine runs at a time; results preserve input order regardless of completion order; workers self-throttle because a worker can only grab the next item after its <code>await</code> resolves; rejected jobs must also release their slot or the pool stalls. Common mistakes: polling with <code>while (active &gt;= limit) await sleep(10)</code> — the <code>await</code> itself is the gate; unbounded <code>Promise.all</code>; and forgetting to attach <code>.catch()</code> before storing a promise in a variable, which Node flags as an unhandled rejection in that gap.</p>
 <p><strong>Build a typeahead search that cancels stale requests.</strong> This is the highest-value frontend coding task because it hides a real bug: a slow earlier response arriving after a newer one and overwriting it. <code>AbortController</code> cancels the in-flight request on each new keystroke, which fixes both the waste and the out-of-order overwrite.</p>
 <pre><code class="hljs" data-lang="js"><span class="hljs-keyword">let</span> controller
 <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">search</span>(<span class="hljs-params">query</span>) {

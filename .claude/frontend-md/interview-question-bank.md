@@ -162,6 +162,25 @@ async function retry(fn, { retries = 3, base = 200 } = {}) {
 }
 ```
 
+**Implement a worker pool (bounded concurrency).** You have more items than you can process simultaneously: open sockets, API rate limits, DB connections. `Promise.all(items.map(fn))` fires everything at once and blows the limit; `for...of` with `await` is serial and wastes idle capacity. A worker pool sits in between: spawn N coroutines that share a cursor and each grab the next item after their previous `await` resolves. The pattern only helps I/O-bound work — for CPU-bound computation you need `worker_threads`.
+
+```js
+async function workerPool(limit, items, fn) {
+  const results = new Array(items.length)
+  let cursor = 0
+  async function worker() {
+    while (cursor < items.length) {
+      const i = cursor++          // safe: JS is single-threaded, no race
+      results[i] = await fn(items[i], i)
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker))
+  return results
+}
+```
+
+Key points to land: `cursor++` is atomic because only one coroutine runs at a time; results preserve input order regardless of completion order; workers self-throttle because a worker can only grab the next item after its `await` resolves; rejected jobs must also release their slot or the pool stalls. Common mistakes: polling with `while (active >= limit) await sleep(10)` — the `await` itself is the gate; unbounded `Promise.all`; and forgetting to attach `.catch()` before storing a promise in a variable, which Node flags as an unhandled rejection in that gap.
+
 **Build a typeahead search that cancels stale requests.** This is the highest-value frontend coding task because it hides a real bug: a slow earlier response arriving after a newer one and overwriting it. `AbortController` cancels the in-flight request on each new keystroke, which fixes both the waste and the out-of-order overwrite.
 
 ```js
