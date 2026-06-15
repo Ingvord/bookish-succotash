@@ -57,7 +57,7 @@ const GUIDES = [
     out:      'backend/scaling-foundations-prep.html',
     kicker:   'Interview Preparation · Staff Backend',
     title:    'Scaling Foundations',
-    subtitle: 'Load balancing, caching, security, and authentication for distributed systems: the shared reliability vocabulary (RPS, nines, percentiles) every backend round assumes.',
+    subtitle: 'Load balancing, real-time transport (polling, SSE, WebSockets), caching, security, and authentication: the shared reliability vocabulary (RPS, nines, percentiles) every backend round assumes.',
     accent:   '#7a5500',  // amber
   },
 

@@ -295,7 +295,7 @@ td code { font-size: .84em; }
   <header class="doc-header">
     <div class="kicker">Interview Preparation · Staff Backend</div>
     <h1>Scaling Foundations</h1>
-    <div class="sub">Load balancing, caching, security, and authentication for distributed systems: the shared reliability vocabulary (RPS, nines, percentiles) every backend round assumes.</div>
+    <div class="sub">Load balancing, real-time transport (polling, SSE, WebSockets), caching, security, and authentication: the shared reliability vocabulary (RPS, nines, percentiles) every backend round assumes.</div>
   </header>
   <main>
 <h2>How to use this guide</h2>
@@ -337,6 +337,67 @@ td code { font-size: .84em; }
 </table>
 <p>Two operational pieces complete the picture. Health checks let the balancer stop routing to a sick instance: an active check periodically probes a <code>/health</code> endpoint and ejects failing nodes, which is what actually delivers availability, since a balancer that keeps sending traffic to a dead node provides no redundancy. Distinguish liveness (is the process up) from readiness (is it ready to serve, with warm caches and live dependencies), and only route to ready instances. Sticky sessions (session affinity) pin a user to one instance, usually via a cookie; treat them as a smell, because they undermine even balancing and make a node's failure lose those users' state. The better design is stateless instances with shared session state in Redis, so any instance can serve any request and you can roll deploys freely.</p>
 <p>TLS termination is the last decision: terminate at the load balancer (simplest, lets the LB inspect and route on L7, but traffic is plaintext inside the network) or re-encrypt to the backend (mTLS for zero-trust internal networks). State where you terminate and why, because it determines what the balancer can see and what your internal threat model assumes.</p>
+<hr>
+<h2>Real-time transport: polling, long polling, SSE, and WebSockets</h2>
+<p>When a client needs data that changes on the server, you have four transport options that differ in how the connection is managed, which direction data flows, and how much operational weight they carry.</p>
+<p><strong>Short polling</strong> is the baseline: the client sends a request on a fixed interval (every second, every five seconds) and the server responds immediately with whatever is current. It is simple, works behind every proxy and CDN, and requires no persistent connection. The catch is waste at scale: most responses carry no new data, and the update latency is bounded by the polling interval, not by how often data actually changes. Ten thousand clients polling every second is ten thousand requests per second of mostly empty work.</p>
+<p><strong>Long polling</strong> removes most of that waste. The client sends a request and the server holds it open until data arrives or a timeout fires (typically 20 to 30 seconds), then responds and the client immediately re-requests. Latency drops to near-zero once the server has data, and the request rate collapses to roughly one per event per client. It is still plain HTTP so it passes through every proxy unchanged. The catch is that each waiting client holds a connection and a server-side resource (a thread, a file descriptor, or a coroutine). On a synchronous server model this ties up thread-pool slots; on an async model (Node, Python asyncio, Vert.x) the cost is low. The second catch is the reconnect gap: if the server restarts or the network hiccups between the response and the client's next request, events in that window are lost unless you track a cursor and replay from it.</p>
+<p><strong>Server-Sent Events (SSE)</strong> keep the one-way server-to-client stream open for the lifetime of the page. After the initial HTTP request the server sends <code>Content-Type: text/event-stream</code> and continues writing events onto the response indefinitely. The browser's <code>EventSource</code> API handles reconnection automatically and sends <code>Last-Event-ID</code> on reconnect so the server can replay missed events. SSE is the right default for anything that only pushes from server to client: live dashboards, price feeds, notification streams, job-progress updates. It is standard HTTP so proxies understand it; it multiplexes over HTTP/2 without the six-connections-per-origin limit that can bite HTTP/1.1 setups; and it carries no client-to-server channel to manage.</p>
+<pre><code class="hljs" data-lang="text">Client                         Server
+  |------ GET /events -------&gt;|
+  |                           |  (holds response open)
+  |&lt;-- data: price=101\n\n --|
+  |&lt;-- data: price=102\n\n --|
+  |       ... stream ...      |
+  |  (network drop)           |
+  |------ GET /events -------&gt;|  Last-Event-ID: 102
+  |&lt;-- data: price=103\n\n --|   (server replays from 102)
+</code></pre>
+<p>The catch: SSE is one direction only. If the client ever needs to send data it must open a separate HTTP request. Buffering proxies and misconfigured Nginx setups are a common operational headache because a proxy that buffers responses holds events in memory instead of streaming them to the client; the fix is <code>X-Accel-Buffering: no</code> or equivalent.</p>
+<p><strong>WebSockets</strong> upgrade a plain HTTP connection to a full-duplex, persistent binary channel. After the <code>Upgrade: websocket</code> handshake, both sides push frames at any time with 2 to 14 bytes of framing overhead per message. WebSockets are the right choice when the client genuinely needs to send a high-frequency stream: live collaborative editing, multiplayer games, trading order entry, chat with typing indicators.</p>
+<p>The catch is operational weight. A WebSocket connection is stateful and long-lived, which breaks naive round-robin load balancing: reconnection after a backend restart is the client's responsibility (no standard protocol exists), and delivering server-side events to any connected client regardless of which instance holds the socket usually requires a pub/sub fan-out layer (Redis Pub/Sub or Streams) so any backend can push to any client. There is no built-in backpressure: a slow client can buffer unbounded frames and you build the shed-load logic yourself. L7 proxies need explicit WebSocket support (Nginx <code>proxy_read_timeout</code>, sticky routing or stateless fan-out). The total operational surface is significantly larger than SSE.</p>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Direction</th>
+<th>Connection</th>
+<th>Built-in reconnect</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Short polling</td>
+<td>Client pulls</td>
+<td>Per-request</td>
+<td>Automatic</td>
+<td>Simple, infrequent updates, widest compat</td>
+</tr>
+<tr>
+<td>Long polling</td>
+<td>Server pushes</td>
+<td>Per-event burst</td>
+<td>Manual with cursor</td>
+<td>Broad proxy compat, moderate frequency</td>
+</tr>
+<tr>
+<td>SSE</td>
+<td>Server to client</td>
+<td>Persistent HTTP</td>
+<td>Yes (<code>Last-Event-ID</code>)</td>
+<td>Feeds, notifications, dashboards</td>
+</tr>
+<tr>
+<td>WebSockets</td>
+<td>Full duplex</td>
+<td>Persistent WS</td>
+<td>No (build it)</td>
+<td>Chat, collaboration, bidirectional streams</td>
+</tr>
+</tbody>
+</table>
+<p>The selection rule: pick the lightest option that meets the need. SSE is the under-used middle ground. Most &quot;we need real time&quot; requirements are unidirectional (server pushes state to client) and SSE covers them with far less operational cost than WebSockets. Reach for WebSockets only when the client needs to send a continuous stream, not just occasional HTTP requests alongside a server-push channel.</p>
 <hr>
 <h2>Caching: the layers and the hard parts</h2>
 <p>Caching trades freshness for speed and load reduction by keeping a copy of expensive-to-produce data close to where it is needed. The senior framing is to name the layers, because caching is not one thing: the browser cache (client-side, controlled by HTTP headers), the CDN (edge cache for static and cacheable responses near the user), the application cache (an in-process or shared cache like Redis for computed results and hot rows), and the database's own buffer cache. Each layer absorbs load the layers below it never see; a request served from CDN never touches your origin at all.</p>
@@ -461,6 +522,7 @@ cur.execute(<span class="hljs-string">&quot;SELECT * FROM orders WHERE id = %s&q
 <p>This is the cross-cutting material every backend round assumes, so expect rapid-fire questions. Answer with the mechanism, then the trade-off.</p>
 <p><strong>L4 versus L7 load balancing?</strong> An L4 balancer forwards TCP/UDP by IP and port without reading the payload, so it is fast and protocol-agnostic but cannot route on HTTP details. An L7 balancer terminates the connection and reads the request, so it can route on path, header, host, or cookie, at more cost per request. Most application traffic uses L7; L4 is for raw throughput, non-HTTP protocols, or TLS pass-through.</p>
 <p><strong>Which load-balancing algorithm when?</strong> Round-robin for uniform instances and cheap uniform requests; least-connections when request durations vary widely, so long requests do not pile onto a busy node; weighted for heterogeneous instance sizes; consistent hashing when you need cache locality or sticky routing, because adding or removing a node remaps only a small fraction of keys instead of reshuffling everything.</p>
+<p><strong>Long polling versus SSE versus WebSockets?</strong> Long polling holds each HTTP request open until the server has data, then immediately re-requests; it reduces the empty-response waste of short polling while remaining plain HTTP compatible with every proxy. SSE keeps a single persistent HTTP response open and streams events one-way from server to client, with built-in <code>EventSource</code> reconnection and <code>Last-Event-ID</code> replay; it is the right default for feeds, notifications, and dashboards. WebSockets upgrade to a full-duplex persistent binary channel for bidirectional low-latency streaming (chat, live collaboration, order entry), but carry significantly more operational weight: stateful connections complicate load balancing, there is no built-in reconnect or backpressure protocol, and a pub/sub fan-out layer (Redis) is usually needed so any backend instance can reach any connected client. The selection rule: pick the lightest option that meets the need; SSE handles most &quot;server pushes to client&quot; cases with far less cost than WebSockets.</p>
 <p><strong>Sessions versus JWT?</strong> A server-side session stores state and hands the client an opaque ID, so it is trivially revocable but needs shared session storage to scale horizontally. A JWT is self-contained and signed, so the server validates it without a lookup and scales statelessly, but it is hard to revoke before it expires. The trade-off is revocability and easy invalidation versus stateless scaling.</p>
 <p><strong>How do you revoke a JWT before it expires?</strong> You largely cannot revoke the token itself, so you use short-lived access tokens (minutes) plus a long-lived, server-side-revocable refresh token: a leaked access token is useless quickly, and revoking the refresh token stops new ones being issued. Note a JWT is signed, not encrypted, so never put secrets in its claims.</p>
 <p><strong>OAuth2 versus OIDC?</strong> OAuth2 is an authorization framework for granting a third party scoped access without sharing a password. OpenID Connect is a thin identity layer on top of OAuth2 that adds an ID token, turning it into authentication (&quot;log in with Google&quot;). The flow to know is Authorization Code with PKCE, now recommended for web and mobile.</p>
