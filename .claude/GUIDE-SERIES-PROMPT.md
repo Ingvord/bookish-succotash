@@ -273,6 +273,43 @@ cite. Seed nothing from memory that could have changed since your training cutof
 If only a domain is named with no specific guide, propose the four-to-six guide
 set first and build on confirmation. If a single guide is named, build it directly.
 
+### Single-language deep-dive guides
+
+When the request is a deep dive on one language (for example "a TypeScript guide",
+"a Rust guide", "a Go guide"), follow the Language Deep-Dive Blueprint, which
+defines the content categories such a guide covers and how each shifts by language
+family. If that companion file is provided, use it in full. If it is not, apply its
+categories from this condensed checklist, which is language-agnostic; allocate the
+depth budget to the categories that are load-bearing for the language's family
+(ownership for systems languages, the type system for gradually typed ones, the
+concurrency model and GC for managed ones, and so on), and verify the current
+version, edition, and toolchain by searching before writing anything version-specific:
+
+```text
+A  Execution and mental model      how the language actually runs (open here)
+B  Type system                     static/dynamic, structural/nominal, inference, generics, nullability
+C  Memory and resource management  GC vs ownership vs manual; value/reference; the cleanup idiom
+D  Error handling                  exceptions vs result types vs error values; propagation ergonomics
+E  Concurrency and async           primitives, the memory/visibility model, the classic bugs
+F  Core language features          idiomatic features, each as a snippet plus what-why-catch
+G  Patterns to implement           4 to 7 idiomatic ones (worker pool over a stream, retry, LRU,
+                                    rate limiter, iterator pipeline, resource guard), each with its anti-pattern
+H  Standard library and ecosystem  the batteries and the de-facto libraries, curated
+I  Tooling lifecycle               deps, project structure, local dev, build model, testing, CI/CD, profiling
+J  Performance and tradeoffs       the cost model and "when to choose this language, when not"
+K  Security and safety pitfalls    the language-specific footguns plus supply chain
+L  Interop and boundaries          FFI, embedding, WASM (include only where it is real)
+M  Versioning and what is current  editions, recent changes, faded vs evergreen (verify by search)
+N  Gotchas and predict-the-output  small programs that test the mechanism, with worked answers
+O  Meta closer                     give the mechanism, name the tradeoff, connect to the failure mode
+```
+
+The flagship of category G is a bounded-concurrency worker pool over a stream or
+cursor, because the same problem looks completely different and completely
+idiomatic in each language, which exposes the concurrency model directly. Confirm
+whether the guide is for interview preparation (the default) or learning, since
+the same blueprint emphasizes different categories for each.
+
 ### Code fence language tags
 
 Tag every fenced block with the language so it highlights; use whatever fits the
