@@ -182,6 +182,54 @@ h1 {
   line-height: 1.55;
 }
 
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
 /* ---------- headings ---------- */
 h2 {
   font-family: "Fraunces", Georgia, serif;
@@ -286,6 +334,7 @@ td code { font-size: .84em; }
   pre, table { break-inside: auto; }
   tr { break-inside: avoid; }
   h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
 }
 
 </style>
@@ -296,6 +345,7 @@ td code { font-size: .84em; }
     <div class="kicker">Interview Preparation · Staff Backend</div>
     <h1>Node.js Backend: Express & NestJS</h1>
     <div class="sub">The event loop as a throughput budget: middleware, dependency injection, graceful shutdown, and the latency metrics that separate senior from staff.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
   </header>
   <main>
 <h2>The event loop is your throughput budget</h2>
@@ -507,6 +557,12 @@ process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&
 <p>On framework choice, refuse the &quot;which is better&quot; framing and answer by lifecycle and team: Express (or Fastify for raw throughput) for small services and single owners, NestJS for larger teams that need its imposed structure. Show currency by knowing the present state (Express 5 is the npm default and forwards async rejections, NestJS 11 runs on it, Node 24 is the Active LTS in 2026) and rigor by insisting that observability include the loop, since a service graphing only CPU and latency is blind to the one failure that defines Node in production.</p>
 
   </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
 </div>
 </body>
 </html>

@@ -1,14 +1,13 @@
 # AI-Assisted Development and Design-to-Code
 
-This guide targets the AI section of the interview, where the evaluation noted
-strong personal Claude usage and MCP experience, but flagged no design-to-code
-(D2C) experience. D2C is a workflow, not a single tool. You can speak to it
-credibly after understanding how it works and trying the primary tools once, which
-takes an afternoon.
+This guide covers the AI-assisted development section of a frontend or staff
+interview. D2C (design-to-code) is a workflow, not a single tool. You can speak
+to it credibly after understanding how it works and trying the primary tools once,
+which takes an afternoon.
 
-The interview evaluates three things: what AI tools you use and how, whether you
-apply judgment (not just accept output), and whether you have touched the D2C
-workflow specifically. This guide covers all three.
+Interviewers in this area typically probe three things: what AI tools you use and
+how, whether you apply judgment (not just accept output), and whether you have
+touched the D2C workflow specifically. This guide covers all three.
 
 ---
 
@@ -94,19 +93,20 @@ and disabled states. Add responsive behaviour.
 
 ---
 
-## 4. Bridging your CMS experience to D2C
+## 4. Bridging adjacent experience to D2C
 
-The evaluation noted a CMS application background with no D2C experience. These
-are closer than they appear. A headless CMS feeds structured content into
-components; D2C converts visual designs into those same components. If you have
-built CMS-driven pages, you have done the "output" half of D2C. The gap is the
-"input" half (consuming a design file).
+A common gap is strong component or content-system experience without hands-on
+D2C usage. These are closer than they appear. A headless CMS feeds structured
+content into components; D2C converts visual designs into those same components.
+If you have built CMS-driven pages or a component library, you have done the
+"output" half of D2C. The gap is the "input" half (consuming a design file).
 
-Frame it this way in the interview: "My CMS work gave me strong opinions about
+If your background is in content-heavy or component-library work, frame it as a
+transferable skill: "My work with content models gave me strong opinions about
 component API design, because every content model decision shows up in the
 component's props. Applying that to a D2C workflow, I review generated components
 the same way: does the props API match the content model, or is the generator
-exposing implementation details the author should not care about?"
+exposing implementation details the caller should not care about?"
 
 That answer takes existing experience and places it precisely in the D2C context,
 which is more credible than claiming broad D2C experience you do not have.
@@ -115,8 +115,9 @@ which is more credible than claiming broad D2C experience you do not have.
 
 ## 5. AI-assisted development beyond D2C
 
-The evaluation noted good Claude usage for personal tasks, some MCP experience,
-and skills with prompts. Strengthen that into a coherent picture.
+Strong candidates present a coherent picture: not just "I use AI," but specific
+leverage points, consistent review discipline, and team impact. Here is how to
+build that picture.
 
 **Where AI adds the most leverage.** Be specific rather than saying "I use it for
 everything."
@@ -148,8 +149,8 @@ the most important guardrails in an AI-assisted workflow.
 
 ## 6. MCP servers: what to say
 
-The evaluation noted "used some MCP." Being concrete converts "some" into a
-credible data point.
+Vague MCP claims ("I've used it a bit") signal surface familiarity. Being concrete
+converts that into a credible data point.
 
 MCP (Model Context Protocol) is an open protocol that lets an AI assistant call
 external tools: read files, query databases, fetch URLs, run code, talk to APIs.
@@ -165,17 +166,17 @@ In a frontend context, practical MCP servers you can name:
 - **GitHub**: Claude reads open issues, recent commits, and pull request diffs
   to understand project context before generating or reviewing code.
 
-The honest framing: "I have used filesystem and browser MCP servers with Claude
+Example framing: "I have used filesystem and browser MCP servers with Claude
 Code for agentic coding tasks. The biggest benefit was removing the round-trip
-of pasting context; the model reads the actual files and its suggestions match
+of pasting context: the model reads the actual files and its suggestions match
 the codebase's conventions immediately."
 
 ---
 
 ## 7. Framing AI experience in the interview
 
-The evaluation wants three things: evidence of real usage, evidence of judgment,
-and evidence of team impact. Structure your answer around all three.
+Interviewers in this area look for three things: evidence of real usage, evidence
+of judgment, and evidence of team impact. Structure your answer around all three.
 
 ```text
 Task:    what I delegated to AI

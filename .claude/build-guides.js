@@ -13,6 +13,15 @@ const MarkdownIt = require('markdown-it')
 const hljs = require('highlight.js')
 
 // ----------------------------------------------------------------
+//  TIP TARGET — swap REPLACE_HANDLE for the real Ko-fi handle,
+//  then rerun: node .claude/build-guides.js
+// ----------------------------------------------------------------
+
+const KOFI = {
+  url: 'https://ko-fi.com/ingvord',
+}
+
+// ----------------------------------------------------------------
 //  GUIDES MANIFEST
 //  src and out are relative to the repository root.
 // ----------------------------------------------------------------
@@ -242,6 +251,54 @@ h1 {
   line-height: 1.55;
 }
 
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
 /* ---------- headings ---------- */
 h2 {
   font-family: "Fraunces", Georgia, serif;
@@ -346,6 +403,7 @@ td code { font-size: .84em; }
   pre, table { break-inside: auto; }
   tr { break-inside: avoid; }
   h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
 }
 `
 }
@@ -374,10 +432,17 @@ ${cssBody}
     <div class="kicker">${meta.kicker}</div>
     <h1>${pageH1}</h1>
     <div class="sub">${meta.subtitle}</div>
+    <a class="tip-chip" href="${KOFI.url}" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
   </header>
   <main>
 ${bodyHtml}
   </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="${KOFI.url}" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
 </div>
 </body>
 </html>`

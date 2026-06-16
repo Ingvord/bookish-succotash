@@ -182,6 +182,54 @@ h1 {
   line-height: 1.55;
 }
 
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
 /* ---------- headings ---------- */
 h2 {
   font-family: "Fraunces", Georgia, serif;
@@ -286,6 +334,7 @@ td code { font-size: .84em; }
   pre, table { break-inside: auto; }
   tr { break-inside: avoid; }
   h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
 }
 
 </style>
@@ -296,6 +345,7 @@ td code { font-size: .84em; }
     <div class="kicker">Interview Preparation · Staff Backend</div>
     <h1>Scaling Foundations</h1>
     <div class="sub">Load balancing, real-time transport (polling, SSE, WebSockets), caching, security, and authentication: the shared reliability vocabulary (RPS, nines, percentiles) every backend round assumes.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
   </header>
   <main>
 <h2>How to use this guide</h2>
@@ -534,6 +584,12 @@ cur.execute(<span class="hljs-string">&quot;SELECT * FROM orders WHERE id = %s&q
 <p><strong>SLI, SLO, SLA, and error budget?</strong> An SLI is a measured signal (success rate, p99 latency); an SLO is the target for it over a window (&quot;99.9 percent succeed within 200 ms over 28 days&quot;); an SLA is the contractual version with consequences, always looser than the SLO. The error budget is the allowed failure (0.1 percent for a 99.9 percent SLO): spend it on faster shipping when healthy, freeze risky changes when burned. It turns the ship-versus-stability tension into a number both sides can see.</p>
 
   </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
 </div>
 </body>
 </html>
