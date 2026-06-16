@@ -163,11 +163,11 @@ The harness uses `@testing-library/react` and `@testing-library/user-event`. You
 
 ## A session, end to end
 
-The GIF below shows a complete task cycle: the agent scaffolds a task, the user codes, types `done`, receives a PASS with score and test breakdown, then issues `proceed` to move on.
+The video below shows a Q&A/MCQ session: the agent presents a multiple-choice question from the bank, the user answers, and the agent scores it and explains the correct option before moving to the next question.
 
-<iframe width="700" height="394" src="https://www.youtube.com/embed/m0CzZh_tIw4" title="Coding interview simulator: sample session" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;max-width:100%;border-radius:6px;"></iframe>
+<iframe width="700" height="394" src="https://www.youtube.com/embed/m0CzZh_tIw4" title="Coding interview simulator: Q&A/MCQ session" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;max-width:100%;border-radius:6px;"></iframe>
 
-The full text flow for a single task looks like this:
+A coding task cycle follows the same rhythm. The text flow for a single task looks like this:
 
 ```text
 Agent:  Task 1.1: promiseAll

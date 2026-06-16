@@ -484,9 +484,9 @@ python3 practice/task-5.2-top-organism/test_5_2.py
 <p><strong>The catch for React tasks.</strong> Race conditions involving stale async responses are always tested. If your component does not cancel a pending fetch before starting a new one (via <code>AbortController</code> or a request-ID ref), the test that fires two searches in quick succession will fail. This is intentional: it is the senior-level signal interviewers look for.</p>
 <hr>
 <h2>A session, end to end</h2>
-<p>The GIF below shows a complete task cycle: the agent scaffolds a task, the user codes, types <code>done</code>, receives a PASS with score and test breakdown, then issues <code>proceed</code> to move on.</p>
-<iframe width="700" height="394" src="https://www.youtube.com/embed/m0CzZh_tIw4" title="Coding interview simulator: sample session" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;max-width:100%;border-radius:6px;"></iframe>
-<p>The full text flow for a single task looks like this:</p>
+<p>The video below shows a Q&amp;A/MCQ session: the agent presents a multiple-choice question from the bank, the user answers, and the agent scores it and explains the correct option before moving to the next question.</p>
+<iframe width="700" height="394" src="https://www.youtube.com/embed/m0CzZh_tIw4" title="Coding interview simulator: Q&A/MCQ session" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;max-width:100%;border-radius:6px;"></iframe>
+<p>A coding task cycle follows the same rhythm. The text flow for a single task looks like this:</p>
 <pre><code class="hljs" data-lang="text">Agent:  Task 1.1: promiseAll
         Time budget: 12 minutes
         File ready: practice/task-1.1-promise-all/solution.mjs
