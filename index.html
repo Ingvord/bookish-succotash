@@ -114,6 +114,51 @@
       margin-top: 0.25rem;
     }
 
+    .tip-banner {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #2563eb;
+      border-radius: 12px;
+      padding: 1.75rem 2rem;
+      margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tip-banner-copy { flex: 1; min-width: 200px; }
+
+    .tip-banner-copy strong {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.4rem;
+    }
+
+    .tip-banner-copy p {
+      font-size: 0.875rem;
+      color: #64748b;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .tip-banner-btn {
+      display: inline-block;
+      background: #2563eb;
+      color: #fff;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.6em 1.2em;
+      border-radius: 8px;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .tip-banner-btn:hover { background: #1d4ed8; }
+
     footer {
       text-align: center;
       padding: 2rem;
@@ -131,6 +176,14 @@
 </header>
 
 <main>
+
+  <div class="tip-banner">
+    <div class="tip-banner-copy">
+      <strong>&#x2615; Found these guides useful?</strong>
+      <p>Each guide is written with Claude, and each one burns real API tokens to research, draft, and fact-check. No paywall, no signup. If one helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    </div>
+    <a class="tip-banner-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">Tip on Ko-fi</a>
+  </div>
 
   <section class="section">
     <h2 class="section-title">Frontend</h2>
