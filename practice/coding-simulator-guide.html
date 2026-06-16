@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Run a Local Coding Interview Simulator with Claude Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #5b3a8c;
+  --accent-soft:  #5b3a8c14;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Practice Tooling</div>
+    <h1>Run a Local Coding Interview Simulator with Claude Code</h1>
+    <div class="sub">Turn Claude Code into a strict proctor and autograder: timed one-at-a-time tasks, hidden test suites, PASS/FAIL scoring, and a session you drive entirely from chat commands.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>When you reach for this</h2>
+<p>You have an upcoming coding interview. You want timed, autograded reps on real task types: async JavaScript, REST aggregation, React components, Python data wrangling, SQL window functions. Paid platforms give you generic problems and a fixed timer. This setup gives you a Claude Code agent that acts as a strict proctor and autograder, driven entirely by a spec file you write once and reuse as many times as you like.</p>
+<p>You type <code>done</code>, and the agent runs your code against hidden test suites, returns a <code>VERDICT</code>, a score out of ten, and a count of passed and failed cases. You control the pace; the agent controls the grading.</p>
+<hr>
+<h2>The mental model</h2>
+<p><strong>What it is.</strong> Two files do everything: a driver spec and a content bank. The driver is a Markdown document you load into a Claude Code context; it defines the agent's behaviour for an entire session. The content bank is a second Markdown file holding task statements, sample cases, and reference solutions. The agent reads the bank at startup, hides the solutions, and scaffolds one task at a time into a local <code>practice/</code> directory.</p>
+<p><strong>Why it works.</strong> Claude Code can execute shell commands, write files, and read test output. That is exactly what an autograder does. The driver spec turns those raw capabilities into a structured session: one active task, a waiting state, a deterministic validation trigger, and a scoring report.</p>
+<p><strong>The catch.</strong> The agent's behaviour is only as strict as the driver you write. A vague driver will give helpful hints unprompted, reveal solutions early, or pass sloppy code. The patterns in the sections below are deliberate: they name every rule the driver must enforce so you can copy or adapt them.</p>
+<hr>
+<h2>Setting it up</h2>
+<p><strong>Prerequisites.</strong> The simulator relies on standard local toolchains. Verify them once before the first session:</p>
+<pre><code class="hljs" data-lang="bash">node --version          <span class="hljs-comment"># need v18 or later for the built-in test runner</span>
+python3 --version       <span class="hljs-comment"># need 3.9 or later</span>
+python3 -c <span class="hljs-string">&quot;import sqlite3, sys; print(&#x27;sqlite&#x27;, sqlite3.sqlite_version)&quot;</span>
+</code></pre>
+<p>All three commands should succeed. If they do not, install the missing runtime first. The agent will run this same check silently at session start and tell you if anything is missing.</p>
+<p><strong>React tasks only.</strong> One task type needs npm packages (Vitest, jsdom, Testing Library). The agent installs them on demand inside the task's own directory. Nothing touches your global environment.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">cd</span> practice/task-4.1-react-search &amp;&amp; npm install &amp;&amp; npm <span class="hljs-built_in">test</span>
+</code></pre>
+<p>If <code>npm install</code> fails in a locked environment, the agent falls back to a manual rubric: it reads your component against a checklist of five required behaviours and scores it without running a test runner.</p>
+<p><strong>Repo layout.</strong> Your project needs two directories:</p>
+<pre><code class="hljs" data-lang="text">.claude/
+  driver.md          ← the behaviour spec (see section below)
+  tasks.md           ← task statements + reference solutions (hidden)
+practice/            ← created at session start; never commit this
+  PROGRESS.md        ← running scorecard, updated after each task
+  task-1.1-slug/
+    PROMPT.md        ← the task statement
+    solution.mjs     ← your code goes here
+    solution.test.mjs← hidden tests (written by the agent at scaffold time)
+</code></pre>
+<p>The <code>practice/</code> directory is ephemeral. Add it to <code>.gitignore</code>. The driver and task bank belong in <code>.claude/</code> alongside any other Claude Code configuration.</p>
+<hr>
+<h2>The driver: what it enforces</h2>
+<p>The driver spec is a plain Markdown document that opens with an instruction like &quot;You are a coding interview proctor.&quot; Everything below that line defines the agent's rules for the session. The rules that matter most:</p>
+<p><strong>One task at a time.</strong> The agent scaffolds exactly one task, then waits. It does not create the next task directory until you issue <code>proceed</code>. This mirrors the locked-down conditions of a real platform where you cannot jump ahead.</p>
+<p><strong>Stub only, never solve.</strong> When the agent creates <code>solution.mjs</code> (or <code>solution.py</code>, <code>solution.jsx</code>, etc.), it writes a stub with the required export signature and a <code>// TODO</code> comment. It does not write any implementation, even if you ask. The content bank's reference solutions are used for grading only, not shown.</p>
+<p><strong>Wait for the trigger.</strong> The agent does not run your code automatically when you edit the file. You type <code>done</code> or <code>validate</code> in the chat to trigger execution. This prevents the agent from grading partially finished code.</p>
+<p><strong>Grade tough.</strong> Passing the provided sample cases but failing an edge case is a FAIL. The hidden test suite always includes boundary conditions: empty input, a single element, a large input for time complexity, rejection handling for async tasks, concurrent access for queue tasks. If you would pass the sample but not the edges, you need to know that.</p>
+<p><strong>Report format.</strong> Every verdict follows the same structure, making it easy to scan a session's output:</p>
+<pre><code class="hljs" data-lang="text">VERDICT: PASS
+SCORE:   8/10
+Tests:   6 passed, 0 failed
+</code></pre>
+<p>After the verdict the agent explains your approach, notes what you missed, and suggests one concrete improvement. It then waits for <code>proceed</code>.</p>
+<hr>
+<h2>The command vocabulary</h2>
+<p>You drive the entire session from the chat input. The agent recognises these commands:</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>done</code> / <code>validate</code></td>
+<td>Run the hidden tests against your current solution and report the verdict</td>
+</tr>
+<tr>
+<td><code>proceed</code> / <code>next</code></td>
+<td>Scaffold the next task and wait</td>
+</tr>
+<tr>
+<td><code>hint</code></td>
+<td>Give one targeted hint, no code. Can only be used once per task</td>
+</tr>
+<tr>
+<td><code>solution</code></td>
+<td>Reveal the reference solution. Marks the task as &quot;reviewed, not solved&quot; in <a href="http://PROGRESS.md">PROGRESS.md</a></td>
+</tr>
+<tr>
+<td><code>skip</code></td>
+<td>Mark the task as skipped and scaffold the next one</td>
+</tr>
+<tr>
+<td><code>timer N</code></td>
+<td>Tell the agent the elapsed minutes. It flags tasks that exceed their budgeted time</td>
+</tr>
+<tr>
+<td><code>redo</code> / <code>reset task</code></td>
+<td>Wipe the task directory, re-scaffold a clean stub, and restart the clock</td>
+</tr>
+<tr>
+<td><code>harder</code></td>
+<td>After a PASS, add one additional edge-case test and re-validate</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>Print the current <a href="http://PROGRESS.md">PROGRESS.md</a> scorecard</td>
+</tr>
+<tr>
+<td><code>summary</code></td>
+<td>End the session: print totals, strengths, the one pattern to drill, and a readiness call</td>
+</tr>
+</tbody>
+</table>
+<p>The most useful command after a FAIL is <code>hint</code>, not <code>solution</code>. The point is to find the edge case yourself.</p>
+<hr>
+<h2>How validation actually runs</h2>
+<p>Each task type uses a different runner. The agent picks the right one automatically based on the task.</p>
+<p><strong>JavaScript / Node (most tasks).</strong> Solutions are ES Modules that export named functions. Tests use the built-in Node test runner introduced in Node 18, so no test-framework install is needed:</p>
+<pre><code class="hljs" data-lang="bash">node --<span class="hljs-built_in">test</span> practice/task-1.1-promise-all/
+</code></pre>
+<p>The test file (<code>solution.test.mjs</code>) imports from <code>./solution.mjs</code>:</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">import</span> { test } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;node:test&#x27;</span>;
+<span class="hljs-keyword">import</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;node:assert/strict&#x27;</span>;
+<span class="hljs-keyword">import</span> { promiseAll } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./solution.mjs&#x27;</span>;
+
+<span class="hljs-title function_">test</span>(<span class="hljs-string">&#x27;preserves order&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">promiseAll</span>([<span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-number">1</span>), <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-number">2</span>)]);
+  assert.<span class="hljs-title function_">deepEqual</span>(result, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>]);
+});
+</code></pre>
+<p><strong>The catch for JS tasks.</strong> Your function must match the exact export signature the test file expects. If you export <code>myPromiseAll</code> instead of <code>promiseAll</code>, every test fails with an import error, not an assertion error. The stub the agent creates always has the correct signature.</p>
+<p><strong>Python stdin tasks.</strong> Some tasks read from stdin and write to stdout, matching the classic competitive-programming format. The test file pipes fixture data and diffs the output:</p>
+<pre><code class="hljs" data-lang="bash">python3 practice/task-5.1-distinct-counts/test_5_1.py
+</code></pre>
+<p>Inside that test file, each case calls <code>subprocess.run</code> with <code>input=fixture</code> and checks <code>stdout</code> against the expected string. The only import your <code>solution.py</code> needs is from the standard library.</p>
+<p><strong>Python pandas tasks.</strong> The agent checks for pandas first and installs it only if missing:</p>
+<pre><code class="hljs" data-lang="bash">python3 -c <span class="hljs-string">&quot;import pandas&quot;</span> 2&gt;/dev/null || pip install pandas
+python3 practice/task-5.2-top-organism/test_5_2.py
+</code></pre>
+<p><strong>The catch for pandas tasks.</strong> The test calls your function with a specific DataFrame schema. If you change column names or return a Series instead of a DataFrame, you get a KeyError or an assertion on shape rather than values. The PROMPT always specifies the expected return shape.</p>
+<p><strong>SQL tasks.</strong> You write one <code>.sql</code> file containing a single <code>SELECT</code> query. The test runner creates an in-memory SQLite database, seeds it with fixture data, executes your query, and compares the result set:</p>
+<pre><code class="hljs" data-lang="bash">python3 practice/task-6.1-sql-join/test_sql.py 6.1
+</code></pre>
+<p><strong>The catch for SQL tasks.</strong> The local runner uses SQLite, but a real platform runs PostgreSQL or MySQL. Window functions like <code>ROW_NUMBER() OVER (...)</code> work in all three, but PostgreSQL-specific syntax (for example <code>FILTER (WHERE ...)</code> or certain date functions) will silently pass locally and fail on the platform. Write ANSI SQL unless the PROMPT says otherwise.</p>
+<p><strong>React tasks.</strong> These are the only tasks that need npm packages. The agent sets up a minimal Vitest + jsdom harness in the task directory:</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">cd</span> practice/task-4.1-sample-search &amp;&amp; npm install &amp;&amp; npm <span class="hljs-built_in">test</span>
+</code></pre>
+<p>The harness uses <code>@testing-library/react</code> and <code>@testing-library/user-event</code>. Your component must be a default export from <code>solution.jsx</code>. The test mounts it, fires user events, and asserts on DOM state.</p>
+<p><strong>The catch for React tasks.</strong> Race conditions involving stale async responses are always tested. If your component does not cancel a pending fetch before starting a new one (via <code>AbortController</code> or a request-ID ref), the test that fires two searches in quick succession will fail. This is intentional: it is the senior-level signal interviewers look for.</p>
+<hr>
+<h2>A session, end to end</h2>
+<p>The GIF below shows a complete task cycle: the agent scaffolds a task, the user codes, types <code>done</code>, receives a PASS with score and test breakdown, then issues <code>proceed</code> to move on.</p>
+<iframe width="700" height="394" src="https://www.youtube.com/embed/m0CzZh_tIw4" title="Coding interview simulator: sample session" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;max-width:100%;border-radius:6px;"></iframe>
+<p>The full text flow for a single task looks like this:</p>
+<pre><code class="hljs" data-lang="text">Agent:  Task 1.1: promiseAll
+        Time budget: 12 minutes
+        File ready: practice/task-1.1-promise-all/solution.mjs
+
+[you edit solution.mjs]
+
+You:    done
+
+Agent:  Running: node --test practice/task-1.1-promise-all/
+
+        VERDICT: PASS
+        SCORE:   9/10
+        Tests:   4 passed, 0 failed
+
+        Your solution uses Promise.all internally (fine for this task).
+        Note the hidden test for rejection: it expects the returned promise
+        to reject with the first reason, which Promise.all handles correctly.
+        You got all four cases. One mark off for not guarding the empty-array
+        edge in your own logic (the built-in covers it, but the check shows
+        you reasoned about it).
+
+        Type &quot;proceed&quot; for the next task or &quot;harder&quot; to add an edge case.
+
+You:    proceed
+</code></pre>
+<p>Each task directory stays on disk after you move on. You can revisit any solution after the session ends, or diff it against the reference after typing <code>solution</code>.</p>
+<hr>
+<h2>Building your own task bank</h2>
+<p>A task bank is a Markdown file with two sections: task statements above a <code>## Reference Solutions</code> heading, and the solutions below it. The agent reads the whole file at startup, treats everything above the heading as the task catalogue, and uses everything below only for post-validation grading.</p>
+<p><strong>Task structure.</strong> Each task needs four things:</p>
+<pre><code class="hljs" data-lang="text">### 1.1 Task slug (time budget)
+
+[Two or three sentences: what the function signature is, what it does, the key constraint.]
+
+**Sample:**
+
+[Input and expected output, in plain text or a code block]
+</code></pre>
+<p>Keep the statement concise. The <a href="http://PROMPT.md">PROMPT.md</a> the agent scaffolds comes directly from this text. If the statement is ambiguous, the agent will ask one clarifying question before scaffolding.</p>
+<p><strong>Writing injectable tests.</strong> For tasks that touch external state (network calls, timers, a database), the test must be able to inject a mock. The most reliable way is to add the dependency as a parameter:</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// Bad: the test cannot intercept globalThis.fetch</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getOrganismCounts</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/samples?page=1&#x27;</span>);
+  <span class="hljs-comment">// ...</span>
+}
+
+<span class="hljs-comment">// Good: the test passes in a mock; the real caller passes in fetch</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getOrganismCounts</span>(<span class="hljs-params">fetchPage = fetch</span>) {
+  <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchPage</span>(<span class="hljs-string">&#x27;/api/samples?page=1&#x27;</span>);
+  <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p>This pattern also makes it possible to test bounded-concurrency logic: the mock tracks how many calls are in flight simultaneously, and the test asserts that the number never exceeds the limit.</p>
+<p><strong>Time budgets.</strong> Assign each task a budget based on its cognitive load, not its line count. A twelve-line async pool implementation that requires reasoning about a shared cursor and a fill-loop deserves eighteen minutes. A ten-line SQL join deserves ten. When you issue <code>timer N</code> mid-task, the agent flags overruns in <a href="http://PROGRESS.md">PROGRESS.md</a> so your summary can call out where time leaked.</p>
+<p><strong>Reference solutions.</strong> Put them below the <code>## Reference Solutions</code> heading, labelled with the same task ID. The agent uses them for grading and can show them on <code>solution</code> command, but never before a validated attempt.</p>
+<hr>
+<h2>How to get the most from it</h2>
+<p><strong>Simulate exam conditions.</strong> Close your references before the session. Type <code>timer 0</code> when you open the first task so elapsed time is tracked from the start. The point is to surface the gap between &quot;I know this concept&quot; and &quot;I can produce correct code under time pressure.&quot;</p>
+<p><strong>Attempt before <code>solution</code>.</strong> The reference solution is there as a calibration tool, not a shortcut. If you use <code>solution</code> before attempting, the task is marked &quot;reviewed, not solved&quot; in <a href="http://PROGRESS.md">PROGRESS.md</a> and does not count toward your score. That is an honest signal: you read it, not did it.</p>
+<p><strong>Trust the <code>summary</code> command.</strong> At the end of a session, <code>summary</code> prints the one pattern that caused the most time loss or the most failures. That single pattern is what you drill next. A session where you passed seven tasks but all three FAIL cases involved off-by-one errors in async concurrency control tells you exactly what to practice next time.</p>
+<p><strong>Add tasks incrementally.</strong> Start with five or six tasks covering your known weak spots. After the first session, <code>summary</code> will name one or two more. Add those to the bank and run again. The bank grows toward the actual interview, not away from it.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

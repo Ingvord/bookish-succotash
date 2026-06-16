@@ -126,6 +126,16 @@ const GUIDES = [
     accent:   '#8a2436',  // burgundy (also used by java-classic — different section)
   },
 
+  // ---- Practice -----------------------------------------------
+  {
+    src:      '.claude/practice-md/coding-simulator-guide.md',
+    out:      'practice/coding-simulator-guide.html',
+    kicker:   'Interview Preparation · Practice Tooling',
+    title:    'Run a Local Coding Interview Simulator with Claude Code',
+    subtitle: 'Turn Claude Code into a strict proctor and autograder: timed one-at-a-time tasks, hidden test suites, PASS/FAIL scoring, and a session you drive entirely from chat commands.',
+    accent:   '#5b3a8c',  // deep violet
+  },
+
   // ---- Data & Messaging ----------------------------------------
   {
     src:      '.claude/data-md/relational-db-prep.md',
@@ -172,6 +182,7 @@ const GUIDES = [
 //  plum        #6b3585   [reserved: relational-db-prep]
 //  rose        #9d3658   [reserved: redis-prep]       -- new, AA on white
 //  steel       #3f5566   [reserved: kafka-prep]       -- new, AA on white
+//  deep violet #5b3a8c   coding-simulator-guide       -- new, AA on white
 // ----------------------------------------------------------------
 
 // ================================================================
