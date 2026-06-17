@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Senior Platform Engineer Interview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #5c6b1f;
+  --accent-soft:  #5c6b1f14;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Senior Platform Engineer</div>
+    <h1>The Senior Platform Engineer Interview</h1>
+    <div class="sub">What the loop actually tests: competency map, depth on IaC, observability, security, and data pipelines, plus six STAR story templates with quantified results and visible mechanisms.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>The interview is really asking one thing</h2>
+<p>Every senior platform engineer loop, regardless of company or stack, is probing the same question: do you own infrastructure end-to-end, or do you manage it? The first builds systems that hold when you are not watching, encode the right defaults, and fail safely. The second keeps things running while you are in the room. The difference shows in every story you tell.</p>
+<p>The frame is the same as a staff software engineer round: for every project you claim, the interviewer will ask &quot;how&quot; until they hit a concrete mechanism or the bottom of your knowledge. A claim with no mechanism is coordination, not ownership. See the companion guide &quot;Depth That Survives Probing&quot; for the full pattern; here it is applied to platform work specifically.</p>
+<hr>
+<h2>What the interview tests: competency map</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>What they actually probe</th>
+<th>Proof that lands</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IaC and Terraform</td>
+<td>State management, drift detection, module blast radius</td>
+<td>&quot;We caught drift via scheduled CI plan, not by hand&quot;</td>
+</tr>
+<tr>
+<td>Kubernetes and Docker</td>
+<td>Scheduling, probes, RBAC, rollout strategy, security contexts</td>
+<td>A failure mode you diagnosed with a named command</td>
+</tr>
+<tr>
+<td>Multi-cloud</td>
+<td>Trade-offs across AWS / Azure / GCP; managed vs self-managed</td>
+<td>The time you chose one over the other and measured the outcome</td>
+</tr>
+<tr>
+<td>CI/CD and developer experience</td>
+<td>Pipeline design, feedback loop time, golden path</td>
+<td>&quot;P95 pipeline time: 22 min to 5 min, here is how&quot;</td>
+</tr>
+<tr>
+<td>Observability</td>
+<td>Metrics, logs, traces; SLOs; error budgets; alert tuning</td>
+<td>The outage you caught because of a signal, not despite its absence</td>
+</tr>
+<tr>
+<td>Security by design</td>
+<td>Least privilege, secrets management, CVE scanning, PSA</td>
+<td>The specific access you removed and the mechanism that enforces it</td>
+</tr>
+<tr>
+<td>Data at scale</td>
+<td>Idempotent pipelines, backpressure, schema evolution</td>
+<td>A pipeline that recovered from a partial run without re-processing</td>
+</tr>
+<tr>
+<td>AI and agentic tooling</td>
+<td>Harness thinking, context engineering, evaluation</td>
+<td>Context, tools, constraints, evals, not &quot;I use an AI assistant&quot;</td>
+</tr>
+<tr>
+<td>Incident response</td>
+<td>RCA process, durable fix, postmortem quality</td>
+<td>The mechanism you added so the same failure class cannot be silent again</td>
+</tr>
+<tr>
+<td>Mentoring and standards</td>
+<td>How you made the right thing the default</td>
+<td>A linter, a template, a CI check, not a wiki doc nobody read</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Depth on the load-bearing areas</h2>
+<h3>Terraform state and drift</h3>
+<p>Terraform state is the source of truth between your config and the live cloud. Drift happens when someone changes infrastructure outside Terraform (console click, one-off CLI command, another tool) or when a resource's computed values change underneath you. The mechanism that catches drift is running <code>terraform plan</code> in CI on a schedule against the live state, not only as a gate on deploy. If plan shows a diff on a codebase nobody touched since last run, something in the world changed.</p>
+<p>The catch: state is a lock file and a secret store combined. Storing it in S3 with DynamoDB locking prevents concurrent applies from corrupting it. But secrets Terraform creates (database passwords, API keys) land in state in plaintext. Encrypt the bucket, rotate the state file's access policy regularly, and prefer <code>terraform state rm</code> plus import workflows to keep sensitive resources out of state where you can. Large modules with many resources share one apply blast radius. A plan error in one resource blocks everything in that module. Split modules at &quot;what can I safely apply independently,&quot; not by team or feature boundaries.</p>
+<h3>Golden path and platform as product</h3>
+<p>A golden path is an opinionated, self-serve starting point that makes the correct architecture the path of least resistance. It is not a template in a wiki. It is a cookiecutter scaffold, a Terraform module, or a Helm chart that provisions a service with the right defaults already wired: RBAC, NetworkPolicy, observability scrape config, secret injection, on-call routing. The platform team's job is to make &quot;new service&quot; not require a ticket and three Slack threads.</p>
+<p>The catch: golden paths rot. If the scaffold creates something that diverges from best practice six months later, teams that used it have a maintenance gap and no signal it exists. Version the scaffold with SemVer, send a Dependabot-style update when the base changes, and maintain a drift-detection job that compares deployed services against the current template. Without that feedback loop, the golden path becomes a technical debt generator.</p>
+<h3>SLOs, error budgets, and the culture they create</h3>
+<p>An SLO is an agreed target: &quot;99.5% of requests succeed within 500 ms, measured over 30 days.&quot; The error budget is the allowed failure space: 0.5% of the time window. When the budget is full, you can ship freely. When the budget is exhausted, you stop shipping features and fix reliability instead.</p>
+<p>The catch: SLOs only change behaviour if the team actually gates deploys on the budget. An SLO nobody checks is a health check nobody watches. The mechanism is a CI step or a deploy hook that queries the SLO metric and blocks if the budget is below a threshold. The culture change is secondary; the automated gate is what makes the SLO meaningful. Set the objective based on what users actually need (measured by user journey success rates, not arbitrary nines), not on what is easiest to hit.</p>
+<h3>Secrets management and least privilege</h3>
+<p>Every secret passed as a plain environment variable is a credential in <code>kubectl describe pod</code> output, in process memory readable via <code>/proc/&lt;pid&gt;/environ</code>, and in any log shipper that captures env vars. The right mechanism in Kubernetes is: store the secret in a secrets manager (AWS Secrets Manager, GCP Secret Manager, HashiCorp Vault), deliver it at pod start via a CSI driver or the External Secrets Operator, and mount it as a file or short-lived env var that never appears in the Deployment manifest committed to git.</p>
+<p>The catch: RBAC on Kubernetes Secrets is coarse by default. A service account with <code>get</code> on <code>secrets</code> in a namespace can read all secrets in that namespace, including the ones it should not know about. Fix with namespace isolation (one namespace per workload, limiting blast radius) or use Vault's dynamic secrets so each pod gets a short-lived credential unique to its identity rather than a shared static one.</p>
+<h3>Idempotent data pipelines</h3>
+<p>A pipeline is idempotent if running it twice on the same input produces the same output and the same state. This matters because failures mid-run are normal at scale: a network hiccup, a spot-instance preemption, a node eviction. If the pipeline is not idempotent, partial runs corrupt data and re-runs double-count.</p>
+<p>The mechanism: write to a staging partition or temporary table, validate there (row count, schema, referential integrity), then atomic-swap to the production partition. Or use a write-once, append-only store (object storage, Kafka) and process with offset tracking so replaying a window is safe. The catch: idempotency and deduplication are related but different. Idempotency means re-running is safe; deduplication means the output contains no duplicates. You often need both, and they require different mechanisms. Idempotency is a property of the writer; deduplication is often a property of the reader or a post-process step.</p>
+<hr>
+<h2>STAR stories: adaptable templates</h2>
+<p>Each story below is a template. Fill the specifics from your own work. The shape, the visible mechanism, and the quantified result are what the interviewer is actually listening for. The &quot;make it yours&quot; line tells you what to swap.</p>
+<h3>Story 1: Cutting CI/CD feedback time</h3>
+<p><strong>Situation:</strong> build pipelines took 18 to 22 minutes end to end. Developers context-switched away while waiting, and feedback on broken tests was delayed by 30 to 90 minutes after a push.</p>
+<p><strong>Task:</strong> reduce pipeline P95 to under 8 minutes without dropping test coverage.</p>
+<p><strong>Action:</strong> I profiled the pipeline with timing flags and found three hot spots. First, a Docker layer cache miss on every run because the Dockerfile ran <code>COPY . .</code> before <code>pip install</code>, so the dependency layer rebuilt every time any source file changed. I restructured it to copy the requirements file first so the layer cached correctly. Second, the test suite ran sequentially; I sharded it across four parallel runners using historical duration as the distribution key, so the longest shard set the total time. Third, a redundant publish step was gating downstream jobs that could have run concurrently; I split the DAG so unrelated jobs fanned out. I added a pre-commit cache for linting so trivial failures were caught before CI received the push.</p>
+<p><strong>Result:</strong> P95 pipeline time dropped from 22 minutes to 5 minutes. Docker dependency layer cache hit rate went from 12% to 91%, measured over 500 subsequent runs. Developer satisfaction with CI (internal survey, 5-point scale) moved from 2.8 to 4.4 over the following quarter.</p>
+<p>Make it yours: swap the tools (Docker, pytest-split, the DAG runner) for the ones you used. Swap the duration numbers for your real numbers. The proof shape is: you profiled before changing anything (named the mechanism), made specific structural changes (named them), and measured the outcome (named the metric and the window).</p>
+<h3>Story 2: Building a self-serve golden path</h3>
+<p><strong>Situation:</strong> provisioning a new service required a ticket to the platform team, a three-day wait, and manual configuration of IAM roles, a Kubernetes namespace, a service account, Prometheus scrape configs, and an alerting integration. Errors were common because the steps were documented but not enforced.</p>
+<p><strong>Task:</strong> make new service provisioning self-serve, repeatable, and correct by default without a platform ticket.</p>
+<p><strong>Action:</strong> I built a Terraform module that provisioned the full service footprint in one apply: namespace, service account with minimal IAM permissions via a workload-identity binding, a NetworkPolicy with default-deny and explicit egress to the services it was allowed to call, a Prometheus ServiceMonitor, and an alert rule pointing at the team's on-call rotation. I wrapped it in a <code>cookiecutter</code> scaffold that asked for service name, team slug, and SLO target, then generated a Terraform workspace and a PR. I added a CI check that validated the generated config against the module's current version, so a scaffold generated from an old version flagged itself for upgrade. I ran three pilot teams through it before general release, collected friction, and iterated the defaults. I documented escape hatches (how to add a permission the default did not include) so teams did not bypass the scaffold when they needed something custom.</p>
+<p><strong>Result:</strong> mean time from &quot;we need a new service&quot; to &quot;service live in staging&quot; dropped from 3 days to under 2 hours. Platform team's provisioning ticket volume dropped 70%. Zero misconfigured IAM bindings in services provisioned via scaffold in the 6 months post-launch, measured by a weekly policy scanner that compared live bindings to the module output.</p>
+<p>Make it yours: the stack details are swappable. The shape is: you built a self-serve tool, made the right thing the default, added a correctness check in CI, iterated with real users before general release, and measured adoption and quality.</p>
+<h3>Story 3: Incident, root cause, and the durable fix</h3>
+<p><strong>Situation:</strong> the production service returned 503s to roughly 15% of users for 47 minutes. Postmortem showed a single misconfigured replica had an uncapped thread pool that accepted connections and then timed out every request, dragging down the cluster's error rate.</p>
+<p><strong>Task:</strong> restore service, identify the root cause, and prevent the same class of failure from being silent in future.</p>
+<p><strong>Action:</strong> for immediate mitigation I cordoned the bad node and scaled up two replacement replicas, which restored the error rate to baseline in 11 minutes. For the root cause: the thread pool size was read from an env var with no validation at startup. A misconfiguration could silently produce a bad value. I added a startup check that read the config and exited with a non-zero code and a descriptive message if the pool size exceeded a safe threshold or was zero. That turned a misconfiguration into a CrashLoopBackOff at deploy time, visible in 30 seconds, rather than a silent degradation in production discovered by users after 47 minutes. I added a Prometheus gauge for thread pool utilisation and a Grafana alert at 80% saturation so on-call is paged before users see degradation.</p>
+<p><strong>Result:</strong> mean time to detect for thread pool saturation dropped from 47 minutes (user-reported) to under 3 minutes (alert firing time). During the postmortem sweep, the same class of problem (unconfigured env var with no startup validation) was found in two other services and fixed before any incident.</p>
+<p>Make it yours: swap the specific failure for yours. The structure is: fast mitigation with a named action and a named time to resolution, a root-cause fix that makes the wrong thing impossible or loud at deploy time, and a signal that surfaces the problem class earlier so the next person is paged rather than surprised.</p>
+<h3>Story 4: Least-privilege audit and secrets remediation</h3>
+<p><strong>Situation:</strong> a quarterly security review found that 12 service accounts in the production cluster had <code>cluster-admin</code> bindings, most inherited from a &quot;it was easier at the time&quot; decision 18 months earlier. Service credentials were passed as plain environment variables in Deployment manifests stored in git.</p>
+<p><strong>Task:</strong> reduce privilege to least-required for all service accounts and move secrets out of plaintext manifests without breaking any running service.</p>
+<p><strong>Action:</strong> I used Kubernetes audit logs to map the actual API calls each service made over a 30-day window, then used <code>kubectl auth can-i --list</code> to compare that against what the <code>cluster-admin</code> binding permitted. For each service account I wrote a Role covering only the resources and verbs observed in the audit log, replaced the ClusterRoleBinding with a namespaced RoleBinding, and let the service run in staging for two weeks watching for 403 errors before promoting to production. For secrets, I migrated to the cloud provider's secrets manager with the External Secrets Operator syncing Kubernetes Secret objects with a 1-hour TTL rotation. Deployment manifests no longer contain any credential value. I added Gitleaks to CI to block any future secret committed to the repository.</p>
+<p><strong>Result:</strong> <code>cluster-admin</code> bindings dropped from 12 to 0. The blast radius of a compromised service account shrank from &quot;full cluster write&quot; to the specific namespace and the specific resources that service actually uses. Zero secrets-in-git findings in CI in the 8 months after migration, compared to 4 findings the quarter before it.</p>
+<p>Make it yours: the tools (External Secrets Operator, Gitleaks) are replaceable. What must be visible is that you measured the before state, implemented the mechanism, validated it safely with a staged rollout, and measured the after state quantitatively.</p>
+<h3>Story 5: Observability that caught a failure class</h3>
+<p><strong>Situation:</strong> a data pipeline produced silent correctness errors: it completed with exit code 0 but output row counts were 15 to 30% lower than expected, with no alert. The first signal was always a downstream analyst noticing wrong numbers two days after the run.</p>
+<p><strong>Task:</strong> make correctness failures visible before or immediately after the pipeline completes, without requiring a human to spot the numbers.</p>
+<p><strong>Action:</strong> I instrumented the pipeline at each major stage with a row-count gauge emitted to Prometheus: source rows read, rows after transform, rows written to the output. I added a reconciliation check at the end of the run that compared input rows to output rows and exited non-zero if the ratio fell outside a configurable threshold (default: output must be within 5% of input, with known-good exceptions for filter stages). I set a Grafana alert on the gauge's rate of change that fired if the last stage's count dropped more than 10% from the 7-day rolling median. I tested the threshold against 6 months of historical runs, distinguishing real data drops (smaller upstream file) from correctness bugs, and tuned the threshold to produce zero false positives over that window.</p>
+<p><strong>Result:</strong> the next correctness bug, a schema mismatch causing silent null propagation, was caught 4 minutes after the pipeline completed rather than 2 days later. The reconciliation check fired 3 times in 6 months after launch; all 3 were real bugs, zero were false positives.</p>
+<p>Make it yours: the pipeline type and tools are yours to substitute. The proof shape is: you identified a gap (silent failure), added instrumentation at the right granularity, validated the threshold against historical data to tune out false positives, and tracked the false-positive rate after launch.</p>
+<h3>Story 6: AI tooling with engineering guardrails</h3>
+<p><strong>Situation:</strong> the team adopted an AI coding assistant but usage was informal: each engineer used it differently, output was reviewed visually without automated validation, and there was no measurement of whether AI-assisted changes were higher or lower quality than hand-written ones.</p>
+<p><strong>Task:</strong> make AI-assisted engineering a reliable, measurable part of the workflow rather than a productivity wildcard.</p>
+<p><strong>Action:</strong> I built a shared context baseline for every session: a project-level <code>CLAUDE.md</code> describing the architecture, coding conventions, the services the model was most likely to touch, and the test patterns in use, so every session started from the same informed state rather than the model inferring context from file names. I ensured strict typing was enabled in the language (type-check in CI) and coverage enforcement was set at 90% line coverage, so all AI-generated code had to pass the same lint, type-check, and test gate as hand-written code. I introduced a weekly review of merged PRs tagged <code>ai-assisted</code> against the defect rate for hand-written PRs over the same period, measuring quality rather than just output volume. I wrote internal guidelines on what to give the model (a file with the right context, a test you want it to make pass) versus what produces poor results (a vague &quot;rewrite this module&quot; instruction with no acceptance criteria).</p>
+<p><strong>Result:</strong> AI-assisted PR throughput increased 40% measured over the following quarter. Defect rate for AI-assisted PRs came in at 8% above baseline for hand-written PRs; during informal pre-guideline usage it had been 2.4x the baseline. The guardrails, not the model upgrade, drove the quality improvement.</p>
+<p>Make it yours: the specific tools are swappable. What must be visible is: context engineering (not just prompting), automated constraints (types, tests, CI gates), and a before/after quality measurement that separates speed gains from quality risk.</p>
+<hr>
+<h2>Pre-interview audit: platform edition</h2>
+<p>Run every claim through this before the day. It mirrors the three-layer drill from the staff-depth guide (decision, mechanism, evidence) applied to platform work.</p>
+<pre><code class="hljs" data-lang="text">For each infrastructure or platform project:
+[ ] Can I state the decision and why I chose it over the alternatives?
+[ ] Can I name the technical mechanism that enforced or implemented it?
+[ ] Can I give a metric or concrete signal that it worked?
+[ ] Does it read as ownership (holds without me) or only as operation?
+
+For observability:
+[ ] Can I describe what a failure looked like before the signal existed?
+[ ] Can I describe the signal and how fast it fired?
+[ ] Did the signal produce false positives? How did I tune the threshold?
+
+For security:
+[ ] Can I name the specific access that was removed?
+[ ] Can I describe how I confirmed it was safe to remove (staged rollout, audit logs)?
+[ ] Is the enforcement automatic, or does it depend on someone remembering?
+
+For AI and platform tooling:
+[ ] Can I speak to context, tools, constraints, and evaluation?
+[ ] Do I have a before/after quality metric, not just a speed claim?
+[ ] Am I claiming maturity I can defend, or inflating a demo into expertise?
+
+For STAR stories:
+[ ] Is the Result quantified with a number and a time window?
+[ ] Is the mechanism named explicitly, not summarised as &quot;we improved things&quot;?
+[ ] If pushed on &quot;how did you validate it was safe,&quot; do I have a specific answer?
+</code></pre>
+<p>The platform engineer's version of the staff trap: claiming you &quot;improved reliability&quot; or &quot;standardised the infrastructure&quot; without naming the mechanism. Reliability improved because the SLO gate blocked the deploy, not because the team cared more. Standards held because the CI check failed the PR, not because the documentation was clear. The mechanism is the answer; the outcome confirms the mechanism worked.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

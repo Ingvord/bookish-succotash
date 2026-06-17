@@ -116,6 +116,16 @@ const GUIDES = [
     accent:   '#2e5280',  // slate (also used by python-backend — different section)
   },
 
+  // ---- DevOps --------------------------------------------------
+  {
+    src:      '.claude/devops-md/kubernetes-troubleshooting.md',
+    out:      'devops/kubernetes-troubleshooting.html',
+    kicker:   'Interview Preparation · DevOps · Kubernetes',
+    title:    'Kubernetes: Diagnose It Live',
+    subtitle: 'Symptom-first troubleshooting for the live round: eight real failure scenarios from Pending to RBAC Forbidden, each as symptom, ranked causes, commands, fix, and the catch.',
+    accent:   '#0d5c8c',  // ocean
+  },
+
   // ---- Level ---------------------------------------------------
   {
     src:      '.claude/level-md/staff-depth-guide.md',
@@ -124,6 +134,14 @@ const GUIDES = [
     title:    'Depth That Survives Probing',
     subtitle: 'The staff-level rejection pattern: claims that collapse under deeper questioning. How to back every architecture, leadership, and AI claim with the concrete technical mechanism that made it real.',
     accent:   '#8a2436',  // burgundy (also used by java-classic — different section)
+  },
+  {
+    src:      '.claude/level-md/platform-engineer-prep.md',
+    out:      'level/platform-engineer-prep.html',
+    kicker:   'Interview Preparation · Senior Platform Engineer',
+    title:    'The Senior Platform Engineer Interview',
+    subtitle: 'What the loop actually tests: competency map, depth on IaC, observability, security, and data pipelines, plus six STAR story templates with quantified results and visible mechanisms.',
+    accent:   '#5c6b1f',  // moss
   },
 
   // ---- Practice -----------------------------------------------
@@ -179,10 +197,12 @@ const GUIDES = [
 //  forest      #2d6a44   nodejs-backend-prep
 //  slate       #2e5280   python-backend-prep, frontend-system-design
 //  amber       #7a5500   scaling-foundations-prep, modules-build-guide
-//  plum        #6b3585   [reserved: relational-db-prep]
-//  rose        #9d3658   [reserved: redis-prep]       -- new, AA on white
-//  steel       #3f5566   [reserved: kafka-prep]       -- new, AA on white
-//  deep violet #5b3a8c   coding-simulator-guide       -- new, AA on white
+//  plum        #6b3585   relational-db-prep
+//  rose        #9d3658   redis-prep                   -- AA on white
+//  steel       #3f5566   kafka-prep                   -- AA on white
+//  deep violet #5b3a8c   coding-simulator-guide       -- AA on white
+//  ocean       #0d5c8c   kubernetes-troubleshooting   -- AA on white (6.5:1)
+//  moss        #5c6b1f   platform-engineer-prep       -- AA on white (5.3:1)
 // ----------------------------------------------------------------
 
 // ================================================================

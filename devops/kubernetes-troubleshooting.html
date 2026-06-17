@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kubernetes: Diagnose It Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #0d5c8c;
+  --accent-soft:  #0d5c8c14;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · DevOps · Kubernetes</div>
+    <h1>Kubernetes: Diagnose It Live</h1>
+    <div class="sub">Symptom-first troubleshooting for the live round: eight real failure scenarios from Pending to RBAC Forbidden, each as symptom, ranked causes, commands, fix, and the catch.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>When you're in the seat, you get a symptom</h2>
+<p>The interview drops you into a running cluster and says: &quot;Pods are not starting. Figure out what's wrong.&quot; Not &quot;explain liveness probes.&quot; Not &quot;describe the scheduler.&quot; A symptom. The win is a diagnostic loop you can narrate out loud as you work.</p>
+<p>One loop covers almost every failure: <code>kubectl get</code> to see the state, <code>kubectl describe</code> (read Events first) to find the cause, <code>kubectl logs</code> to see what the app said, and then fix. Knowing that loop cold, and being able to say what each command reveals and why you ran it next, is the answer to most Kubernetes live-coding rounds.</p>
+<hr>
+<h2>The diagnostic funnel</h2>
+<p>Every incident starts here. The four moves below cover 90% of the failures you will encounter.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># 1. See what state things are actually in</span>
+kubectl get pods -n &lt;namespace&gt; -o wide
+
+<span class="hljs-comment"># 2. Read Events: they almost always name the cause directly</span>
+kubectl describe pod &lt;pod-name&gt; -n &lt;namespace&gt;
+
+<span class="hljs-comment"># 3. See what the app said before it died</span>
+kubectl logs &lt;pod-name&gt; -n &lt;namespace&gt; --previous
+
+<span class="hljs-comment"># 4. Jump inside if the above is not enough</span>
+kubectl <span class="hljs-built_in">exec</span> -it &lt;pod-name&gt; -n &lt;namespace&gt; -- sh
+</code></pre>
+<p>The catch: <code>describe</code> prints a lot. Skip straight to the <code>Events:</code> block at the bottom. That block is the error message. The top sections (<code>Status</code>, <code>Containers</code>) name what state you are in; Events name why you got there.</p>
+<hr>
+<h2>Toolkit at a glance</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kubectl get pods -o wide</code></td>
+<td>Pod phase, node placement, restart count</td>
+</tr>
+<tr>
+<td><code>kubectl describe pod</code></td>
+<td>Events, probe config, image, requested resources</td>
+</tr>
+<tr>
+<td><code>kubectl logs --previous</code></td>
+<td>Last container's stdout before it crashed</td>
+</tr>
+<tr>
+<td><code>kubectl get events --sort-by='.lastTimestamp' -n &lt;ns&gt;</code></td>
+<td>Cluster-wide timeline in order</td>
+</tr>
+<tr>
+<td><code>kubectl debug -it pod/&lt;name&gt; --image=busybox</code></td>
+<td>Shell in the cluster network, bypasses your app image</td>
+</tr>
+<tr>
+<td><code>kubectl port-forward pod/&lt;name&gt; 8080:8080</code></td>
+<td>Hit the pod directly, cuts out the Service</td>
+</tr>
+<tr>
+<td><code>kubectl get endpoints &lt;svc-name&gt;</code></td>
+<td>Instantly shows whether a Service has backing pods</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Scenario 1: Pod stuck in Pending</h2>
+<p>The pod exists but has never run. Kubernetes accepted the object; the scheduler has not placed it on any node.</p>
+<p>Causes, ranked by frequency:</p>
+<ol>
+<li>Node resources exhausted: <code>requests.cpu</code> or <code>requests.memory</code> exceeds what any schedulable node can offer.</li>
+<li>Taint/toleration mismatch: the node has a taint the pod does not tolerate.</li>
+<li>Node selector or affinity rule not matched: a <code>nodeSelector</code> or <code>nodeAffinity</code> has no matching node.</li>
+<li>PersistentVolumeClaim not bound: a <code>volumes</code> entry references a PVC that is still <code>Pending</code>.</li>
+</ol>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Events usually say it directly</span>
+kubectl describe pod &lt;name&gt; -n &lt;ns&gt;
+<span class="hljs-comment"># Events: 0/3 nodes are available: 3 Insufficient memory.</span>
+<span class="hljs-comment"># or:     0/3 nodes available: 3 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }</span>
+
+<span class="hljs-comment"># Confirm what each node actually has left</span>
+kubectl describe nodes | grep -A4 <span class="hljs-string">&quot;Allocated resources&quot;</span>
+</code></pre>
+<p>Fix: reduce the request to what the app actually needs (or add nodes). The catch: CPU requests reserve capacity even when the app is idle. A <code>requests.cpu: 2000m</code> on a node with 2 cores leaves zero room and nothing will schedule there. <code>requests</code> express the guaranteed floor; set them from measured usage, not from limits.</p>
+<hr>
+<h2>Scenario 2: ImagePullBackOff / ErrImagePull</h2>
+<p>The scheduler placed the pod but the kubelet cannot pull the image. The pod shows <code>ErrImagePull</code> on the first failure, then <code>ImagePullBackOff</code> as the kubelet retries with backoff.</p>
+<p>Causes ranked:</p>
+<ol>
+<li>Tag does not exist: a typo, a <code>:latest</code> override, or the image was never pushed with that tag.</li>
+<li>Private registry with no pull secret, or the secret exists but is not referenced in the pod's <code>imagePullSecrets</code>.</li>
+<li>Docker Hub rate limit: anonymous pulls are capped at roughly 100 per 6 hours per IP. On shared nodes this triggers unexpectedly.</li>
+</ol>
+<pre><code class="hljs" data-lang="bash">kubectl describe pod &lt;name&gt;
+<span class="hljs-comment"># Events:</span>
+<span class="hljs-comment">#   Failed to pull image &quot;myrepo/app:v1.2&quot;: rpc error: ...</span>
+<span class="hljs-comment">#   unauthorized: authentication required</span>
+<span class="hljs-comment">#   or: manifest for myrepo/app:v1.2 not found</span>
+
+<span class="hljs-comment"># Verify the pull secret exists and is the correct type</span>
+kubectl get secret my-registry-secret -o yaml
+<span class="hljs-comment"># type: kubernetes.io/dockerconfigjson   &lt;- correct type</span>
+</code></pre>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">imagePullSecrets:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">my-registry-secret</span>
+  <span class="hljs-attr">containers:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">app</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">registry.example.com/myrepo/app:v1.2</span>
+</code></pre>
+<p>The catch: the secret must live in the same namespace as the pod. A secret in <code>default</code> does not help a pod in <code>production</code>. In clusters using a service-account-bound pull secret, patch the service account rather than each Deployment individually.</p>
+<hr>
+<h2>Scenario 3: CrashLoopBackOff</h2>
+<p>The container starts and exits. Kubernetes restarts it with exponential backoff: 10 s, 20 s, 40 s, up to 5 minutes. The symptom looks alarming; the root cause ranges from a one-line config fix to a fundamental app bug.</p>
+<p>Causes ranked:</p>
+<ol>
+<li>App crash on startup: missing env var, bad connection string, missing config file.</li>
+<li>OOMKilled: exit code 137, kernel kills the process the moment it exceeds its memory limit.</li>
+<li>Mis-tuned liveness probe killing a healthy-but-slow-starting app.</li>
+<li>Wrong command or entrypoint in the image.</li>
+</ol>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Read the last crash&#x27;s stdout</span>
+kubectl logs &lt;pod&gt; --previous
+
+<span class="hljs-comment"># Check exit code and restart count</span>
+kubectl describe pod &lt;pod&gt;
+<span class="hljs-comment"># Last State:  Terminated</span>
+<span class="hljs-comment">#   Reason:    OOMKilled  Exit Code: 137</span>
+<span class="hljs-comment"># or:</span>
+<span class="hljs-comment">#   Reason:    Error      Exit Code: 1</span>
+</code></pre>
+<p>The classic cascade that catches people off guard: a liveness probe with <code>initialDelaySeconds: 5</code> on an app that takes 30 seconds to load a model or build a cache will kill the container the moment the probe fails. Kubernetes restarts it; the probe fails again immediately; the pod enters CrashLoopBackOff with exit code 0 or 137 and no helpful app log. The fix is to set <code>initialDelaySeconds</code> long enough for the app to be genuinely healthy, and to use a separate readiness probe to gate traffic in the meantime.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">livenessProbe:</span>
+  <span class="hljs-attr">httpGet:</span>
+    <span class="hljs-attr">path:</span> <span class="hljs-string">/healthz</span>
+    <span class="hljs-attr">port:</span> <span class="hljs-number">8080</span>
+  <span class="hljs-attr">initialDelaySeconds:</span> <span class="hljs-number">60</span>    <span class="hljs-comment"># longer than your worst-case cold-start</span>
+  <span class="hljs-attr">periodSeconds:</span> <span class="hljs-number">10</span>
+  <span class="hljs-attr">failureThreshold:</span> <span class="hljs-number">3</span>
+<span class="hljs-attr">readinessProbe:</span>
+  <span class="hljs-attr">httpGet:</span>
+    <span class="hljs-attr">path:</span> <span class="hljs-string">/ready</span>
+    <span class="hljs-attr">port:</span> <span class="hljs-number">8080</span>
+  <span class="hljs-attr">initialDelaySeconds:</span> <span class="hljs-number">10</span>
+  <span class="hljs-attr">periodSeconds:</span> <span class="hljs-number">5</span>
+  <span class="hljs-attr">failureThreshold:</span> <span class="hljs-number">3</span>
+</code></pre>
+<p>Readiness controls traffic; liveness controls restarts. They are different knobs and should not be the same probe with the same thresholds.</p>
+<hr>
+<h2>Scenario 4: Rollout stuck, Deployment never fully available</h2>
+<p>You apply a Deployment update. The rollout starts but never finishes. Old pods keep serving; new pods never become fully available.</p>
+<pre><code class="hljs" data-lang="bash">kubectl rollout status deployment/&lt;name&gt;
+<span class="hljs-comment"># Waiting for deployment &quot;&lt;name&gt;&quot; rollout to finish:</span>
+<span class="hljs-comment">#   1 out of 3 new replicas have been updated...</span>
+
+<span class="hljs-comment"># See counts and strategy</span>
+kubectl describe deployment &lt;name&gt;
+<span class="hljs-comment"># Replicas: 3 desired | 1 updated | 3 total | 2 available | 1 unavailable</span>
+<span class="hljs-comment"># StrategyType: RollingUpdate</span>
+<span class="hljs-comment"># RollingUpdateStrategy: 25% max unavailable, 25% max surge</span>
+</code></pre>
+<p>Causes:</p>
+<ol>
+<li>New pods fail their readiness probe. They never enter <code>Running/Ready</code>, so the rollout controller refuses to proceed to the next batch.</li>
+<li><code>maxUnavailable: 0</code> with new pods also not ready means the controller cannot take any old pod down, and cannot bring any new pod up past 0 ready.</li>
+<li>Not enough cluster capacity for the surge (loops back to Pending).</li>
+</ol>
+<p>Diagnose the new pods directly. They will be in <code>Running</code> with <code>0/1</code> ready containers. Describe them and read Events and the probe section. The catch: a rollout is blocked in both directions by design. If you pushed a bad probe config, you need to push another update to fix it. The controller will not self-heal a deployment that is stuck due to its own spec.</p>
+<hr>
+<h2>Scenario 5: I can't reach my Service</h2>
+<p>The pods are running but network calls to the Service fail. This is a layered problem: check selector, then Endpoints, then DNS, then NetworkPolicy.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Step 1: does the Service have any endpoints at all?</span>
+kubectl get endpoints &lt;svc-name&gt; -n &lt;ns&gt;
+<span class="hljs-comment"># Endpoints: &lt;none&gt;   &lt;- selector does not match any running pods</span>
+
+<span class="hljs-comment"># Step 2: compare the Service selector with actual pod labels</span>
+kubectl get svc &lt;svc-name&gt; -o jsonpath=<span class="hljs-string">&#x27;{.spec.selector}&#x27;</span>
+<span class="hljs-comment"># {&quot;app&quot;:&quot;myapp&quot;}</span>
+kubectl get pods -l app=myapp -n &lt;ns&gt; --show-labels
+<span class="hljs-comment"># No resources found  &lt;- the label is different on the pods</span>
+
+<span class="hljs-comment"># Step 3: test DNS from inside the cluster</span>
+kubectl run tmp --image=busybox --restart=Never -it --<span class="hljs-built_in">rm</span> -- \
+  nslookup myapp.production.svc.cluster.local
+
+<span class="hljs-comment"># Step 4: bypass the Service entirely to isolate networking vs routing</span>
+kubectl port-forward svc/&lt;svc-name&gt; 8080:80 -n &lt;ns&gt;
+curl localhost:8080
+</code></pre>
+<p>A selector mismatch is the most common cause. The Service was written with <code>app: myapp</code> but the pod has <code>app.kubernetes.io/name: myapp</code>, or there is a namespace typo, or a deployment was renamed. If <code>kubectl get endpoints</code> returns <code>&lt;none&gt;</code>, the fix is the selector, not the network stack.</p>
+<p>NetworkPolicy default-deny is the second most common: a <code>NetworkPolicy</code> with no ingress rules blocks all incoming traffic to pods in that namespace silently. Check with <code>kubectl get networkpolicy -n &lt;ns&gt;</code> and read the <code>Ingress</code> rules.</p>
+<p>The catch: <code>targetPort</code> must match the port the container actually listens on, not the Service's own port. A Service with <code>port: 80, targetPort: 8080</code> works only if the container listens on 8080. Getting these reversed produces requests that arrive at the pod's IP but get refused at the socket layer, with no event and no clear error message.</p>
+<hr>
+<h2>Scenario 6: OOMKilled vs CPU throttling</h2>
+<p>Two distinct resource failure modes, one loud and one silent.</p>
+<p><strong>OOMKilled (memory limit exceeded):</strong> the Linux kernel kills the process when it exceeds <code>limits.memory</code>. Exit code 137. Visible immediately in <code>kubectl describe pod</code> under <code>Last State: Terminated Reason: OOMKilled</code>. The pod restarts; if it OOMKills again quickly you get CrashLoopBackOff. Fix: raise the limit, or fix the memory leak. Check <code>kubectl top pod</code> to see live usage.</p>
+<p><strong>CPU throttling (not a kill):</strong> the container is not killed. It runs slowly. The Linux CFS scheduler caps CPU usage at the <code>limits.cpu</code> ceiling, measured in 100 ms windows. A container limited to <code>500m</code> that wants <code>2000m</code> CPU is throttled to 25% speed. There is no log entry, no event, no exit code. The only symptom is latency rising or throughput falling.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Live usage</span>
+kubectl top pod &lt;name&gt; -n &lt;ns&gt;
+
+<span class="hljs-comment"># What is configured</span>
+kubectl describe pod &lt;name&gt; | grep -A6 Limits
+</code></pre>
+<p>The catch: setting no CPU limit avoids throttling but allows a runaway process to starve neighbours. The right approach is a limit, set from measured 99th-percentile usage, not a guess. <code>kubectl top</code> shows current; use your metrics store (Prometheus, Datadog) for the histogram. As a side note, the QoS class follows from how you set requests and limits: <code>Guaranteed</code> (requests equal limits on all containers) has the lowest eviction priority under memory pressure; <code>BestEffort</code> (no requests or limits) is evicted first.</p>
+<hr>
+<h2>Scenario 7: Node NotReady and evictions</h2>
+<p>Pods start disappearing from a node, or new pods will not schedule onto it.</p>
+<pre><code class="hljs" data-lang="bash">kubectl get nodes
+<span class="hljs-comment"># NAME      STATUS     ROLES   AGE   VERSION</span>
+<span class="hljs-comment"># node-3    NotReady   &lt;none&gt;  3d    v1.36.1</span>
+
+kubectl describe node node-3
+<span class="hljs-comment"># Conditions:</span>
+<span class="hljs-comment">#   MemoryPressure  False</span>
+<span class="hljs-comment">#   DiskPressure    True   &lt;- kubelet is running out of disk</span>
+<span class="hljs-comment">#   PIDPressure     False</span>
+<span class="hljs-comment">#   Ready           False</span>
+
+<span class="hljs-comment"># Is it just manually cordoned?</span>
+kubectl get node node-3 -o jsonpath=<span class="hljs-string">&#x27;{.spec.unschedulable}&#x27;</span>
+<span class="hljs-comment"># true  &lt;- someone ran kubectl cordon</span>
+</code></pre>
+<p><code>DiskPressure</code> is the most common in production, especially on nodes running many short-lived jobs that fill <code>/var/log</code> or the container image overlay. When the kubelet detects pressure it automatically adds a <code>node.kubernetes.io/disk-pressure:NoSchedule</code> taint. Pods with no matching toleration are not scheduled there; existing pods without <code>NoExecute</code> tolerance are eventually evicted starting with <code>BestEffort</code> and <code>Burstable</code> QoS.</p>
+<p>Free disk by pruning unused images (<code>crictl rmi --prune</code>), adjusting log rotation, or increasing volume size. The catch: once the taint goes on, the eviction sequence is determined by QoS class and pod priority, not by which pods are &quot;least important&quot; in your head. If you need a critical pod to survive node pressure, give it a <code>PriorityClass</code> with a high integer value and explicit tolerations for the pressure taints.</p>
+<hr>
+<h2>Scenario 8: Forbidden and won't-start-by-policy</h2>
+<p>Two causes that share a similar surface symptom but require different fixes.</p>
+<p><strong>RBAC denial:</strong> a service account or user is missing the right Role or ClusterRole binding. The response body and the audit log are explicit.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Test whether a service account can do a specific thing</span>
+kubectl auth can-i get secrets -n production \
+  --as=system:serviceaccount:production:my-sa
+<span class="hljs-comment"># no</span>
+
+<span class="hljs-comment"># See what bindings the SA has</span>
+kubectl get rolebindings,clusterrolebindings -n production -o wide | grep my-sa
+</code></pre>
+<p>Fix: create a Role covering the exact verbs and resources needed, and bind it. The catch: granting <code>cluster-admin</code> &quot;just to unblock&quot; creates a blast radius where one compromised credential is full cluster write. Use audit logs to identify exactly which API calls the service makes, and grant only those.</p>
+<p><strong>Pod Security Admission (PSA):</strong> PodSecurityPolicy was removed in Kubernetes 1.25. The replacement is PSA, which enforces one of three built-in profiles at the namespace level via labels: <code>privileged</code>, <code>baseline</code>, or <code>restricted</code>. A pod running as root or requesting <code>hostNetwork: true</code> in a <code>restricted</code> namespace is rejected at admission time with a clear message.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># See which profile the namespace enforces</span>
+kubectl get ns production -o jsonpath=<span class="hljs-string">&#x27;{.metadata.labels}&#x27;</span>
+<span class="hljs-comment"># {&quot;pod-security.kubernetes.io/enforce&quot;:&quot;restricted&quot;}</span>
+
+<span class="hljs-comment"># The rejection you will see</span>
+<span class="hljs-comment"># Error from server (Forbidden): pods &quot;my-pod&quot; is forbidden:</span>
+<span class="hljs-comment"># violates PodSecurity &quot;restricted:latest&quot;:</span>
+<span class="hljs-comment"># allowPrivilegeEscalation != false, runAsNonRoot != true</span>
+</code></pre>
+<p>Fix: either relax the namespace profile label (a business and security decision) or make the pod comply. The <code>warn</code> and <code>audit</code> modes let you detect violations without blocking, which is the right way to tighten an existing namespace without surprises.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-comment"># Gradual tightening: warn and audit first, then switch enforce once clean</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">labels:</span>
+    <span class="hljs-attr">pod-security.kubernetes.io/warn:</span> <span class="hljs-string">restricted</span>
+    <span class="hljs-attr">pod-security.kubernetes.io/audit:</span> <span class="hljs-string">restricted</span>
+    <span class="hljs-attr">pod-security.kubernetes.io/enforce:</span> <span class="hljs-string">baseline</span>
+</code></pre>
+<hr>
+<h2>How to narrate this in the interview</h2>
+<p>Interviewers running a live Kubernetes round are not testing whether you can recite YAML. They are watching how you reason under a symptom. Say the hypothesis before you run the command. &quot;I expect the Events block to name why the scheduler rejected this pod, so I'll describe it first.&quot; Then read the output and update your hypothesis out loud. &quot;Events say insufficient memory. My next step is to check node allocatable capacity against this pod's resource request.&quot;</p>
+<p>That loop, stated clearly, is the answer. The interviewer can see you understand the mechanism, knew which command to run before you ran it, and move from symptom to root cause rather than from topic to topic. Speed matters less than the ability to demonstrate that each move follows logically from what the previous one showed.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>
