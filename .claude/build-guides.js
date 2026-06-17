@@ -115,6 +115,14 @@ const GUIDES = [
     subtitle: 'Architecting the client application for a combined coding and system design round: a framework to drive the conversation, rendering and data strategy, scale, and two worked examples shaped like the real role.',
     accent:   '#2e5280',  // slate (also used by python-backend — different section)
   },
+  {
+    src:      '.claude/backend-md/system-design-backend-prep.md',
+    out:      'system-design/backend-system-design-guide.html',
+    kicker:   'Interview Preparation · Backend System Design',
+    title:    'Backend System Design',
+    subtitle: 'Driving the room, the 1K-to-1M-plus three-tier scaling ladder, the outbox/inbox patterns, availability mechanics, and the RAG and OLAP cases, with worked drives from real interviews.',
+    accent:   '#1e5fa8',  // cobalt
+  },
 
   // ---- DevOps --------------------------------------------------
   {
@@ -203,6 +211,7 @@ const GUIDES = [
 //  deep violet #5b3a8c   coding-simulator-guide       -- AA on white
 //  ocean       #0d5c8c   kubernetes-troubleshooting   -- AA on white (6.5:1)
 //  moss        #5c6b1f   platform-engineer-prep       -- AA on white (5.3:1)
+//  cobalt      #1e5fa8   system-design-backend-prep   -- AA on white (5.6:1)
 // ----------------------------------------------------------------
 
 // ================================================================
