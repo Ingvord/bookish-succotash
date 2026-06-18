@@ -33,6 +33,8 @@ The distinction that decides a staff verdict. Coordination is aligning people: r
 
 The sharpest way to hold the line in your own head: a best practice that depends on people remembering to follow it is coordination. The same practice encoded so it cannot be violated is technical leadership. The interviewer is listening for which one you actually did.
 
+There is a second axis the title tests, beyond enforcement: whether you own the problem or only the solution. Being handed a solution and executing it well is valuable, but it is execution. Owning the problem is the staff signal: you decide what is worth building, define what success and ROI look like, carry it through to production, and run it afterward. "You build it, you run it" is the compact version. When you tell a project story, make clear which one it was, because "I was told to build X and I built it" reads a full level below "I identified that X was the problem worth solving, made the case for it, and carried it to production."
+
 The technical means that turn a practice into something enforced, stated generally so it transfers to any architecture or standards effort:
 
 - Automated enforcement: lint rules, type checks, continuous-integration gates, pre-commit hooks, custom static analysis that fail the build when the rule is broken.
@@ -46,7 +48,26 @@ The reframe move in the room: when asked about a standards or architecture effor
 
 ---
 
-## 3. A worked reframe: from pattern to enforcement
+## 3. Driving decisions without an ivory tower: tech-topic to ADR
+
+The same claims-versus-mechanisms test applies to how you make architectural decisions, and interviewers increasingly ask about the process directly: "how do you make architecture decisions?" The weak answer is "we discuss it as a team." The answer that signals staff is a lightweight, written pipeline that turns a question into a captured decision, run by the engineer who owns the problem rather than by a separate architecture board.
+
+**What.** Two templated documents carry it. The first is a tech-topic: a design document for any technical question, structured as context, the question being asked, the options on the table, and the tradeoffs weighed explicitly as cost, benefit, and opportunity. The second is an Architecture Decision Record (ADR), written once the stakeholders and the decision-owner are comfortable with a direction. The ADR records the decision, the tradeoff accepted, the scope of the debt taken on and the plan to pay it back, and the impacts that follow. The tech-topic is where you think; the ADR is where the thinking becomes durable.
+
+**Why it matters.** This is the thesis of this guide expressed as an artifact. A decision discussed in a meeting and never written down holds only as long as the people who were in the room. An ADR is the mechanism that makes the decision survive reorgs, onboarding, and your own forgetting: the next engineer reads why, not just what. The deliberate philosophy behind it is that there is no team of architects in an ivory tower prescribing patterns they never implement. Every engineer owns the decisions for the problem they own, and the template is what makes that ownership safe rather than chaotic. Note the debt field specifically: it forces debt to be taken consciously and named, with a payback plan, rather than accumulated by accident.
+
+```text
+tech-topic  ->  context | question | options | tradeoffs (cost / benefit / opportunity)
+ADR         ->  decision | tradeoff accepted | scope of debt + payback plan | impacts
+```
+
+The shape above is the difference between a decision you can defend a year later and one you cannot reconstruct.
+
+**Catch.** The honest failure mode, and naming it is itself a staff signal, is that the process gets bypassed exactly when it matters most. Under deadline pressure (the request lands Monday, the demo is Wednesday) teams cut the corner and ship without writing anything. Agentic coding makes this worse: it is trivial to prompt a model, get a few pull requests, and merge with no design phase and no discussion at all. The line to carry into the room: a decision was still made, it just was not discussed, so nobody weighed the tradeoffs and nothing was captured. The staff engineer's job is not to add process for its own sake; it is to restore the design step, even a lightweight five-minute one, before the code, so the decision is a decision and not an accident. That is the same move as section 2: enforce the right thing rather than hope people remember it.
+
+---
+
+## 4. A worked reframe: from pattern to enforcement
 
 Take a generic claim and watch it move from collapsing to holding. The topic is consistency across teams, but the shape applies to any leadership claim.
 
@@ -77,7 +98,7 @@ What changed is exactly the method from section 1. The decision stayed the same;
 
 ---
 
-## 4. AI maturity versus enthusiasm
+## 5. AI maturity versus enthusiasm
 
 The second face of the same pattern. Enthusiasm is the headline: you are excited about AI, you built a demo, you use it daily. Maturity is the mechanism: you understand how to engineer with AI reliably, and you are aware of how the field has moved. Under probing, enthusiasm without maturity reads the same way coordination without leadership does, as motion without substance.
 
@@ -87,7 +108,7 @@ The honesty guard matters here as much as anywhere: if your practice really has 
 
 ---
 
-## 5. The AI engineering harness
+## 6. The AI engineering harness
 
 The generalizable framework behind that maturity, and a useful mental model regardless of this one interview. A harness is the scaffolding you build around a model so its output is reliable. It has four parts, and naming them is the difference between sounding current and sounding a year behind.
 
@@ -103,7 +124,7 @@ The signal this sends: you think about AI as an engineering system with inputs, 
 
 ---
 
-## 6. How to prepare and how to answer under probing
+## 7. How to prepare and how to answer under probing
 
 The preparation is the three-layer drill from section 1, run against everything you might say. For each project, can you name the decision, the mechanism, and the evidence. For your AI practice, can you speak to context, tools, constraints, and evaluation, and describe how the field has moved. Where you cannot, either build the missing depth before the interview or scope the claim down to what you can defend.
 
@@ -111,7 +132,7 @@ In the room, the rule is simple: when the interviewer pushes deeper, move toward
 
 ---
 
-## 7. The pre-interview audit
+## 8. The pre-interview audit
 
 Run every claim you intend to make through this before the day.
 

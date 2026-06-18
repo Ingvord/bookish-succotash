@@ -103,6 +103,18 @@ Why it works: the business row and the event commit together or not at all, so t
 
 ---
 
+## Anti-patterns: how good architecture decays
+
+A design round often turns to "what is the best and the worst architecture decision you have made," and the strongest answers show you understand how a clean design rots over time, not just how to draw one on a whiteboard. Three failure modes come up again and again, and each has a mechanism that prevents it.
+
+**The distributed monolith.** A set of services live in one repository, meant to be released independently, but they are so tightly coupled (to a shared backend and to each other) that no service ships without shipping the rest. You pay the operational cost of microservices (separate deploys, network hops, partial-failure handling) while keeping the release cadence of a monolith. Why it bites: the coupling is invisible day to day and only shows up the moment you try to release one piece and discover you cannot. The catch and the fix: independent release is a property of versioned contracts at the boundaries, not of separate folders. The test to apply is concrete, can you deploy service A against the previous version of service B and have it work. If not, you have a monolith wearing a microservices costume, and splitting the repo did not split the system.
+
+**Accidental over-abstraction.** Someone builds a beautiful general-purpose layer, clean abstractions everywhere, for one specific purpose, and it is genuinely impressive on the day it ships. Then the requirements move, as they always do, and the abstraction that fit the original purpose now fights every new one. A common symptom is an impedance mismatch between layers: one side creates resources dynamically on demand while the other (say a Terraform or other declarative infrastructure description) can only ingest them statically, so every change means bending the system backwards to reconcile the two models. Why: an abstraction encodes the assumptions you held when you wrote it, and the cost of a wrong assumption shows up only later when it breaks. The catch is YAGNI in reverse: prefer the abstraction you can delete cheaply over the elegant one you cannot, and do not build for a generality the requirements have not yet demanded.
+
+**Architecture by drift, and Conway's law.** The worst decisions are frequently the ones nobody consciously made. The system accreted into its current shape as requirements changed, one expedient choice at a time, and no single moment is where you would say "that was the mistake." This compounds with reorganizations: a component that had a clear owner loses it when a team is restructured, and "who owns this" becomes a manhunt that ends in "I used to, but not anymore." The catch and the mechanism: ownership has to be encoded, not remembered, through CODEOWNERS files and a service catalog that names a current owner for every component, and consequential decisions have to be captured in Architecture Decision Records (see the staff-level guide on the tech-topic to ADR pipeline) so the reasoning survives the people. Drift is the default; resisting it takes an explicit mechanism.
+
+---
+
 ## Availability: the numbers and how you buy each nine
 
 You are expected to recite the availability budget on demand. Each nine is a downtime allowance: 99% is about 3.65 days a year, 99.9% (three nines) is about 8.8 hours a year or 43 minutes a month, 99.99% (four nines) is about 52 minutes a year, and 99.999% (five nines) is about 5 minutes a year. The full table with monthly and daily columns, plus the SLI/SLO/SLA and error-budget framing, lives in Scaling Foundations; what a design round wants is not the recitation but the mechanism: how you actually buy each nine.

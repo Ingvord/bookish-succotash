@@ -12,41 +12,50 @@ Install once per working directory:
 npm install markdown-it highlight.js
 ```
 
-`build-guide.js` converts a Markdown file to HTML. Before each build, set four values at the top of the file:
+`.claude/build-guides.js` is a manifest-driven builder: it converts every guide's Markdown source to a styled, syntax-highlighted HTML file in one run. There is no per-file editing of placeholders.
 
-| Placeholder | Description |
+To add or change a guide, edit the `GUIDES` array in `.claude/build-guides.js`. Each entry is one guide:
+
+| Field | Description |
 |---|---|
-| `REPLACE_INPUT` | Source Markdown filename |
-| `REPLACE_OUTPUT` | Output HTML filename |
-| `REPLACE_KICKER` | Short label, e.g. `'Interview Preparation · Python'` |
-| `REPLACE_TITLE` | H1 title (not in the Markdown — comes from META) |
-| `REPLACE_SUBTITLE` | One sentence shown under the title |
-| `REPLACE_ACCENT` | Hex accent colour from the palette below |
+| `src` | Source Markdown filename (relative to repo root) |
+| `out` | Output HTML filename (relative to repo root) |
+| `kicker` | Short label, e.g. `'Interview Preparation · Python'` |
+| `title` | Used for the `<title>` tag (and the `<h1>` when `h1` is absent) |
+| `h1` | Optional: the `<h1>` heading when it differs from `title` |
+| `subtitle` | One sentence shown under the title |
+| `accent` | Hex accent colour from the palette below |
 
-Run: `node build-guide.js`
+Metadata lives in the manifest entry, not in the Markdown (the Markdown still starts at the first `##`). Drafts not ready to ship stay out of the `GUIDES` array (see the `EXCLUDED DRAFTS` comment in the builder).
+
+Run (rebuilds every guide in the manifest): `node .claude/build-guides.js`
 
 ### Accent Colour Palette
 
-All colours pass WCAG AA contrast on white.
+All colours pass WCAG AA contrast on white. The authoritative list is the palette comment in `.claude/build-guides.js`; keep this table in sync with it. Each guide in a set gets a distinct accent.
 
-| Name | Hex | Status |
+| Name | Hex | Used by |
 |---|---|---|
-| Teal | `#0f6e62` | Used |
-| Terracotta | `#b0502f` | Used |
-| Indigo | `#33408c` | Used |
-| Burgundy | `#8a2436` | Used |
-| Deep Cyan | `#0a6b82` | Used |
-| Forest | `#2d6a44` | Used |
-| Slate | `#2e5280` | Used |
-| Amber | `#7a5500` | Used |
-| Plum | `#6b3585` | Free |
-
-Update the Status column whenever a colour is used so each guide in a set has a distinct accent.
+| Teal | `#0f6e62` | vue-interview-prep |
+| Terracotta | `#b0502f` | js-interview-prep |
+| Indigo | `#33408c` | interview-question-bank |
+| Burgundy | `#8a2436` | java-classic-prep, staff-depth-guide |
+| Deep Cyan | `#0a6b82` | java-cloud-native-prep |
+| Forest | `#2d6a44` | nodejs-backend-prep |
+| Slate | `#2e5280` | python-backend-prep, frontend-system-design |
+| Amber | `#7a5500` | scaling-foundations-prep, modules-build-guide |
+| Plum | `#6b3585` | relational-db-prep |
+| Rose | `#9d3658` | redis-prep |
+| Steel | `#3f5566` | kafka-prep |
+| Deep Violet | `#5b3a8c` | coding-simulator-guide |
+| Ocean | `#0d5c8c` | kubernetes-troubleshooting |
+| Moss | `#5c6b1f` | platform-engineer-prep |
+| Cobalt | `#1e5fa8` | system-design-backend-prep |
 
 ### Sanity-check after build
 
 ```js
-const h = require('fs').readFileSync('OUTPUT.html', 'utf8')
+const h = require('fs').readFileSync('level/platform-engineer-prep.html', 'utf8')  // swap for the guide's `out` path
 console.log('h2:', (h.match(/<h2/g)||[]).length,
             '| code:', (h.match(/<pre>/g)||[]).length,
             '| hljs:', (h.match(/hljs-keyword/g)||[]).length,
