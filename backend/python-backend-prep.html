@@ -433,6 +433,193 @@ app = FastAPI(lifespan=lifespan)
 </code></pre>
 <p>The counterintuitive rule worth stating outright: a <em>synchronous</em> <code>def</code> handler can be safer than a badly written <code>async def</code> one, because FastAPI threads the sync handler off the loop, whereas a blocking call in an async handler poisons the whole worker. &quot;Async everywhere&quot; is not the goal; &quot;never block the loop&quot; is.</p>
 <hr>
+<h2>Concurrency for I/O-bound data pipelines: asyncio vs threading vs multiprocessing</h2>
+<p>Instrument backends running at kilohertz data rates make the concurrency choice visible in a way web services rarely do. The stakes are concrete: pick the wrong model and you either hit a bottleneck that has nothing to do with Python, or you introduce the unbounded-memory failure that only appears at production data rates.</p>
+<h3>The three-way choice, and why the GIL is a non-issue here</h3>
+<p>Lead with the rule: the GIL only serializes Python bytecode. It is released during blocking I/O (socket reads, file reads) and inside C extensions like NumPy and SciPy. At kilohertz detector rates the bottleneck is waiting on the detector socket, not executing bytecode, so the GIL never becomes the limit. This is the answer to give when an interviewer asks whether the GIL makes Python unsuitable for scientific data collection: it does not, because the work is either I/O-bound (GIL released during the kernel wait) or NumPy-bound (GIL released inside the C layer). The three-way decision comes down to which bottleneck you actually have.</p>
+<table>
+<thead>
+<tr>
+<th>Workload</th>
+<th>GIL relevant?</th>
+<th>Right tool</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Socket/file reads, network detectors</td>
+<td>No (GIL released during I/O)</td>
+<td>asyncio event loop or thread pool</td>
+</tr>
+<tr>
+<td>NumPy/SciPy array processing</td>
+<td>No (GIL released in C layer)</td>
+<td>asyncio.to_thread + ThreadPoolExecutor</td>
+</tr>
+<tr>
+<td>Pure-Python CPU loops</td>
+<td>Yes (GIL held)</td>
+<td>multiprocessing / ProcessPoolExecutor</td>
+</tr>
+<tr>
+<td>Mixed I/O + array compute</td>
+<td>No (for both legs)</td>
+<td>asyncio loop + to_thread for array work</td>
+</tr>
+</tbody>
+</table>
+<p>The catch: the three tools are not interchangeable. Threads work for I/O-bound and GIL-releasing native compute but not for pure-Python CPU loops (each thread still waits its turn for the GIL, so four threads are slower than one due to contention overhead). Processes parallelize anything but pay a serialization cost on every data crossing (pickling a 10 MB NumPy frame across a process boundary costs more than processing it on a thread where NumPy already drops the GIL). asyncio scales I/O concurrency furthest with the lowest overhead, but any synchronous call on the event-loop thread still stalls everything, as the prior section showed.</p>
+<h3>Your Node.js event loop translates directly to asyncio</h3>
+<p>If you come from Node, the asyncio mental model is the same event-loop story: one thread runs a loop that drives I/O callbacks and resumes suspended coroutines, and no two async steps run concurrently unless you explicitly create tasks. The APIs have different names, but the semantics are one-to-one.</p>
+<pre><code class="hljs" data-lang="text">Node.js                              asyncio / Python
+---------------------------          -----------------------------------
+event loop (libuv)               -&gt;  asyncio event loop
+async function / await           -&gt;  async def coroutine / await
+Promise.all([...])               -&gt;  asyncio.gather(coro1, coro2, ...)
+new Promise(resolve, reject)     -&gt;  asyncio.Future (or asyncio.create_task)
+EventEmitter / net.Socket        -&gt;  asyncio.Protocol + transport
+stream backpressure              -&gt;  asyncio.Queue(maxsize=N) + transport.pause_reading()
+worker_threads (I/O offload)     -&gt;  asyncio.to_thread / loop.run_in_executor(ThreadPool)
+worker_threads (CPU offload)     -&gt;  loop.run_in_executor(ProcessPoolExecutor)
+setTimeout / setInterval         -&gt;  loop.call_later / asyncio.sleep in a loop
+</code></pre>
+<p>The one real divergence: Node mostly prevents you from calling blocking synchronous code from inside an async function (it would block the main thread visibly and is hard to do accidentally). Python lets you make that mistake silently inside a coroutine, which is exactly the blocking-the-loop footgun the prior section described. Everything else maps cleanly: once you internalize the event-loop model from Node, asyncio is a vocabulary swap, not a conceptual shift.</p>
+<h3>Producer-consumer with asyncio.Queue (the kHz pipeline)</h3>
+<p>The canonical pattern for kilohertz instrument data is a producer coroutine reading detector frames and pushing them into a bounded <code>asyncio.Queue</code>, with a pool of consumer tasks draining and processing. The queue is the coupling point: it decouples the read rate from the compute rate, and its <code>maxsize</code> is what makes backpressure explicit rather than implicit.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> asyncio
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> <span class="hljs-type">Optional</span>
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">producer</span>(<span class="hljs-params">queue: asyncio.Queue, detector</span>) -&gt; <span class="hljs-literal">None</span>:
+    <span class="hljs-string">&quot;&quot;&quot;Read frames from the detector and push them into the pipeline queue.
+    Suspends on await queue.put() when the queue is full, which is the
+    backpressure signal: the consumer is falling behind, so slow the reader.&quot;&quot;&quot;</span>
+    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
+        frame: <span class="hljs-type">Optional</span>[np.ndarray] = <span class="hljs-keyword">await</span> detector.read_frame()
+        <span class="hljs-keyword">if</span> frame <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+            <span class="hljs-keyword">break</span>
+        <span class="hljs-keyword">await</span> queue.put(frame)    <span class="hljs-comment"># suspends here when queue.maxsize is reached</span>
+    <span class="hljs-keyword">await</span> queue.put(<span class="hljs-literal">None</span>)         <span class="hljs-comment"># sentinel: one None tells all consumers to drain and exit</span>
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">consumer</span>(<span class="hljs-params">queue: asyncio.Queue, worker_id: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-literal">None</span>:
+    <span class="hljs-string">&quot;&quot;&quot;Pull frames from the queue and process them. Propagates the shutdown
+    sentinel so every sibling worker also receives it and exits cleanly.&quot;&quot;&quot;</span>
+    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
+        frame = <span class="hljs-keyword">await</span> queue.get()
+        <span class="hljs-keyword">if</span> frame <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:         <span class="hljs-comment"># received the shutdown sentinel</span>
+            <span class="hljs-keyword">await</span> queue.put(<span class="hljs-literal">None</span>) <span class="hljs-comment"># pass it along for the next sibling</span>
+            queue.task_done()
+            <span class="hljs-keyword">return</span>
+        <span class="hljs-keyword">await</span> process_frame(frame)
+        queue.task_done()
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">run_pipeline</span>(<span class="hljs-params">detector, n_workers: <span class="hljs-built_in">int</span> = <span class="hljs-number">4</span></span>) -&gt; <span class="hljs-literal">None</span>:
+    <span class="hljs-comment"># Bound the queue: 1000 frames * 1 MB/frame = 1 GB ceiling, not unbounded growth</span>
+    queue: asyncio.Queue = asyncio.Queue(maxsize=<span class="hljs-number">1000</span>)
+    <span class="hljs-comment"># Start consumers first so nothing piles up before they are listening</span>
+    workers = [
+        asyncio.create_task(consumer(queue, i))
+        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(n_workers)
+    ]
+    <span class="hljs-keyword">await</span> producer(queue, detector)  <span class="hljs-comment"># runs until the detector signals EOF</span>
+    <span class="hljs-keyword">await</span> asyncio.gather(*workers)   <span class="hljs-comment"># wait for all consumers to drain cleanly</span>
+</code></pre>
+<p>The <code>maxsize=1000</code> is the critical line. An unbounded queue silently accumulates every unprocessed frame in memory. At 1 kHz with 1 MB frames that is 1 GB per second of memory growth before any alarm fires. With a bounded queue, <code>await queue.put()</code> suspends the producer when the queue is full, applying backpressure all the way back to the read loop. The consumer count is a tuning knob: start with one per core for compute-heavy frames, or fewer if the pipeline is mostly NumPy (which releases the GIL and gets real thread-level parallelism from a smaller pool).</p>
+<h3>NumPy releases the GIL: safe array work from async context</h3>
+<p>NumPy vectorized operations (reductions, FFTs, matrix math) execute inside C extensions that release the GIL for their duration. This means a NumPy computation running on a thread-pool worker runs genuinely in parallel with the asyncio event-loop thread and with other NumPy threads. The correct pattern is <code>asyncio.to_thread</code> (or <code>loop.run_in_executor</code> with a shared pool), which submits a callable to the thread pool and returns an awaitable. The event loop suspends the coroutine, keeps draining the socket, and resumes when the thread finishes.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> asyncio
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> concurrent.futures <span class="hljs-keyword">import</span> ThreadPoolExecutor
+
+<span class="hljs-comment"># A shared pool avoids creating threads per frame; size to available cores</span>
+_pool = ThreadPoolExecutor(max_workers=<span class="hljs-number">4</span>)
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">reduce_frame</span>(<span class="hljs-params">frame: np.ndarray</span>) -&gt; <span class="hljs-built_in">float</span>:
+    <span class="hljs-string">&quot;&quot;&quot;Pure NumPy: FFT magnitude + RMS reduction. Releases the GIL throughout,
+    so this function runs truly in parallel with other threads and the event loop.&quot;&quot;&quot;</span>
+    spectrum = np.fft.rfft(frame.astype(np.float64))
+    rms = <span class="hljs-built_in">float</span>(np.sqrt((np.<span class="hljs-built_in">abs</span>(spectrum) ** <span class="hljs-number">2</span>).mean()))
+    <span class="hljs-keyword">return</span> rms
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">process_frame</span>(<span class="hljs-params">frame: np.ndarray</span>) -&gt; <span class="hljs-built_in">float</span>:
+    <span class="hljs-string">&quot;&quot;&quot;Offload the NumPy work to a thread so the event loop remains free
+    to keep draining the detector socket while the array is being crunched.&quot;&quot;&quot;</span>
+    loop = asyncio.get_running_loop()
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> loop.run_in_executor(_pool, reduce_frame, frame)
+    <span class="hljs-comment"># asyncio.to_thread(reduce_frame, frame) is equivalent using the default executor</span>
+</code></pre>
+<p>The catch: <code>asyncio.to_thread</code> and <code>ThreadPoolExecutor</code> are the right choice only when the callable releases the GIL. For pure-Python CPU loops, threads buy nothing because each thread still waits for the GIL, and the switching overhead makes four threads slower than one. For those workloads, use <code>ProcessPoolExecutor</code> and accept the pickling cost on every argument and return value. A practical test: if swapping from one thread to four threads on your workload does not improve throughput, the GIL is the bottleneck; switch to processes.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">from</span> concurrent.futures <span class="hljs-keyword">import</span> ProcessPoolExecutor
+
+<span class="hljs-comment"># For pure-Python CPU work that cannot release the GIL</span>
+_proc_pool = ProcessPoolExecutor(max_workers=<span class="hljs-number">4</span>)
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">heavy_pure_python</span>(<span class="hljs-params">data: <span class="hljs-built_in">list</span></span>) -&gt; <span class="hljs-built_in">int</span>:
+    <span class="hljs-string">&quot;&quot;&quot;GIL-bound in a ThreadPool; ProcessPool gives true parallelism at the cost
+    of pickling data across the process boundary on every call.&quot;&quot;&quot;</span>
+    loop = asyncio.get_running_loop()
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> loop.run_in_executor(_proc_pool, compute_pure_python, data)
+</code></pre>
+<h3>Detector socket via asyncio.Protocol and readable transport</h3>
+<p>For raw socket connections to a hardware detector, <code>asyncio.Protocol</code> gives you the low-level transport/protocol split that mirrors Node's <code>net.Socket</code> plus <code>EventEmitter</code>. The transport owns the socket and the OS buffer; the protocol owns the framing and application logic. You subclass <code>asyncio.Protocol</code> and implement three methods: <code>connection_made</code> (receives the transport handle), <code>data_received</code> (called with arbitrary-sized byte chunks as they arrive), and <code>connection_lost</code>.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> asyncio
+<span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Iterator
+
+FRAME_SIZE = <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>  <span class="hljs-comment"># 1 MB per detector frame (example fixed-size framing)</span>
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">split_frames</span>(<span class="hljs-params">buf: <span class="hljs-built_in">bytearray</span></span>) -&gt; Iterator[<span class="hljs-built_in">bytes</span>]:
+    <span class="hljs-string">&quot;&quot;&quot;Yield complete fixed-size frames from the accumulation buffer.
+    Real protocols use a length header or sync word; fixed size shown here for clarity.&quot;&quot;&quot;</span>
+    <span class="hljs-keyword">while</span> <span class="hljs-built_in">len</span>(buf) &gt;= FRAME_SIZE:
+        <span class="hljs-keyword">yield</span> <span class="hljs-built_in">bytes</span>(buf[:FRAME_SIZE])
+        <span class="hljs-keyword">del</span> buf[:FRAME_SIZE]
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">DetectorProtocol</span>(asyncio.Protocol):
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, queue: asyncio.Queue</span>) -&gt; <span class="hljs-literal">None</span>:
+        <span class="hljs-variable language_">self</span>.queue = queue
+        <span class="hljs-variable language_">self</span>.buf = <span class="hljs-built_in">bytearray</span>()          <span class="hljs-comment"># accumulates partial frames between calls</span>
+        <span class="hljs-variable language_">self</span>.transport: asyncio.Transport
+        <span class="hljs-variable language_">self</span>._paused = <span class="hljs-literal">False</span>
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">connection_made</span>(<span class="hljs-params">self, transport: asyncio.Transport</span>) -&gt; <span class="hljs-literal">None</span>:
+        <span class="hljs-variable language_">self</span>.transport = transport
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Connected: <span class="hljs-subst">{transport.get_extra_info(<span class="hljs-string">&#x27;peername&#x27;</span>)}</span>&quot;</span>)
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">data_received</span>(<span class="hljs-params">self, data: <span class="hljs-built_in">bytes</span></span>) -&gt; <span class="hljs-literal">None</span>:
+        <span class="hljs-string">&quot;&quot;&quot;Called by the event loop whenever bytes arrive. May be called with
+        partial frames or multiple frames in one chunk; never assume frame alignment.&quot;&quot;&quot;</span>
+        <span class="hljs-variable language_">self</span>.buf.extend(data)
+        <span class="hljs-keyword">for</span> frame <span class="hljs-keyword">in</span> split_frames(<span class="hljs-variable language_">self</span>.buf):
+            <span class="hljs-keyword">try</span>:
+                <span class="hljs-variable language_">self</span>.queue.put_nowait(frame)
+            <span class="hljs-keyword">except</span> asyncio.QueueFull:
+                <span class="hljs-comment"># Consumer pipeline is falling behind: pause reads at the socket</span>
+                <span class="hljs-comment"># level so the OS buffer absorbs the backpressure instead of memory</span>
+                <span class="hljs-variable language_">self</span>.transport.pause_reading()
+                <span class="hljs-variable language_">self</span>._paused = <span class="hljs-literal">True</span>
+                <span class="hljs-keyword">break</span>  <span class="hljs-comment"># remaining buf data waits until resume_producing is called</span>
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">resume_producing</span>(<span class="hljs-params">self</span>) -&gt; <span class="hljs-literal">None</span>:
+        <span class="hljs-string">&quot;&quot;&quot;Call from the consumer when the queue drops below a low-water threshold.&quot;&quot;&quot;</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>._paused:
+            <span class="hljs-variable language_">self</span>.transport.resume_reading()
+            <span class="hljs-variable language_">self</span>._paused = <span class="hljs-literal">False</span>
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">connection_lost</span>(<span class="hljs-params">self, exc: Exception | <span class="hljs-literal">None</span></span>) -&gt; <span class="hljs-literal">None</span>:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Detector disconnected: <span class="hljs-subst">{exc!r}</span>&quot;</span>)
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">run_detector</span>(<span class="hljs-params">host: <span class="hljs-built_in">str</span>, port: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-literal">None</span>:
+    queue: asyncio.Queue = asyncio.Queue(maxsize=<span class="hljs-number">1000</span>)
+    loop = asyncio.get_running_loop()
+    _, protocol = <span class="hljs-keyword">await</span> loop.create_connection(
+        <span class="hljs-keyword">lambda</span>: DetectorProtocol(queue), host, port
+    )
+    workers = [asyncio.create_task(consumer(queue, i)) <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">4</span>)]
+    <span class="hljs-keyword">await</span> asyncio.gather(*workers)
+</code></pre>
+<p>The catch is twofold. First, <code>data_received</code> delivers arbitrary-sized byte chunks that are never aligned to frame boundaries. You must buffer in <code>self.buf</code> and de-frame yourself; a common bug is assuming each <code>data_received</code> call contains exactly one complete frame. Second, forgetting <code>transport.pause_reading()</code> when the queue fills reintroduces the unbounded-memory failure at the socket layer: the OS keeps delivering data into <code>data_received</code>, each call appends to <code>self.buf</code> or the queue, and memory grows without bound. The <code>pause_reading</code> / <code>resume_reading</code> pair is the correct backpressure mechanism at the transport level, not an optional optimization.</p>
+<p>The higher-level alternative is <code>asyncio.open_connection</code>, which returns <code>(StreamReader, StreamWriter)</code> and handles the internal buffering for you. Use it when the protocol is line-based or simple binary and you want <code>await reader.read(N)</code> in a loop. Reach for <code>Protocol</code> directly when you need fine-grained <code>pause_reading</code> / <code>resume_reading</code> control, when the framing is complex, or when you need transport factories that the streams API does not expose (TLS transports, Unix domain sockets, UDP via <code>create_datagram_endpoint</code>).</p>
+<hr>
 <h2>Pydantic v2, validation, and contract-first APIs</h2>
 <p>Pydantic is the validation and serialization engine, and the v1-to-v2 migration is a frequent interview topic because the rewrite was substantial. Pydantic v2's core is implemented in Rust (<code>pydantic-core</code>), making validation 5 to 50 times faster, which matters because in a typical FastAPI request, validation and serialization are a real slice of the CPU budget. The API changed: <code>BaseSettings</code> moved to a separate <code>pydantic-settings</code> package, validators use the new <code>@field_validator</code>/<code>@model_validator</code> decorators, <code>.dict()</code> became <code>.model_dump()</code>, and config moved from an inner <code>Config</code> class to <code>model_config</code>. Knowing these names signals you have actually done the migration.</p>
 <pre><code class="hljs" data-lang="python"><span class="hljs-keyword">from</span> pydantic <span class="hljs-keyword">import</span> BaseModel, field_validator
@@ -542,6 +729,8 @@ result = <span class="hljs-keyword">await</span> anyio.to_thread.run_sync(heavy_
 <p><strong>How do you size worker count?</strong> Because the GIL caps pure-Python CPU parallelism per process, run roughly one worker per core (a common start is <code>2 * cores + 1</code>, fewer for memory-heavy apps), and remember each worker carries the full memory footprint, so an ML-laden app times eight workers can be gigabytes before serving a request. The real throughput ceiling is usually the database pool, by Little's Law, not the worker count.</p>
 <p><strong>How do you handle CPU-bound or slow background work?</strong> Push it out of the web process onto a task queue (Celery, Dramatiq, ARQ) with separate workers, so the web tier stays responsive and scales independently. A request that does 30 seconds of CPU work is an architecture mistake no amount of async fixes; it should enqueue the job and return immediately.</p>
 <p><strong>Contract-first or code-first OpenAPI?</strong> FastAPI generates the OpenAPI schema from your type hints and Pydantic models, so code-first is the default and the docs never drift. For contract-first shops, keep a hand-authored spec as the agreed contract and verify the implementation against it in CI (schemathesis can fuzz the API against the spec). Either way the contract is enforced mechanically, and consumers generate typed clients from the published schema.</p>
+<p><strong>Asyncio vs threading vs multiprocessing for instrument data collection?</strong> At kilohertz detector rates the work is socket-wait dominated (I/O-bound), so asyncio gives the most concurrency per thread: one event loop holds thousands of in-flight reads simultaneously. The GIL is released during blocking I/O and inside NumPy, so it is not the bottleneck here. Use <code>asyncio.to_thread</code> with a <code>ThreadPoolExecutor</code> for NumPy array work alongside the event loop, because NumPy releases the GIL and worker threads get genuine parallelism. Reserve <code>ProcessPoolExecutor</code> (multiprocessing) for pure-Python CPU loops where the GIL cannot be released; it pays a pickling cost on every data crossing but removes the serialization constraint entirely.</p>
+<p><strong>Why is the GIL not a problem for an I/O-bound scientific pipeline?</strong> The GIL only serializes Python bytecode. Detector reads spend time in the kernel waiting for socket data: no bytecode runs, so no GIL is held, and hundreds of pending reads coexist in one event-loop thread. NumPy vectorized operations (FFT, reductions, array math) run inside C extensions that release the GIL, so a thread pool of NumPy workers runs genuinely in parallel with the asyncio loop and with each other. The GIL becomes a bottleneck only when the pipeline bottleneck shifts to a pure-Python CPU loop, which a well-designed instrument pipeline avoids by expressing the compute as NumPy operations or by pushing it to a process pool.</p>
 
   </main>
   <footer class="tip-jar">

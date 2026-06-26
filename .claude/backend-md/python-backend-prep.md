@@ -116,6 +116,198 @@ The counterintuitive rule worth stating outright: a *synchronous* `def` handler 
 
 ---
 
+## Concurrency for I/O-bound data pipelines: asyncio vs threading vs multiprocessing
+
+Instrument backends running at kilohertz data rates make the concurrency choice visible in a way web services rarely do. The stakes are concrete: pick the wrong model and you either hit a bottleneck that has nothing to do with Python, or you introduce the unbounded-memory failure that only appears at production data rates.
+
+### The three-way choice, and why the GIL is a non-issue here
+
+Lead with the rule: the GIL only serializes Python bytecode. It is released during blocking I/O (socket reads, file reads) and inside C extensions like NumPy and SciPy. At kilohertz detector rates the bottleneck is waiting on the detector socket, not executing bytecode, so the GIL never becomes the limit. This is the answer to give when an interviewer asks whether the GIL makes Python unsuitable for scientific data collection: it does not, because the work is either I/O-bound (GIL released during the kernel wait) or NumPy-bound (GIL released inside the C layer). The three-way decision comes down to which bottleneck you actually have.
+
+| Workload | GIL relevant? | Right tool |
+|---|---|---|
+| Socket/file reads, network detectors | No (GIL released during I/O) | asyncio event loop or thread pool |
+| NumPy/SciPy array processing | No (GIL released in C layer) | asyncio.to_thread + ThreadPoolExecutor |
+| Pure-Python CPU loops | Yes (GIL held) | multiprocessing / ProcessPoolExecutor |
+| Mixed I/O + array compute | No (for both legs) | asyncio loop + to_thread for array work |
+
+The catch: the three tools are not interchangeable. Threads work for I/O-bound and GIL-releasing native compute but not for pure-Python CPU loops (each thread still waits its turn for the GIL, so four threads are slower than one due to contention overhead). Processes parallelize anything but pay a serialization cost on every data crossing (pickling a 10 MB NumPy frame across a process boundary costs more than processing it on a thread where NumPy already drops the GIL). asyncio scales I/O concurrency furthest with the lowest overhead, but any synchronous call on the event-loop thread still stalls everything, as the prior section showed.
+
+### Your Node.js event loop translates directly to asyncio
+
+If you come from Node, the asyncio mental model is the same event-loop story: one thread runs a loop that drives I/O callbacks and resumes suspended coroutines, and no two async steps run concurrently unless you explicitly create tasks. The APIs have different names, but the semantics are one-to-one.
+
+```text
+Node.js                              asyncio / Python
+---------------------------          -----------------------------------
+event loop (libuv)               ->  asyncio event loop
+async function / await           ->  async def coroutine / await
+Promise.all([...])               ->  asyncio.gather(coro1, coro2, ...)
+new Promise(resolve, reject)     ->  asyncio.Future (or asyncio.create_task)
+EventEmitter / net.Socket        ->  asyncio.Protocol + transport
+stream backpressure              ->  asyncio.Queue(maxsize=N) + transport.pause_reading()
+worker_threads (I/O offload)     ->  asyncio.to_thread / loop.run_in_executor(ThreadPool)
+worker_threads (CPU offload)     ->  loop.run_in_executor(ProcessPoolExecutor)
+setTimeout / setInterval         ->  loop.call_later / asyncio.sleep in a loop
+```
+
+The one real divergence: Node mostly prevents you from calling blocking synchronous code from inside an async function (it would block the main thread visibly and is hard to do accidentally). Python lets you make that mistake silently inside a coroutine, which is exactly the blocking-the-loop footgun the prior section described. Everything else maps cleanly: once you internalize the event-loop model from Node, asyncio is a vocabulary swap, not a conceptual shift.
+
+### Producer-consumer with asyncio.Queue (the kHz pipeline)
+
+The canonical pattern for kilohertz instrument data is a producer coroutine reading detector frames and pushing them into a bounded `asyncio.Queue`, with a pool of consumer tasks draining and processing. The queue is the coupling point: it decouples the read rate from the compute rate, and its `maxsize` is what makes backpressure explicit rather than implicit.
+
+```python
+import asyncio
+import numpy as np
+from typing import Optional
+
+async def producer(queue: asyncio.Queue, detector) -> None:
+    """Read frames from the detector and push them into the pipeline queue.
+    Suspends on await queue.put() when the queue is full, which is the
+    backpressure signal: the consumer is falling behind, so slow the reader."""
+    while True:
+        frame: Optional[np.ndarray] = await detector.read_frame()
+        if frame is None:
+            break
+        await queue.put(frame)    # suspends here when queue.maxsize is reached
+    await queue.put(None)         # sentinel: one None tells all consumers to drain and exit
+
+async def consumer(queue: asyncio.Queue, worker_id: int) -> None:
+    """Pull frames from the queue and process them. Propagates the shutdown
+    sentinel so every sibling worker also receives it and exits cleanly."""
+    while True:
+        frame = await queue.get()
+        if frame is None:         # received the shutdown sentinel
+            await queue.put(None) # pass it along for the next sibling
+            queue.task_done()
+            return
+        await process_frame(frame)
+        queue.task_done()
+
+async def run_pipeline(detector, n_workers: int = 4) -> None:
+    # Bound the queue: 1000 frames * 1 MB/frame = 1 GB ceiling, not unbounded growth
+    queue: asyncio.Queue = asyncio.Queue(maxsize=1000)
+    # Start consumers first so nothing piles up before they are listening
+    workers = [
+        asyncio.create_task(consumer(queue, i))
+        for i in range(n_workers)
+    ]
+    await producer(queue, detector)  # runs until the detector signals EOF
+    await asyncio.gather(*workers)   # wait for all consumers to drain cleanly
+```
+
+The `maxsize=1000` is the critical line. An unbounded queue silently accumulates every unprocessed frame in memory. At 1 kHz with 1 MB frames that is 1 GB per second of memory growth before any alarm fires. With a bounded queue, `await queue.put()` suspends the producer when the queue is full, applying backpressure all the way back to the read loop. The consumer count is a tuning knob: start with one per core for compute-heavy frames, or fewer if the pipeline is mostly NumPy (which releases the GIL and gets real thread-level parallelism from a smaller pool).
+
+### NumPy releases the GIL: safe array work from async context
+
+NumPy vectorized operations (reductions, FFTs, matrix math) execute inside C extensions that release the GIL for their duration. This means a NumPy computation running on a thread-pool worker runs genuinely in parallel with the asyncio event-loop thread and with other NumPy threads. The correct pattern is `asyncio.to_thread` (or `loop.run_in_executor` with a shared pool), which submits a callable to the thread pool and returns an awaitable. The event loop suspends the coroutine, keeps draining the socket, and resumes when the thread finishes.
+
+```python
+import asyncio
+import numpy as np
+from concurrent.futures import ThreadPoolExecutor
+
+# A shared pool avoids creating threads per frame; size to available cores
+_pool = ThreadPoolExecutor(max_workers=4)
+
+def reduce_frame(frame: np.ndarray) -> float:
+    """Pure NumPy: FFT magnitude + RMS reduction. Releases the GIL throughout,
+    so this function runs truly in parallel with other threads and the event loop."""
+    spectrum = np.fft.rfft(frame.astype(np.float64))
+    rms = float(np.sqrt((np.abs(spectrum) ** 2).mean()))
+    return rms
+
+async def process_frame(frame: np.ndarray) -> float:
+    """Offload the NumPy work to a thread so the event loop remains free
+    to keep draining the detector socket while the array is being crunched."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(_pool, reduce_frame, frame)
+    # asyncio.to_thread(reduce_frame, frame) is equivalent using the default executor
+```
+
+The catch: `asyncio.to_thread` and `ThreadPoolExecutor` are the right choice only when the callable releases the GIL. For pure-Python CPU loops, threads buy nothing because each thread still waits for the GIL, and the switching overhead makes four threads slower than one. For those workloads, use `ProcessPoolExecutor` and accept the pickling cost on every argument and return value. A practical test: if swapping from one thread to four threads on your workload does not improve throughput, the GIL is the bottleneck; switch to processes.
+
+```python
+from concurrent.futures import ProcessPoolExecutor
+
+# For pure-Python CPU work that cannot release the GIL
+_proc_pool = ProcessPoolExecutor(max_workers=4)
+
+async def heavy_pure_python(data: list) -> int:
+    """GIL-bound in a ThreadPool; ProcessPool gives true parallelism at the cost
+    of pickling data across the process boundary on every call."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(_proc_pool, compute_pure_python, data)
+```
+
+### Detector socket via asyncio.Protocol and readable transport
+
+For raw socket connections to a hardware detector, `asyncio.Protocol` gives you the low-level transport/protocol split that mirrors Node's `net.Socket` plus `EventEmitter`. The transport owns the socket and the OS buffer; the protocol owns the framing and application logic. You subclass `asyncio.Protocol` and implement three methods: `connection_made` (receives the transport handle), `data_received` (called with arbitrary-sized byte chunks as they arrive), and `connection_lost`.
+
+```python
+import asyncio
+from typing import Iterator
+
+FRAME_SIZE = 1024 * 1024  # 1 MB per detector frame (example fixed-size framing)
+
+def split_frames(buf: bytearray) -> Iterator[bytes]:
+    """Yield complete fixed-size frames from the accumulation buffer.
+    Real protocols use a length header or sync word; fixed size shown here for clarity."""
+    while len(buf) >= FRAME_SIZE:
+        yield bytes(buf[:FRAME_SIZE])
+        del buf[:FRAME_SIZE]
+
+class DetectorProtocol(asyncio.Protocol):
+    def __init__(self, queue: asyncio.Queue) -> None:
+        self.queue = queue
+        self.buf = bytearray()          # accumulates partial frames between calls
+        self.transport: asyncio.Transport
+        self._paused = False
+
+    def connection_made(self, transport: asyncio.Transport) -> None:
+        self.transport = transport
+        print(f"Connected: {transport.get_extra_info('peername')}")
+
+    def data_received(self, data: bytes) -> None:
+        """Called by the event loop whenever bytes arrive. May be called with
+        partial frames or multiple frames in one chunk; never assume frame alignment."""
+        self.buf.extend(data)
+        for frame in split_frames(self.buf):
+            try:
+                self.queue.put_nowait(frame)
+            except asyncio.QueueFull:
+                # Consumer pipeline is falling behind: pause reads at the socket
+                # level so the OS buffer absorbs the backpressure instead of memory
+                self.transport.pause_reading()
+                self._paused = True
+                break  # remaining buf data waits until resume_producing is called
+
+    def resume_producing(self) -> None:
+        """Call from the consumer when the queue drops below a low-water threshold."""
+        if self._paused:
+            self.transport.resume_reading()
+            self._paused = False
+
+    def connection_lost(self, exc: Exception | None) -> None:
+        print(f"Detector disconnected: {exc!r}")
+
+async def run_detector(host: str, port: int) -> None:
+    queue: asyncio.Queue = asyncio.Queue(maxsize=1000)
+    loop = asyncio.get_running_loop()
+    _, protocol = await loop.create_connection(
+        lambda: DetectorProtocol(queue), host, port
+    )
+    workers = [asyncio.create_task(consumer(queue, i)) for i in range(4)]
+    await asyncio.gather(*workers)
+```
+
+The catch is twofold. First, `data_received` delivers arbitrary-sized byte chunks that are never aligned to frame boundaries. You must buffer in `self.buf` and de-frame yourself; a common bug is assuming each `data_received` call contains exactly one complete frame. Second, forgetting `transport.pause_reading()` when the queue fills reintroduces the unbounded-memory failure at the socket layer: the OS keeps delivering data into `data_received`, each call appends to `self.buf` or the queue, and memory grows without bound. The `pause_reading` / `resume_reading` pair is the correct backpressure mechanism at the transport level, not an optional optimization.
+
+The higher-level alternative is `asyncio.open_connection`, which returns `(StreamReader, StreamWriter)` and handles the internal buffering for you. Use it when the protocol is line-based or simple binary and you want `await reader.read(N)` in a loop. Reach for `Protocol` directly when you need fine-grained `pause_reading` / `resume_reading` control, when the framing is complex, or when you need transport factories that the streams API does not expose (TLS transports, Unix domain sockets, UDP via `create_datagram_endpoint`).
+
+---
+
 ## Pydantic v2, validation, and contract-first APIs
 
 Pydantic is the validation and serialization engine, and the v1-to-v2 migration is a frequent interview topic because the rewrite was substantial. Pydantic v2's core is implemented in Rust (`pydantic-core`), making validation 5 to 50 times faster, which matters because in a typical FastAPI request, validation and serialization are a real slice of the CPU budget. The API changed: `BaseSettings` moved to a separate `pydantic-settings` package, validators use the new `@field_validator`/`@model_validator` decorators, `.dict()` became `.model_dump()`, and config moved from an inner `Config` class to `model_config`. Knowing these names signals you have actually done the migration.
@@ -202,3 +394,7 @@ result = await anyio.to_thread.run_sync(heavy_cpu_transform, data)
 **How do you handle CPU-bound or slow background work?** Push it out of the web process onto a task queue (Celery, Dramatiq, ARQ) with separate workers, so the web tier stays responsive and scales independently. A request that does 30 seconds of CPU work is an architecture mistake no amount of async fixes; it should enqueue the job and return immediately.
 
 **Contract-first or code-first OpenAPI?** FastAPI generates the OpenAPI schema from your type hints and Pydantic models, so code-first is the default and the docs never drift. For contract-first shops, keep a hand-authored spec as the agreed contract and verify the implementation against it in CI (schemathesis can fuzz the API against the spec). Either way the contract is enforced mechanically, and consumers generate typed clients from the published schema.
+
+**Asyncio vs threading vs multiprocessing for instrument data collection?** At kilohertz detector rates the work is socket-wait dominated (I/O-bound), so asyncio gives the most concurrency per thread: one event loop holds thousands of in-flight reads simultaneously. The GIL is released during blocking I/O and inside NumPy, so it is not the bottleneck here. Use `asyncio.to_thread` with a `ThreadPoolExecutor` for NumPy array work alongside the event loop, because NumPy releases the GIL and worker threads get genuine parallelism. Reserve `ProcessPoolExecutor` (multiprocessing) for pure-Python CPU loops where the GIL cannot be released; it pays a pickling cost on every data crossing but removes the serialization constraint entirely.
+
+**Why is the GIL not a problem for an I/O-bound scientific pipeline?** The GIL only serializes Python bytecode. Detector reads spend time in the kernel waiting for socket data: no bytecode runs, so no GIL is held, and hundreds of pending reads coexist in one event-loop thread. NumPy vectorized operations (FFT, reductions, array math) run inside C extensions that release the GIL, so a thread pool of NumPy workers runs genuinely in parallel with the asyncio loop and with each other. The GIL becomes a bottleneck only when the pipeline bottleneck shifts to a pure-Python CPU loop, which a well-designed instrument pipeline avoids by expressing the compute as NumPy operations or by pushing it to a process pool.
