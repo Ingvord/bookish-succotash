@@ -244,6 +244,28 @@ Expect: "What is a closure and where does it bite?" (functions retain their defi
 
 **`setTimeout` versus `requestAnimationFrame`.** `requestAnimationFrame` runs right before the next paint at the display refresh rate, so it is correct for animation, while `setTimeout` is untethered from the frame and causes jank.
 
+**How does `IntersectionObserver` work, and what are its gotchas?** `IntersectionObserver` fires a callback when a target element enters or leaves a configurable boundary relative to a root element or the viewport. The browser handles observation natively, batching checks to avoid layout thrashing, so you get zero scroll event listeners and zero manual position math. The canonical use cases are lazy-loading images, infinite scroll triggers, animating elements on entry, and ad-visibility tracking.
+
+```js
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return
+      entry.target.src = entry.target.dataset.src   // swap in the real URL
+      observer.unobserve(entry.target)              // fire once, then stop watching
+    })
+  },
+  {
+    root: null,           // null means the viewport
+    rootMargin: '100px',  // fire 100 px before the element enters
+    threshold: 0,         // trigger as soon as any pixel is visible
+  }
+)
+document.querySelectorAll('img[data-src]').forEach(img => observer.observe(img))
+```
+
+Two gotchas. First, call `unobserve` after a one-shot trigger: without it the observer fires again on scroll-out and scroll-back, redundantly re-requesting content the browser already cached. Second, `rootMargin` uses CSS-shorthand values but is computed before CSS transforms, so a translated or scaled ancestor can shift where the trigger fires relative to the visible layout. Always call `observer.disconnect()` on teardown; in a framework component, disconnect in the cleanup function or `onBeforeUnmount`.
+
 **Event delegation, bubbling, and capturing.** Events flow down in the capture phase and back up in the bubble phase. Delegation attaches one listener on a common ancestor and inspects `event.target`, which scales to many or dynamic children and is the idiomatic way to handle lists.
 
 ```js

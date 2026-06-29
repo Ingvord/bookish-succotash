@@ -250,6 +250,18 @@ fetch(url, { signal })
 ctrl.abort()
 ```
 
+A modern example that often catches people is `IntersectionObserver`. Creating one and never calling `disconnect` or `unobserve` is exactly the "subscription you never clear" pattern. The observer holds a strong reference to every element passed to `observe`, preventing those elements from being garbage collected even after they are removed from the document. Mirror every `observe` with a cleanup, and call `observer.disconnect()` in the unmount or cleanup hook, the same discipline as `AbortController`.
+
+```js
+function observeWhenVisible(el, callback) {
+  const observer = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) callback()
+  })
+  observer.observe(el)
+  return () => observer.disconnect()   // return a cleanup, caller is responsible for calling it
+}
+```
+
 For diagnosis, mention heap snapshots and the detached-nodes view in DevTools, and the technique of taking two snapshots and comparing retained objects.
 
 ---

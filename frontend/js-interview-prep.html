@@ -564,6 +564,15 @@ button.<span class="hljs-title function_">addEventListener</span>(<span class="h
 <span class="hljs-comment">// teardown, all at once:</span>
 ctrl.<span class="hljs-title function_">abort</span>()
 </code></pre>
+<p>A modern example that often catches people is <code>IntersectionObserver</code>. Creating one and never calling <code>disconnect</code> or <code>unobserve</code> is exactly the &quot;subscription you never clear&quot; pattern. The observer holds a strong reference to every element passed to <code>observe</code>, preventing those elements from being garbage collected even after they are removed from the document. Mirror every <code>observe</code> with a cleanup, and call <code>observer.disconnect()</code> in the unmount or cleanup hook, the same discipline as <code>AbortController</code>.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">observeWhenVisible</span>(<span class="hljs-params">el, callback</span>) {
+  <span class="hljs-keyword">const</span> observer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntersectionObserver</span>(<span class="hljs-function"><span class="hljs-params">entries</span> =&gt;</span> {
+    <span class="hljs-keyword">if</span> (entries[<span class="hljs-number">0</span>].<span class="hljs-property">isIntersecting</span>) <span class="hljs-title function_">callback</span>()
+  })
+  observer.<span class="hljs-title function_">observe</span>(el)
+  <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> observer.<span class="hljs-title function_">disconnect</span>()   <span class="hljs-comment">// return a cleanup, caller is responsible for calling it</span>
+}
+</code></pre>
 <p>For diagnosis, mention heap snapshots and the detached-nodes view in DevTools, and the technique of taking two snapshots and comparing retained objects.</p>
 <hr>
 <h2>9. Copying and immutability</h2>
