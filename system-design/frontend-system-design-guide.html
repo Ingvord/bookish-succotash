@@ -418,7 +418,7 @@ td code { font-size: .84em; }
 <h2>8. Performance as an architectural concern</h2>
 <p>Treat performance as a design input, not a cleanup task. Anchor it to the Core Web Vitals as budgets: Largest Contentful Paint under 2.5 seconds, Interaction to Next Paint under 200 milliseconds, Cumulative Layout Shift under 0.1, at the 75th percentile of real users. Verify the current thresholds before the interview, since they shift.</p>
 <p>The architectural levers: code splitting and route-level lazy loading to shrink the initial download, a performance budget in continuous integration to hold the line, responsive and lazy-loaded images, and avoiding layout shift by reserving space for media and dynamic content.</p>
-<p>The lever most relevant to a B2B catalog is list virtualization. A search result set or a data table can hold thousands of rows, and rendering them all destroys performance. Virtualization (windowing) mounts only the rows currently visible plus a small buffer, keeping the DOM small regardless of result count. Raise this proactively for any &quot;design a list of many items&quot; prompt.</p>
+<p>The lever most relevant to a B2B catalog is list virtualization. A search result set or a data table can hold thousands of rows, and rendering them all destroys performance. Virtualization (windowing) mounts only the rows currently visible plus a small buffer, keeping the DOM small regardless of result count (walked end to end in the large-image-gallery worked example below). Raise this proactively for any &quot;design a list of many items&quot; prompt.</p>
 <p>Watch the network waterfall: fetch independent data in parallel rather than chaining requests, prefetch the likely next navigation, and avoid the pattern where each request waits for the previous one to discover what to fetch next.</p>
 <hr>
 <h2>9. Cross-cutting concerns</h2>
@@ -462,7 +462,199 @@ Data flow on every query or filter change:
 <p><strong>Design.</strong> Debounce the input so you fetch on a pause rather than every keystroke, and enforce a minimum query length. Cancel the previous request with an AbortController on each new keystroke, which both saves work and fixes the out-of-order response bug where a slow earlier result overwrites a newer one. Cache recent queries client-side so backspacing is instant. Make it an accessible combobox: arrow keys to move through suggestions, Enter to select, Escape to close, with the right ARIA roles and an <code>aria-live</code> count. Handle the loading, empty, and error states. If you want to rank or highlight matches, mention it as an enhancement.</p>
 <p>The bridge sentence to use in the room: &quot;The debounce and cancellation we just coded are the core of this; making it production-grade adds the cache, the accessibility, and the loading and empty states.&quot;</p>
 <hr>
-<h2>12. Enforcing patterns and best practices: worked examples</h2>
+<h2>12. Worked example: rendering a large image gallery</h2>
+<p>A gallery UI that must display thousands to millions of images, where source assets can be gigabytes, breaks in three independent ways under the naive approach. A <code>v-for</code> or <code>.map()</code> over 10,000 <code>&lt;img&gt;</code> nodes destroys the DOM. Setting <code>src</code> on all of them simultaneously saturates the network and browser memory. Decoding thousands of compressed images on the main thread freezes the UI. The same virtualization and lazy-load pattern that powers large scientific image galleries serving millions of users addresses each bottleneck separately.</p>
+<h3>Virtual scrolling / windowing</h3>
+<p>The DOM bottleneck first. The browser holds every node in memory, runs layout on all of them, and paints them even when 9,900 are off-screen. Windowing fixes this by mounting only the nodes visible in the viewport plus a small buffer. Items above and below are replaced by a spacer element that preserves scroll height, so the browser never holds more than a few dozen <code>&lt;img&gt;</code> nodes regardless of total count.</p>
+<p>The catch: you must supply item dimensions up front or measure them after render. Variable-height grids need a measurement pass that adds complexity. Windowing also removes off-DOM items from browser find-in-page and screen reader traversal, so state that tradeoff if the interviewer probes.</p>
+<p><strong>React.</strong> The modern choice is <code>@tanstack/react-virtual</code> (<code>useVirtualizer</code>), headless and framework-agnostic at its core. <code>react-window</code> is the well-known predecessor and is stable in maintained codebases; <code>react-virtuoso</code> is the alternative when variable heights are the main concern.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">import</span> { useVirtualizer } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@tanstack/react-virtual&#x27;</span>
+<span class="hljs-keyword">import</span> { useRef } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;react&#x27;</span>
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">ImageGallery</span>(<span class="hljs-params">{ images }</span>) {
+  <span class="hljs-keyword">const</span> parentRef = <span class="hljs-title function_">useRef</span>(<span class="hljs-literal">null</span>)
+  <span class="hljs-keyword">const</span> virtualizer = <span class="hljs-title function_">useVirtualizer</span>({
+    <span class="hljs-attr">count</span>: images.<span class="hljs-property">length</span>,
+    <span class="hljs-attr">getScrollElement</span>: <span class="hljs-function">() =&gt;</span> parentRef.<span class="hljs-property">current</span>,
+    <span class="hljs-attr">estimateSize</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-number">200</span>,          <span class="hljs-comment">// thumbnail height in px</span>
+    <span class="hljs-attr">overscan</span>: <span class="hljs-number">5</span>,                      <span class="hljs-comment">// render 5 extra rows above/below viewport</span>
+  })
+
+  <span class="hljs-keyword">return</span> (
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">ref</span>=<span class="hljs-string">{parentRef}</span> <span class="hljs-attr">style</span>=<span class="hljs-string">{{</span> <span class="hljs-attr">height:</span> &#x27;<span class="hljs-attr">100vh</span>&#x27;, <span class="hljs-attr">overflow:</span> &#x27;<span class="hljs-attr">auto</span>&#x27; }}&gt;</span>
+      {/* Spacer: total height without rendering all items */}
+      <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">style</span>=<span class="hljs-string">{{</span> <span class="hljs-attr">height:</span> <span class="hljs-attr">virtualizer.getTotalSize</span>(), <span class="hljs-attr">position:</span> &#x27;<span class="hljs-attr">relative</span>&#x27; }}&gt;</span>
+        {virtualizer.getVirtualItems().map(item =&gt; (
+          <span class="hljs-tag">&lt;<span class="hljs-name">div</span>
+            <span class="hljs-attr">key</span>=<span class="hljs-string">{item.key}</span>
+            <span class="hljs-attr">style</span>=<span class="hljs-string">{{</span>
+              <span class="hljs-attr">position:</span> &#x27;<span class="hljs-attr">absolute</span>&#x27;,
+              <span class="hljs-attr">top:</span> <span class="hljs-attr">0</span>,
+              <span class="hljs-attr">transform:</span> `<span class="hljs-attr">translateY</span>(${<span class="hljs-attr">item.start</span>}<span class="hljs-attr">px</span>)`,
+              <span class="hljs-attr">width:</span> &#x27;<span class="hljs-attr">100</span>%&#x27;,
+              <span class="hljs-attr">height:</span> <span class="hljs-attr">item.size</span>,
+            }}
+          &gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">{images[item.index].thumbnailUrl}</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">{images[item.index].title}</span> /&gt;</span>
+          <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+        ))}
+      <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+  )
+}
+</code></pre>
+<p>The <code>getTotalSize()</code> div is the spacer: it tells the browser how tall the scroll container would be if all items were rendered, without actually rendering any off-screen node.</p>
+<p><strong>Vue.</strong> <code>vue-virtual-scroller</code> is the idiomatic choice. <code>RecycleScroller</code> reuses a fixed pool of DOM nodes, swapping their content as items enter and leave, which reduces garbage collection overhead during fast scrolling. TanStack Virtual has a Vue adapter for API consistency across frameworks.</p>
+<pre><code class="hljs" data-lang="vue"><span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">RecycleScroller</span>
+    <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;gallery-scroller&quot;</span>
+    <span class="hljs-attr">:items</span>=<span class="hljs-string">&quot;images&quot;</span>
+    <span class="hljs-attr">:item-size</span>=<span class="hljs-string">&quot;200&quot;</span>
+    <span class="hljs-attr">key-field</span>=<span class="hljs-string">&quot;id&quot;</span>
+    <span class="hljs-attr">v-slot</span>=<span class="hljs-string">&quot;{ item }&quot;</span>
+  &gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">:src</span>=<span class="hljs-string">&quot;item.thumbnailUrl&quot;</span> <span class="hljs-attr">:alt</span>=<span class="hljs-string">&quot;item.title&quot;</span> <span class="hljs-attr">decoding</span>=<span class="hljs-string">&quot;async&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">RecycleScroller</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="language-javascript">
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">RecycleScroller</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue-virtual-scroller&#x27;</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">&#x27;vue-virtual-scroller/dist/vue-virtual-scroller.css&#x27;</span>
+
+<span class="hljs-title function_">defineProps</span>({ <span class="hljs-attr">images</span>: <span class="hljs-title class_">Array</span> })
+</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p><code>RecycleScroller</code> requires a fixed item height. For variable heights, use <code>DynamicScroller</code> paired with <code>DynamicScrollerItem</code>, which measures each item and feeds the heights back into the spacer math.</p>
+<p><strong>ExtJS.</strong> ExtJS has native windowing through <code>Ext.data.BufferedStore</code>. The buffered renderer fetches only the visible page plus a configurable lead and trail buffer, discarding pages outside the window, so the DOM stays small against a server-paginated dataset of any size.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> bufferedStore = <span class="hljs-title class_">Ext</span>.<span class="hljs-title function_">create</span>(<span class="hljs-string">&#x27;Ext.data.BufferedStore&#x27;</span>, {
+  <span class="hljs-attr">model</span>: <span class="hljs-string">&#x27;MyApp.model.Image&#x27;</span>,
+  <span class="hljs-attr">buffered</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">pageSize</span>: <span class="hljs-number">100</span>,
+  <span class="hljs-attr">leadingBufferZone</span>: <span class="hljs-number">200</span>,    <span class="hljs-comment">// prefetch this many records ahead</span>
+  <span class="hljs-attr">trailingBufferZone</span>: <span class="hljs-number">50</span>,    <span class="hljs-comment">// retain this many records behind</span>
+  <span class="hljs-attr">proxy</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;ajax&#x27;</span>,
+    <span class="hljs-attr">url</span>: <span class="hljs-string">&#x27;/api/images&#x27;</span>,
+    <span class="hljs-attr">reader</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;json&#x27;</span>, <span class="hljs-attr">rootProperty</span>: <span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-attr">totalProperty</span>: <span class="hljs-string">&#x27;total&#x27;</span> }
+  }
+})
+
+<span class="hljs-title class_">Ext</span>.<span class="hljs-title function_">create</span>(<span class="hljs-string">&#x27;Ext.view.View&#x27;</span>, {
+  <span class="hljs-attr">store</span>: bufferedStore,
+  <span class="hljs-attr">itemTpl</span>: <span class="hljs-string">&#x27;&lt;div class=&quot;thumb&quot;&gt;&lt;img src=&quot;{thumbnailUrl}&quot; alt=&quot;{title}&quot; /&gt;&lt;/div&gt;&#x27;</span>,
+  <span class="hljs-attr">deferInitialRefresh</span>: <span class="hljs-literal">true</span>
+})
+</code></pre>
+<p>The catch: the server must support offset or range pagination, because the buffered store fetches pages rather than holding the full dataset in memory.</p>
+<p><strong>Webix.</strong> The <code>dataview</code> component handles dynamic loading natively. Set <code>datafetch</code> to control how many items load per request and <code>loadahead</code> to preload ahead of the scroll position. No external library is needed.</p>
+<pre><code class="hljs" data-lang="js">webix.<span class="hljs-title function_">ui</span>({
+  <span class="hljs-attr">view</span>: <span class="hljs-string">&#x27;dataview&#x27;</span>,
+  <span class="hljs-attr">url</span>: <span class="hljs-string">&#x27;/api/images&#x27;</span>,
+  <span class="hljs-attr">datafetch</span>: <span class="hljs-number">100</span>,          <span class="hljs-comment">// records per request</span>
+  <span class="hljs-attr">loadahead</span>: <span class="hljs-number">200</span>,          <span class="hljs-comment">// prefetch this many records ahead of scroll</span>
+  <span class="hljs-attr">template</span>: <span class="hljs-string">&#x27;&lt;div class=&quot;thumb&quot;&gt;&lt;img src=&quot;#thumbnailUrl#&quot; alt=&quot;#title#&quot; /&gt;&lt;/div&gt;&#x27;</span>,
+  <span class="hljs-attr">type</span>: { <span class="hljs-attr">height</span>: <span class="hljs-number">200</span>, <span class="hljs-attr">width</span>: <span class="hljs-number">200</span> }
+})
+</code></pre>
+<p>Webix renders only visible items and fetches adjacent pages on demand as the user scrolls. Dynamic loading is a built-in feature of <code>dataview</code> and <code>list</code>, not an add-on.</p>
+<p><strong>Vanilla JS.</strong> A hand-rolled virtualizer positions items absolutely, listens to scroll events, computes the visible range, and swaps the content of a recycled DOM node pool while adjusting the spacer height. It is feasible, but the libraries remove the hard parts: resize observer integration, variable-height measurement, and scroll momentum edge cases. Use a library in production.</p>
+<h3>Lazy loading with IntersectionObserver</h3>
+<p>Even with windowing, the visible items must load their images without firing dozens of simultaneous network requests. <code>IntersectionObserver</code> is the browser's native mechanism: it fires a callback when an element crosses a threshold in the viewport, with zero scroll event listeners and zero manual position math. Attach an observer to each placeholder, swap in the real <code>src</code> when the callback fires, and call <code>unobserve</code> immediately after.</p>
+<p>The catch: always call <code>unobserve</code> once <code>src</code> is set. Without it the observer keeps watching, fires again on scroll-out and scroll-back, and re-requests an image the browser already cached. Use <code>rootMargin</code> to start loading slightly before the item reaches the viewport, so there is no visible gap as the user scrolls.</p>
+<pre><code class="hljs" data-lang="html"><span class="hljs-comment">&lt;!-- Placeholder: no src on initial render --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;lazy&quot;</span> <span class="hljs-attr">data-src</span>=<span class="hljs-string">&quot;https://cdn.example.com/thumb-42.jpg&quot;</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">&quot;Sample image&quot;</span> /&gt;</span>
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">const</span> observer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntersectionObserver</span>(
+  <span class="hljs-function">(<span class="hljs-params">entries</span>) =&gt;</span> {
+    entries.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">entry</span> =&gt;</span> {
+      <span class="hljs-keyword">if</span> (!entry.<span class="hljs-property">isIntersecting</span>) <span class="hljs-keyword">return</span>
+      <span class="hljs-keyword">const</span> img = entry.<span class="hljs-property">target</span>
+      img.<span class="hljs-property">src</span> = img.<span class="hljs-property">dataset</span>.<span class="hljs-property">src</span>     <span class="hljs-comment">// swap in the real URL</span>
+      observer.<span class="hljs-title function_">unobserve</span>(img)       <span class="hljs-comment">// stop watching: prevents re-trigger on scroll-out</span>
+    })
+  },
+  { <span class="hljs-attr">rootMargin</span>: <span class="hljs-string">&#x27;200px&#x27;</span> }           <span class="hljs-comment">// load 200 px before entering viewport</span>
+)
+
+<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&#x27;img.lazy&#x27;</span>).<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">img</span> =&gt;</span> observer.<span class="hljs-title function_">observe</span>(img))
+</code></pre>
+<p><strong>Framework wrappers.</strong> In React the observer lives in a <code>useEffect</code> that attaches on mount and cleans up on unmount. In Vue, a custom directive <code>v-lazy</code> is the idiomatic pattern: the <code>mounted</code> hook observes, <code>beforeUnmount</code> disconnects. In ExtJS, add observer logic in the view's item <code>afterrender</code> listener. In Webix, wire it in the <code>dataview</code>'s <code>onAfterRender</code> event: each time the component paints new items, observe the fresh <code>&lt;img&gt;</code> elements with their <code>data-src</code> values.</p>
+<p>The <code>loading=&quot;lazy&quot;</code> HTML attribute is the zero-JavaScript baseline: the browser natively defers off-screen image loading without any code. Use it as a sensible default on static content, but note it is only evaluated on initial parse, so it does not work reliably when a virtualizer recycles and repopulates DOM nodes dynamically.</p>
+<h3>Lazy blob / proxy loading</h3>
+<p>For very large source assets, even the thumbnails can be heavy. A full-resolution image may be gigabytes; setting <code>src</code> on load for hundreds of items simultaneously saturates the network and exhausts browser memory. The pattern is to fetch a low-resolution proxy first and upgrade to full resolution only on explicit user request, keeping initial render fast and light.</p>
+<p>The catch: <code>URL.createObjectURL</code> returns a <code>blob:</code> URL that lives in memory until you call <code>URL.revokeObjectURL</code>. Forgetting to revoke leaks a chunk of memory for every image the user browses. Revoke the proxy URL when it is replaced, and revoke any remaining URLs on component unmount.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">loadProxy</span>(<span class="hljs-params">proxyUrl, imgElement</span>) {
+  <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(proxyUrl)
+  <span class="hljs-keyword">const</span> blob = <span class="hljs-keyword">await</span> res.<span class="hljs-title function_">blob</span>()
+  <span class="hljs-keyword">const</span> blobUrl = <span class="hljs-variable constant_">URL</span>.<span class="hljs-title function_">createObjectURL</span>(blob)
+  imgElement.<span class="hljs-property">src</span> = blobUrl
+  imgElement.<span class="hljs-property">dataset</span>.<span class="hljs-property">blobUrl</span> = blobUrl       <span class="hljs-comment">// store for cleanup</span>
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">upgradeToFullRes</span>(<span class="hljs-params">fullResUrl, imgElement</span>) {
+  <span class="hljs-keyword">const</span> prev = imgElement.<span class="hljs-property">dataset</span>.<span class="hljs-property">blobUrl</span>
+  <span class="hljs-keyword">if</span> (prev) <span class="hljs-variable constant_">URL</span>.<span class="hljs-title function_">revokeObjectURL</span>(prev)        <span class="hljs-comment">// release proxy before replacing</span>
+
+  <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(fullResUrl)
+  <span class="hljs-keyword">const</span> blob = <span class="hljs-keyword">await</span> res.<span class="hljs-title function_">blob</span>()
+  <span class="hljs-keyword">const</span> blobUrl = <span class="hljs-variable constant_">URL</span>.<span class="hljs-title function_">createObjectURL</span>(blob)
+  imgElement.<span class="hljs-property">src</span> = blobUrl
+  imgElement.<span class="hljs-property">dataset</span>.<span class="hljs-property">blobUrl</span> = blobUrl
+}
+
+<span class="hljs-comment">// Wire upgrade to an explicit user action</span>
+<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&#x27;.gallery-item img&#x27;</span>).<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">img</span> =&gt;</span> {
+  img.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;click&#x27;</span>, <span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">upgradeToFullRes</span>(img.<span class="hljs-property">dataset</span>.<span class="hljs-property">fullSrc</span>, img))
+})
+</code></pre>
+<p>The <code>fetch</code>-based approach also applies when the server requires authorization headers that a plain <code>&lt;img src&gt;</code> cannot send. Fetch the protected resource with a token, create a blob URL from the response, and assign it to <code>src</code>.</p>
+<h3>Thumbnail decode management</h3>
+<p>Setting <code>src</code> fires the network request, but the bottleneck does not end there. The browser must decode the compressed bytes (JPEG, WebP, AVIF) into a raw pixel buffer before painting. For a handful of images this is imperceptible. For hundreds of thumbnails loading simultaneously after a fast scroll, the decode work runs on the main thread and causes jank: dropped frames and a frozen UI.</p>
+<p>There are three mitigations, each with a different tradeoff.</p>
+<p><strong><code>decoding=&quot;async&quot;</code> attribute.</strong> The simplest option: a hint to the browser to decode off the critical path. Browsers may or may not move decoding off the main thread depending on the implementation, so it is a hint, not a guarantee. Use it as a zero-effort baseline on all gallery images.</p>
+<pre><code class="hljs" data-lang="html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;thumb-42.jpg&quot;</span> <span class="hljs-attr">alt</span>=<span class="hljs-string">&quot;Sample&quot;</span> <span class="hljs-attr">decoding</span>=<span class="hljs-string">&quot;async&quot;</span> <span class="hljs-attr">loading</span>=<span class="hljs-string">&quot;lazy&quot;</span> /&gt;</span>
+</code></pre>
+<p><strong><code>img.decode()</code> promise API.</strong> Create the image off-DOM, call <code>decode()</code>, and append it only after decoding completes. This ensures the image is ready before it enters the render tree, preventing a layout-blocking decode on insert. The catch: decoding still happens on the main thread, so the benefit is timing control rather than offloading. Wrap in <code>try/catch</code> because <code>decode()</code> rejects if the load fails.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">appendDecoded</span>(<span class="hljs-params">src, container</span>) {
+  <span class="hljs-keyword">const</span> img = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Image</span>()
+  img.<span class="hljs-property">src</span> = src
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">await</span> img.<span class="hljs-title function_">decode</span>()              <span class="hljs-comment">// waits for decode; still on the main thread</span>
+    container.<span class="hljs-title function_">appendChild</span>(img)     <span class="hljs-comment">// no decode-on-insert jank</span>
+  } <span class="hljs-keyword">catch</span> {
+    container.<span class="hljs-title function_">appendChild</span>(<span class="hljs-title function_">createPlaceholder</span>())
+  }
+}
+</code></pre>
+<p><strong><code>createImageBitmap()</code> in a Web Worker.</strong> The only option that moves decode fully off the main thread. <code>createImageBitmap</code> is available inside workers: pass a <code>Blob</code> from a <code>fetch</code> response and it returns an <code>ImageBitmap</code> you can transfer back to the main thread and draw into a <code>&lt;canvas&gt;</code>. The catch: an <code>ImageBitmap</code> cannot be assigned to <code>&lt;img src&gt;</code>, so you render into a <code>&lt;canvas&gt;</code>, losing native <code>alt</code> text, image events, and lazy-loading attributes. Reserve this path for when profiling confirms main-thread decode is the measured bottleneck.</p>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// decode-worker.js: runs in a dedicated thread</span>
+self.<span class="hljs-property">onmessage</span> = <span class="hljs-title function_">async</span> ({ <span class="hljs-attr">data</span>: { id, blob } }) =&gt; {
+  <span class="hljs-keyword">const</span> bitmap = <span class="hljs-keyword">await</span> <span class="hljs-title function_">createImageBitmap</span>(blob)
+  self.<span class="hljs-title function_">postMessage</span>({ id, bitmap }, [bitmap])   <span class="hljs-comment">// transfer (zero-copy), not copy</span>
+}
+</code></pre>
+<pre><code class="hljs" data-lang="js"><span class="hljs-comment">// main.js</span>
+<span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">&#x27;./decode-worker.js&#x27;</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>))
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">fetchAndDecode</span>(<span class="hljs-params">src, canvas</span>) {
+  <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(src)
+  <span class="hljs-keyword">const</span> blob = <span class="hljs-keyword">await</span> res.<span class="hljs-title function_">blob</span>()
+  worker.<span class="hljs-title function_">postMessage</span>({ <span class="hljs-attr">id</span>: canvas.<span class="hljs-property">id</span>, blob }, [blob])   <span class="hljs-comment">// transfer blob</span>
+}
+
+worker.<span class="hljs-property">onmessage</span> = <span class="hljs-function">(<span class="hljs-params">{ data: { id, bitmap } }</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> canvas = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(id)
+  canvas.<span class="hljs-property">width</span>  = bitmap.<span class="hljs-property">width</span>
+  canvas.<span class="hljs-property">height</span> = bitmap.<span class="hljs-property">height</span>
+  canvas.<span class="hljs-title function_">getContext</span>(<span class="hljs-string">&#x27;2d&#x27;</span>).<span class="hljs-title function_">drawImage</span>(bitmap, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>)
+  bitmap.<span class="hljs-title function_">close</span>()                                         <span class="hljs-comment">// release GPU memory</span>
+}
+</code></pre>
+<p>Start with <code>decoding=&quot;async&quot;</code> on every image as a free win. Add <code>img.decode()</code> when you need precise control over when an image enters the DOM. Reach for the Worker + <code>createImageBitmap</code> path only after profiling identifies main-thread decode as the actual bottleneck.</p>
+<h3>The through-line</h3>
+<p>Virtualize the list so the DOM holds only visible nodes. Lazy-load via <code>IntersectionObserver</code> so the network fetches images as they approach the viewport rather than all at once. For large source assets, fetch a low-resolution proxy first and upgrade only on demand, revoking blob URLs to contain memory. Move decode off the main thread: <code>decoding=&quot;async&quot;</code> as the baseline, <code>img.decode()</code> for fine-grained timing, Worker plus <code>createImageBitmap</code> when profiling points to decode as the bottleneck. These four layers address the DOM, network, memory, and main-thread CPU bottlenecks independently. Large scientific image galleries serving millions of users are built on exactly this stack, and the same architecture applies any time you need to render more images than the browser can hold at once.</p>
+<hr>
+<h2>13. Enforcing patterns and best practices: worked examples</h2>
 <p>A best practice is only real if it is enforced. Stating a convention in a document relies on people remembering it; encoding it in tooling makes following it the default and violating it a failed build. That difference is what an interviewer probes for when you claim you raised standards, so be ready with the mechanism, not the intention. Below are five common frontend patterns, each as a small design plus the concrete enforcement. The through-line is identical: the mechanism runs as a required check in continuous integration, so a violation blocks the merge rather than relying on goodwill.</p>
 <h3>Design tokens, not hardcoded values</h3>
 <p><strong>The practice.</strong> Components reference design tokens exposed as CSS custom properties and never hardcode a colour or spacing value, so a brand or theme switch is a token swap rather than a code change. This is the backbone of a multi-brand design system.</p>
@@ -561,7 +753,7 @@ Data flow on every query or filter change:
 <h3>The through-line</h3>
 <p>Every example ends the same way: the mechanism is a required status check, so a violation blocks the merge. That is what converts a best practice from an intention into a guarantee, and it is the concrete answer when an interviewer asks how you made a standard stick. You did not ask people to follow it; you made the build refuse anything else, and you can point to the check, the config, and the fall in violations as evidence. Notice too that each enforcement maps back to an earlier design decision (tokens to the design system, the data-layer rule to the state architecture, the budgets to performance), which is the difference between a pattern you named and a pattern you operationalized.</p>
 <hr>
-<h2>13. How to answer well in a combined 45-minute round</h2>
+<h2>14. How to answer well in a combined 45-minute round</h2>
 <p>Budget the time. Spend two or three minutes clarifying requirements, about five on the high-level architecture and the rendering decision, and the rest on one or two deep dives the interviewer cares about. Do not attempt to cover everything; depth on what he asks beats shallow breadth.</p>
 <p>Drive the conversation. Structure your answer out loud, sketch the boxes and arrows, decide with explicit tradeoffs, and check in with the interviewer, for example &quot;I can go deeper on the caching strategy or the rendering choice, which is more useful to you.&quot; Because the round combines coding and design, connect the two: let the design grow from the code you wrote, or note how you would implement a piece you just designed.</p>
 <p>The staff-level signal across all of it is the same one from the other guides: explain the mechanism, name the tradeoff, and connect a decision to the failure mode it prevents. A candidate who says &quot;I will cache the results&quot; is junior. One who says &quot;I will cache by query key with stale-while-revalidate, accepting that prices may be briefly stale, and revalidate on window focus to bound that staleness&quot; is the one who proceeds to the next level.</p>

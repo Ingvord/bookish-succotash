@@ -289,6 +289,30 @@ list.addEventListener('click', (e) => {
 
 **General frontend performance levers.** Code splitting and route-level lazy loading to shrink the initial bundle, tree shaking to drop dead code, responsive and lazy-loaded images, bundle analysis with a performance budget enforced in CI, and virtualization for long lists so the DOM holds only visible rows. Memory leaks matter here too, covered in the JavaScript guide.
 
+**How would you render a gallery of 10,000+ images without freezing the browser?** The answer is three separate problems. The DOM, the network, and the decode pipeline each need their own mitigation, and the interviewer is checking whether you see all three independently.
+
+Virtualize the list first: mount only the DOM nodes visible in the viewport. In React, `@tanstack/react-virtual` (`useVirtualizer`) is the modern choice; `react-window` is the stable predecessor. In Vue, `vue-virtual-scroller` (`RecycleScroller`) reuses a fixed DOM node pool. In ExtJS, a `Ext.data.BufferedStore` with the buffered renderer fetches and discards pages outside the visible window natively. In Webix, `view: 'dataview'` with `datafetch` and `loadahead` handles dynamic loading out of the box. A spacer element maintains scroll height without rendering off-screen nodes, so the browser never holds 10,000 `<img>` elements simultaneously.
+
+Lazy-load images via `IntersectionObserver` so the network fetches only as items approach the viewport. Observe each placeholder, swap in `src` on intersection, and call `unobserve` immediately to prevent re-triggering on scroll-out. The `loading="lazy"` HTML attribute is the zero-JavaScript baseline for static content.
+
+```js
+const observer = new IntersectionObserver(
+  entries => entries.forEach(entry => {
+    if (!entry.isIntersecting) return
+    entry.target.src = entry.target.dataset.src   // swap in real URL
+    observer.unobserve(entry.target)              // stop watching, prevents re-fetch
+  }),
+  { rootMargin: '200px' }   // start loading 200 px before the viewport edge
+)
+document.querySelectorAll('img[data-src]').forEach(img => observer.observe(img))
+```
+
+For very large source assets, fetch a low-resolution proxy first and upgrade to full resolution only on explicit user request. Use `URL.createObjectURL` for the blob URL and `URL.revokeObjectURL` when you replace it, or you leak memory for every image browsed.
+
+Move decode off the main thread: add `decoding="async"` to every gallery image as a free baseline, use `img.decode()` when you need to control the exact moment an image enters the DOM, and reach for `createImageBitmap()` in a Web Worker when profiling confirms main-thread decode is the measured bottleneck. The Worker path moves decoding fully off the main thread but requires drawing into a `<canvas>` rather than `<img>`.
+
+The full per-framework treatment, including the Worker plus `createImageBitmap` decode path, is in the Frontend System Design guide worked example.
+
 ---
 
 ## 7. Networking and the web platform

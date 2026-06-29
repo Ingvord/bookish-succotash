@@ -132,7 +132,7 @@ Treat performance as a design input, not a cleanup task. Anchor it to the Core W
 
 The architectural levers: code splitting and route-level lazy loading to shrink the initial download, a performance budget in continuous integration to hold the line, responsive and lazy-loaded images, and avoiding layout shift by reserving space for media and dynamic content.
 
-The lever most relevant to a B2B catalog is list virtualization. A search result set or a data table can hold thousands of rows, and rendering them all destroys performance. Virtualization (windowing) mounts only the rows currently visible plus a small buffer, keeping the DOM small regardless of result count. Raise this proactively for any "design a list of many items" prompt.
+The lever most relevant to a B2B catalog is list virtualization. A search result set or a data table can hold thousands of rows, and rendering them all destroys performance. Virtualization (windowing) mounts only the rows currently visible plus a small buffer, keeping the DOM small regardless of result count (walked end to end in the large-image-gallery worked example below). Raise this proactively for any "design a list of many items" prompt.
 
 Watch the network waterfall: fetch independent data in parallel rather than chaining requests, prefetch the likely next navigation, and avoid the pattern where each request waits for the previous one to discover what to fetch next.
 
@@ -204,7 +204,254 @@ The bridge sentence to use in the room: "The debounce and cancellation we just c
 
 ---
 
-## 12. Enforcing patterns and best practices: worked examples
+## 12. Worked example: rendering a large image gallery
+
+A gallery UI that must display thousands to millions of images, where source assets can be gigabytes, breaks in three independent ways under the naive approach. A `v-for` or `.map()` over 10,000 `<img>` nodes destroys the DOM. Setting `src` on all of them simultaneously saturates the network and browser memory. Decoding thousands of compressed images on the main thread freezes the UI. The same virtualization and lazy-load pattern that powers large scientific image galleries serving millions of users addresses each bottleneck separately.
+
+### Virtual scrolling / windowing
+
+The DOM bottleneck first. The browser holds every node in memory, runs layout on all of them, and paints them even when 9,900 are off-screen. Windowing fixes this by mounting only the nodes visible in the viewport plus a small buffer. Items above and below are replaced by a spacer element that preserves scroll height, so the browser never holds more than a few dozen `<img>` nodes regardless of total count.
+
+The catch: you must supply item dimensions up front or measure them after render. Variable-height grids need a measurement pass that adds complexity. Windowing also removes off-DOM items from browser find-in-page and screen reader traversal, so state that tradeoff if the interviewer probes.
+
+**React.** The modern choice is `@tanstack/react-virtual` (`useVirtualizer`), headless and framework-agnostic at its core. `react-window` is the well-known predecessor and is stable in maintained codebases; `react-virtuoso` is the alternative when variable heights are the main concern.
+
+```js
+import { useVirtualizer } from '@tanstack/react-virtual'
+import { useRef } from 'react'
+
+function ImageGallery({ images }) {
+  const parentRef = useRef(null)
+  const virtualizer = useVirtualizer({
+    count: images.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 200,          // thumbnail height in px
+    overscan: 5,                      // render 5 extra rows above/below viewport
+  })
+
+  return (
+    <div ref={parentRef} style={{ height: '100vh', overflow: 'auto' }}>
+      {/* Spacer: total height without rendering all items */}
+      <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
+        {virtualizer.getVirtualItems().map(item => (
+          <div
+            key={item.key}
+            style={{
+              position: 'absolute',
+              top: 0,
+              transform: `translateY(${item.start}px)`,
+              width: '100%',
+              height: item.size,
+            }}
+          >
+            <img src={images[item.index].thumbnailUrl} alt={images[item.index].title} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+The `getTotalSize()` div is the spacer: it tells the browser how tall the scroll container would be if all items were rendered, without actually rendering any off-screen node.
+
+**Vue.** `vue-virtual-scroller` is the idiomatic choice. `RecycleScroller` reuses a fixed pool of DOM nodes, swapping their content as items enter and leave, which reduces garbage collection overhead during fast scrolling. TanStack Virtual has a Vue adapter for API consistency across frameworks.
+
+```vue
+<template>
+  <RecycleScroller
+    class="gallery-scroller"
+    :items="images"
+    :item-size="200"
+    key-field="id"
+    v-slot="{ item }"
+  >
+    <img :src="item.thumbnailUrl" :alt="item.title" decoding="async" />
+  </RecycleScroller>
+</template>
+
+<script setup>
+import { RecycleScroller } from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+
+defineProps({ images: Array })
+</script>
+```
+
+`RecycleScroller` requires a fixed item height. For variable heights, use `DynamicScroller` paired with `DynamicScrollerItem`, which measures each item and feeds the heights back into the spacer math.
+
+**ExtJS.** ExtJS has native windowing through `Ext.data.BufferedStore`. The buffered renderer fetches only the visible page plus a configurable lead and trail buffer, discarding pages outside the window, so the DOM stays small against a server-paginated dataset of any size.
+
+```js
+const bufferedStore = Ext.create('Ext.data.BufferedStore', {
+  model: 'MyApp.model.Image',
+  buffered: true,
+  pageSize: 100,
+  leadingBufferZone: 200,    // prefetch this many records ahead
+  trailingBufferZone: 50,    // retain this many records behind
+  proxy: {
+    type: 'ajax',
+    url: '/api/images',
+    reader: { type: 'json', rootProperty: 'data', totalProperty: 'total' }
+  }
+})
+
+Ext.create('Ext.view.View', {
+  store: bufferedStore,
+  itemTpl: '<div class="thumb"><img src="{thumbnailUrl}" alt="{title}" /></div>',
+  deferInitialRefresh: true
+})
+```
+
+The catch: the server must support offset or range pagination, because the buffered store fetches pages rather than holding the full dataset in memory.
+
+**Webix.** The `dataview` component handles dynamic loading natively. Set `datafetch` to control how many items load per request and `loadahead` to preload ahead of the scroll position. No external library is needed.
+
+```js
+webix.ui({
+  view: 'dataview',
+  url: '/api/images',
+  datafetch: 100,          // records per request
+  loadahead: 200,          // prefetch this many records ahead of scroll
+  template: '<div class="thumb"><img src="#thumbnailUrl#" alt="#title#" /></div>',
+  type: { height: 200, width: 200 }
+})
+```
+
+Webix renders only visible items and fetches adjacent pages on demand as the user scrolls. Dynamic loading is a built-in feature of `dataview` and `list`, not an add-on.
+
+**Vanilla JS.** A hand-rolled virtualizer positions items absolutely, listens to scroll events, computes the visible range, and swaps the content of a recycled DOM node pool while adjusting the spacer height. It is feasible, but the libraries remove the hard parts: resize observer integration, variable-height measurement, and scroll momentum edge cases. Use a library in production.
+
+### Lazy loading with IntersectionObserver
+
+Even with windowing, the visible items must load their images without firing dozens of simultaneous network requests. `IntersectionObserver` is the browser's native mechanism: it fires a callback when an element crosses a threshold in the viewport, with zero scroll event listeners and zero manual position math. Attach an observer to each placeholder, swap in the real `src` when the callback fires, and call `unobserve` immediately after.
+
+The catch: always call `unobserve` once `src` is set. Without it the observer keeps watching, fires again on scroll-out and scroll-back, and re-requests an image the browser already cached. Use `rootMargin` to start loading slightly before the item reaches the viewport, so there is no visible gap as the user scrolls.
+
+```html
+<!-- Placeholder: no src on initial render -->
+<img class="lazy" data-src="https://cdn.example.com/thumb-42.jpg" alt="Sample image" />
+```
+
+```js
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return
+      const img = entry.target
+      img.src = img.dataset.src     // swap in the real URL
+      observer.unobserve(img)       // stop watching: prevents re-trigger on scroll-out
+    })
+  },
+  { rootMargin: '200px' }           // load 200 px before entering viewport
+)
+
+document.querySelectorAll('img.lazy').forEach(img => observer.observe(img))
+```
+
+**Framework wrappers.** In React the observer lives in a `useEffect` that attaches on mount and cleans up on unmount. In Vue, a custom directive `v-lazy` is the idiomatic pattern: the `mounted` hook observes, `beforeUnmount` disconnects. In ExtJS, add observer logic in the view's item `afterrender` listener. In Webix, wire it in the `dataview`'s `onAfterRender` event: each time the component paints new items, observe the fresh `<img>` elements with their `data-src` values.
+
+The `loading="lazy"` HTML attribute is the zero-JavaScript baseline: the browser natively defers off-screen image loading without any code. Use it as a sensible default on static content, but note it is only evaluated on initial parse, so it does not work reliably when a virtualizer recycles and repopulates DOM nodes dynamically.
+
+### Lazy blob / proxy loading
+
+For very large source assets, even the thumbnails can be heavy. A full-resolution image may be gigabytes; setting `src` on load for hundreds of items simultaneously saturates the network and exhausts browser memory. The pattern is to fetch a low-resolution proxy first and upgrade to full resolution only on explicit user request, keeping initial render fast and light.
+
+The catch: `URL.createObjectURL` returns a `blob:` URL that lives in memory until you call `URL.revokeObjectURL`. Forgetting to revoke leaks a chunk of memory for every image the user browses. Revoke the proxy URL when it is replaced, and revoke any remaining URLs on component unmount.
+
+```js
+async function loadProxy(proxyUrl, imgElement) {
+  const res = await fetch(proxyUrl)
+  const blob = await res.blob()
+  const blobUrl = URL.createObjectURL(blob)
+  imgElement.src = blobUrl
+  imgElement.dataset.blobUrl = blobUrl       // store for cleanup
+}
+
+async function upgradeToFullRes(fullResUrl, imgElement) {
+  const prev = imgElement.dataset.blobUrl
+  if (prev) URL.revokeObjectURL(prev)        // release proxy before replacing
+
+  const res = await fetch(fullResUrl)
+  const blob = await res.blob()
+  const blobUrl = URL.createObjectURL(blob)
+  imgElement.src = blobUrl
+  imgElement.dataset.blobUrl = blobUrl
+}
+
+// Wire upgrade to an explicit user action
+document.querySelectorAll('.gallery-item img').forEach(img => {
+  img.addEventListener('click', () => upgradeToFullRes(img.dataset.fullSrc, img))
+})
+```
+
+The `fetch`-based approach also applies when the server requires authorization headers that a plain `<img src>` cannot send. Fetch the protected resource with a token, create a blob URL from the response, and assign it to `src`.
+
+### Thumbnail decode management
+
+Setting `src` fires the network request, but the bottleneck does not end there. The browser must decode the compressed bytes (JPEG, WebP, AVIF) into a raw pixel buffer before painting. For a handful of images this is imperceptible. For hundreds of thumbnails loading simultaneously after a fast scroll, the decode work runs on the main thread and causes jank: dropped frames and a frozen UI.
+
+There are three mitigations, each with a different tradeoff.
+
+**`decoding="async"` attribute.** The simplest option: a hint to the browser to decode off the critical path. Browsers may or may not move decoding off the main thread depending on the implementation, so it is a hint, not a guarantee. Use it as a zero-effort baseline on all gallery images.
+
+```html
+<img src="thumb-42.jpg" alt="Sample" decoding="async" loading="lazy" />
+```
+
+**`img.decode()` promise API.** Create the image off-DOM, call `decode()`, and append it only after decoding completes. This ensures the image is ready before it enters the render tree, preventing a layout-blocking decode on insert. The catch: decoding still happens on the main thread, so the benefit is timing control rather than offloading. Wrap in `try/catch` because `decode()` rejects if the load fails.
+
+```js
+async function appendDecoded(src, container) {
+  const img = new Image()
+  img.src = src
+  try {
+    await img.decode()              // waits for decode; still on the main thread
+    container.appendChild(img)     // no decode-on-insert jank
+  } catch {
+    container.appendChild(createPlaceholder())
+  }
+}
+```
+
+**`createImageBitmap()` in a Web Worker.** The only option that moves decode fully off the main thread. `createImageBitmap` is available inside workers: pass a `Blob` from a `fetch` response and it returns an `ImageBitmap` you can transfer back to the main thread and draw into a `<canvas>`. The catch: an `ImageBitmap` cannot be assigned to `<img src>`, so you render into a `<canvas>`, losing native `alt` text, image events, and lazy-loading attributes. Reserve this path for when profiling confirms main-thread decode is the measured bottleneck.
+
+```js
+// decode-worker.js: runs in a dedicated thread
+self.onmessage = async ({ data: { id, blob } }) => {
+  const bitmap = await createImageBitmap(blob)
+  self.postMessage({ id, bitmap }, [bitmap])   // transfer (zero-copy), not copy
+}
+```
+
+```js
+// main.js
+const worker = new Worker(new URL('./decode-worker.js', import.meta.url))
+
+async function fetchAndDecode(src, canvas) {
+  const res = await fetch(src)
+  const blob = await res.blob()
+  worker.postMessage({ id: canvas.id, blob }, [blob])   // transfer blob
+}
+
+worker.onmessage = ({ data: { id, bitmap } }) => {
+  const canvas = document.getElementById(id)
+  canvas.width  = bitmap.width
+  canvas.height = bitmap.height
+  canvas.getContext('2d').drawImage(bitmap, 0, 0)
+  bitmap.close()                                         // release GPU memory
+}
+```
+
+Start with `decoding="async"` on every image as a free win. Add `img.decode()` when you need precise control over when an image enters the DOM. Reach for the Worker + `createImageBitmap` path only after profiling identifies main-thread decode as the actual bottleneck.
+
+### The through-line
+
+Virtualize the list so the DOM holds only visible nodes. Lazy-load via `IntersectionObserver` so the network fetches images as they approach the viewport rather than all at once. For large source assets, fetch a low-resolution proxy first and upgrade only on demand, revoking blob URLs to contain memory. Move decode off the main thread: `decoding="async"` as the baseline, `img.decode()` for fine-grained timing, Worker plus `createImageBitmap` when profiling points to decode as the bottleneck. These four layers address the DOM, network, memory, and main-thread CPU bottlenecks independently. Large scientific image galleries serving millions of users are built on exactly this stack, and the same architecture applies any time you need to render more images than the browser can hold at once.
+
+---
+
+## 13. Enforcing patterns and best practices: worked examples
 
 A best practice is only real if it is enforced. Stating a convention in a document relies on people remembering it; encoding it in tooling makes following it the default and violating it a failed build. That difference is what an interviewer probes for when you claim you raised standards, so be ready with the mechanism, not the intention. Below are five common frontend patterns, each as a small design plus the concrete enforcement. The through-line is identical: the mechanism runs as a required check in continuous integration, so a violation blocks the merge rather than relying on goodwill.
 
@@ -347,7 +594,7 @@ Every example ends the same way: the mechanism is a required status check, so a 
 
 ---
 
-## 13. How to answer well in a combined 45-minute round
+## 14. How to answer well in a combined 45-minute round
 
 Budget the time. Spend two or three minutes clarifying requirements, about five on the high-level architecture and the rendering decision, and the rest on one or two deep dives the interviewer cares about. Do not attempt to cover everything; depth on what he asks beats shallow breadth.
 
