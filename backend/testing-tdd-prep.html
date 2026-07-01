@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TDD, Testing & SOLID</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #7d4b13;
+  --accent-soft:  #7d4b1314;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>TDD, Testing & SOLID</h1>
+    <div class="sub">Red-green-refactor as an observable procedure, JUnit 5, AssertJ, Mockito, Spock, and Testcontainers, the over-mocking trap, and SOLID as the design layer that makes code testable.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>How to use this guide</h2>
+<p>You are preparing for a live-coding round where the interviewer grades &quot;clean,
+maintainable, tested solutions.&quot; XP-influenced engineering teams treat TDD
+discipline as an observable signal in the room. Writing all the production
+code first and then adding tests afterward reads as not-TDD-native to an
+interviewer who is watching for the sequence.</p>
+<p>This guide gives you the procedure you can execute under observation, the
+standard Java testing tool stack (JUnit 5, AssertJ, Mockito, Spock,
+Testcontainers), and the design principles that make the code testable in the
+first place.</p>
+<p>Read the red-green-refactor section as a procedure, not a concept to explain.
+The SOLID section explains why the procedure is possible: dependency inversion
+is what gives you the seams to inject test doubles.</p>
+<hr>
+<h2>Red-green-refactor, under observation</h2>
+<p>The loop has three steps. Red: write a failing test that defines one unit of
+behavior, before writing any production code. Green: write the minimum
+implementation to make the test pass. Refactor: improve the structure without
+changing the behavior (tests still green after).</p>
+<p>A worked example using the Account debit case from the domain model:</p>
+<p><strong>Step 1 (red): write the failing test.</strong></p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">import</span> org.junit.jupiter.api.Test;
+<span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> org.assertj.core.api.Assertions.*;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">AccountTest</span> {
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">debit_reducesBalance</span><span class="hljs-params">()</span> {
+        <span class="hljs-type">Account</span> <span class="hljs-variable">account</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Account</span>(AccountId.generate(), Money.of(<span class="hljs-number">200</span>, <span class="hljs-string">&quot;GBP&quot;</span>));
+
+        account.debit(Money.of(<span class="hljs-number">50</span>, <span class="hljs-string">&quot;GBP&quot;</span>), TransactionId.generate());
+
+        assertThat(account.balance()).isEqualTo(Money.of(<span class="hljs-number">150</span>, <span class="hljs-string">&quot;GBP&quot;</span>));
+    }
+}
+</code></pre>
+<p>This does not compile yet because <code>Account</code> does not exist. That is intentional:
+the test is the spec. Write it first, then implement.</p>
+<p><strong>Step 2 (green): minimum implementation to pass.</strong></p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Account</span> {
+    <span class="hljs-keyword">private</span> Money balance;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Account</span><span class="hljs-params">(AccountId id, Money initialBalance)</span> {
+        <span class="hljs-built_in">this</span>.balance = initialBalance;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">debit</span><span class="hljs-params">(Money amount, TransactionId txId)</span> {
+        <span class="hljs-built_in">this</span>.balance = balance.subtract(amount);
+    }
+
+    <span class="hljs-keyword">public</span> Money <span class="hljs-title function_">balance</span><span class="hljs-params">()</span> { <span class="hljs-keyword">return</span> balance; }
+}
+</code></pre>
+<p>The test now passes. There is no invariant enforcement yet: that is correct.
+The next test covers it.</p>
+<p><strong>Step 3 (add the edge case, then refactor): add the insufficient-funds test.</strong></p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-meta">@Test</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">debit_throwsWhenInsufficientFunds</span><span class="hljs-params">()</span> {
+    <span class="hljs-type">Account</span> <span class="hljs-variable">account</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Account</span>(AccountId.generate(), Money.of(<span class="hljs-number">30</span>, <span class="hljs-string">&quot;GBP&quot;</span>));
+
+    assertThatThrownBy(() -&gt;
+        account.debit(Money.of(<span class="hljs-number">50</span>, <span class="hljs-string">&quot;GBP&quot;</span>), TransactionId.generate()))
+        .isInstanceOf(InsufficientFundsException.class);
+}
+</code></pre>
+<p>The test is red. Add the guard in <code>debit()</code>:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">debit</span><span class="hljs-params">(Money amount, TransactionId txId)</span> {
+    <span class="hljs-keyword">if</span> (balance.isLessThan(amount)) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">InsufficientFundsException</span>(id, amount, balance);
+    }
+    <span class="hljs-built_in">this</span>.balance = balance.subtract(amount);
+}
+</code></pre>
+<p>Both tests are green. Now refactor: rename for clarity, extract a helper if
+the guard logic is repeated elsewhere, check that the method is still doing
+one thing. Then move to the next behavior.</p>
+<p>The catch: the refactor step is where most people skip under pressure. Green
+with a mess is not done. In the live room, taking 60 to 90 seconds to
+improve structure before moving to the next case signals TDD discipline.
+Skipping the refactor step is what separates TDD-awareness from TDD-practice.</p>
+<hr>
+<h2>The test pyramid and where each tool sits</h2>
+<p>The test pyramid describes the relative investment in test layers: many small,
+fast unit tests at the base; fewer integration tests in the middle; minimal
+end-to-end tests at the top. The pyramid shape reflects cost and speed: unit
+tests run in milliseconds, end-to-end tests run in minutes.</p>
+<p>The standard Java testing tool stack maps onto the pyramid:</p>
+<ul>
+<li><strong>JUnit 5 with AssertJ</strong> at the unit layer: test lifecycle, parameterized
+tests, fluent assertions that read as English and produce clear failure
+messages.</li>
+<li><strong>Mockito</strong> for collaborator isolation: stub external dependencies so unit
+tests run fast and deterministically without real I/O.</li>
+<li><strong>Spock</strong> for BDD-style specs, particularly at the service layer and for
+data-driven cases.</li>
+<li><strong>Testcontainers</strong> at the integration layer: real Postgres or Redis in a
+Docker container, started and torn down by the test suite.</li>
+</ul>
+<p>A service-layer unit test using Mockito and AssertJ:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-meta">@ExtendWith(MockitoExtension.class)</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">TransferApplicationServiceTest</span> {
+
+    <span class="hljs-meta">@Mock</span> AccountRepository accounts;
+    <span class="hljs-meta">@Mock</span> EventOutbox outbox;
+    <span class="hljs-meta">@InjectMocks</span> TransferApplicationService service;
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">transfer_debitsSourceAndCreditsTarget</span><span class="hljs-params">()</span> {
+        <span class="hljs-type">Account</span> <span class="hljs-variable">source</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Account</span>(AccountId.of(<span class="hljs-string">&quot;src&quot;</span>), Money.of(<span class="hljs-number">200</span>, <span class="hljs-string">&quot;GBP&quot;</span>));
+        <span class="hljs-type">Account</span> <span class="hljs-variable">target</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Account</span>(AccountId.of(<span class="hljs-string">&quot;tgt&quot;</span>), Money.of(<span class="hljs-number">100</span>, <span class="hljs-string">&quot;GBP&quot;</span>));
+        given(accounts.findById(source.id())).willReturn(Optional.of(source));
+        given(accounts.findById(target.id())).willReturn(Optional.of(target));
+
+        service.transfer(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TransferCommand</span>(
+            source.id(), target.id(),
+            Money.of(<span class="hljs-number">50</span>, <span class="hljs-string">&quot;GBP&quot;</span>), TransactionId.generate()));
+
+        assertThat(source.balance()).isEqualTo(Money.of(<span class="hljs-number">150</span>, <span class="hljs-string">&quot;GBP&quot;</span>));
+        assertThat(target.balance()).isEqualTo(Money.of(<span class="hljs-number">150</span>, <span class="hljs-string">&quot;GBP&quot;</span>));
+        verify(accounts, times(<span class="hljs-number">2</span>)).save(any(Account.class));
+    }
+}
+</code></pre>
+<p><code>@InjectMocks</code> injects the mocked <code>AccountRepository</code> and <code>EventOutbox</code> into
+the service via constructor injection. The test never touches a database.</p>
+<h3>Spock</h3>
+<p>Spock is a Groovy-based test framework with first-class <code>given/when/then</code>
+blocks and data-driven testing via <code>where:</code> tables. It compiles to JVM
+bytecode and runs inside the standard JUnit runner.</p>
+<pre><code class="hljs" data-lang="groovy"><span class="hljs-keyword">class</span> <span class="hljs-title class_">AccountSpec</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Specification</span> {
+
+    <span class="hljs-keyword">def</span> <span class="hljs-string">&quot;debit reduces the balance by the specified amount&quot;</span>() {
+        <span class="hljs-symbol">given:</span>
+        <span class="hljs-keyword">def</span> account = <span class="hljs-keyword">new</span> Account(AccountId.generate(), Money.of(<span class="hljs-number">200</span>, <span class="hljs-string">&quot;GBP&quot;</span>))
+
+        <span class="hljs-symbol">when:</span>
+        account.debit(Money.of(<span class="hljs-number">50</span>, <span class="hljs-string">&quot;GBP&quot;</span>), TransactionId.generate())
+
+        <span class="hljs-symbol">then:</span>
+        account.balance() == Money.of(<span class="hljs-number">150</span>, <span class="hljs-string">&quot;GBP&quot;</span>)
+    }
+
+    <span class="hljs-keyword">def</span> <span class="hljs-string">&quot;debit throws InsufficientFundsException when balance is too low&quot;</span>() {
+        <span class="hljs-symbol">given:</span>
+        <span class="hljs-keyword">def</span> account = <span class="hljs-keyword">new</span> Account(AccountId.generate(), Money.of(initial, <span class="hljs-string">&quot;GBP&quot;</span>))
+
+        <span class="hljs-symbol">when:</span>
+        account.debit(Money.of(amount, <span class="hljs-string">&quot;GBP&quot;</span>), TransactionId.generate())
+
+        <span class="hljs-symbol">then:</span>
+        thrown(InsufficientFundsException)
+
+        <span class="hljs-symbol">where:</span>
+        initial | amount
+        <span class="hljs-number">30</span>      | <span class="hljs-number">50</span>
+        <span class="hljs-number">0</span>       | <span class="hljs-number">1</span>
+        <span class="hljs-number">99</span>      | <span class="hljs-number">100</span>
+    }
+}
+</code></pre>
+<p>The <code>where:</code> block is a data table: Spock runs the test once per row,
+substituting the named columns into the <code>given/when/then</code> blocks. This
+replaces <code>@ParameterizedTest</code> boilerplate with a declaration. The failure
+message includes the row values, so a failure at <code>initial=0, amount=1</code> is
+immediately readable.</p>
+<p>Spock has built-in mocking that integrates with the block structure:
+<code>def repo = Mock(AccountRepository)</code> creates a strict mock, and
+<code>1 * repo.save(_)</code> in the <code>then:</code> block asserts it was called exactly once.
+No extra annotation needed.</p>
+<h3>Testcontainers</h3>
+<p>Testcontainers starts a real database (Postgres, Redis, or any Docker image)
+for the duration of a test class or suite, then tears it down. The test code
+connects using the container's dynamically assigned port, exactly as it would
+connect in production.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-meta">@Testcontainers</span>
+<span class="hljs-meta">@SpringBootTest</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">AccountRepositoryIntegrationTest</span> {
+
+    <span class="hljs-meta">@Container</span>
+    <span class="hljs-keyword">static</span> PostgreSQLContainer&lt;?&gt; postgres =
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">PostgreSQLContainer</span>&lt;&gt;(<span class="hljs-string">&quot;postgres:17&quot;</span>)
+            .withDatabaseName(<span class="hljs-string">&quot;payments_test&quot;</span>)
+            .withUsername(<span class="hljs-string">&quot;test&quot;</span>)
+            .withPassword(<span class="hljs-string">&quot;test&quot;</span>);
+
+    <span class="hljs-meta">@DynamicPropertySource</span>
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">configurePostgres</span><span class="hljs-params">(DynamicPropertyRegistry registry)</span> {
+        registry.add(<span class="hljs-string">&quot;spring.datasource.url&quot;</span>,      postgres::getJdbcUrl);
+        registry.add(<span class="hljs-string">&quot;spring.datasource.username&quot;</span>, postgres::getUsername);
+        registry.add(<span class="hljs-string">&quot;spring.datasource.password&quot;</span>, postgres::getPassword);
+    }
+
+    <span class="hljs-meta">@Autowired</span> AccountRepository repository;
+
+    <span class="hljs-meta">@Test</span>
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">save_andFind_roundtrip</span><span class="hljs-params">()</span> {
+        <span class="hljs-type">Account</span> <span class="hljs-variable">account</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Account</span>(AccountId.generate(), Money.of(<span class="hljs-number">200</span>, <span class="hljs-string">&quot;GBP&quot;</span>));
+        repository.save(account);
+
+        <span class="hljs-type">Account</span> <span class="hljs-variable">loaded</span> <span class="hljs-operator">=</span> repository.findById(account.id()).orElseThrow();
+
+        assertThat(loaded.balance()).isEqualTo(Money.of(<span class="hljs-number">200</span>, <span class="hljs-string">&quot;GBP&quot;</span>));
+    }
+}
+</code></pre>
+<p>The catch: the container starts once per test class (static field) and adds 5
+to 15 seconds of startup overhead on first run. In CI, Docker-in-Docker needs
+to be enabled on the runner. The startup cost is worth it for the persistence
+layer: Testcontainers catches wrong SQL, constraint violations, and
+transaction-boundary leaks that an in-memory fake structurally cannot surface.</p>
+<hr>
+<h2>The catch: over-mocking</h2>
+<p>The most common testing anti-pattern is mocking every collaborator in every
+test. A test that stubs the repository, the event outbox, and the validator,
+then asserts that three mocked methods were called in the right order, is
+verifying the mock wiring, not the behavior.</p>
+<p>The rule: mock at the boundary, not through the middle. Mock what you cannot
+control or what you want to isolate for speed: the database in a fast unit
+test, a third-party payment processor, a remote rate-limiting service. Use real
+objects for domain logic collaborators that have no side effects and run in
+microseconds. Use Testcontainers for the persistence layer.</p>
+<p>The bugs that over-mocked unit tests structurally cannot catch: SQL that is
+syntactically valid but semantically wrong, a database constraint you did not
+model in the fake, a transaction isolation issue where two concurrent writes
+race past each other. These are exactly the bugs that matter in a payment
+system. The Relational Databases guide covers the isolation levels and the
+TOCTOU balance-check race: a mocked repository test cannot surface a
+<code>READ COMMITTED</code> vs <code>REPEATABLE READ</code> discrepancy in the actual database
+transaction.</p>
+<p>Mocking the thing you are testing is the most visible symptom: if a test
+creates a <code>Mock(Account)</code> and then asserts that <code>account.debit()</code> was called,
+the test verifies nothing about the Account implementation. Delete the mock,
+use a real <code>Account</code>, and let the assertion on <code>account.balance()</code> do the work.</p>
+<hr>
+<h2>SOLID as the testability lever</h2>
+<p>SOLID names five design principles. Three have direct production teeth for
+testability; know these cold.</p>
+<p><strong>Single Responsibility Principle (SRP):</strong> a class has one reason to change.
+A class that handles HTTP parsing, business validation, database writes, and
+event publishing is hard to test: a unit test must set up all four
+collaborators just to test any of them. Splitting responsibilities makes each
+piece independently testable.</p>
+<p><strong>Dependency Inversion Principle (DIP):</strong> depend on abstractions (interfaces),
+not on concrete classes. This is the enabling principle for all test doubling.
+If <code>TransferApplicationService</code> depends directly on <code>JdbcAccountRepository</code>,
+the test must have a real database. If it depends on the <code>AccountRepository</code>
+interface, the test injects a fake:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Without DIP: impossible to unit test without a live database</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">TransferApplicationService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">JdbcAccountRepository</span> <span class="hljs-variable">repo</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JdbcAccountRepository</span>();
+    <span class="hljs-comment">// ...</span>
+}
+
+<span class="hljs-comment">// With DIP: inject the abstraction; tests inject a mock or fake</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">TransferApplicationService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> AccountRepository accounts;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> EventOutbox outbox;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">TransferApplicationService</span><span class="hljs-params">(AccountRepository accounts,
+                                      EventOutbox outbox)</span> {
+        <span class="hljs-built_in">this</span>.accounts = accounts;
+        <span class="hljs-built_in">this</span>.outbox   = outbox;
+    }
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p>Constructor injection (shown above) is the form that works with Mockito's
+<code>@InjectMocks</code>, Spock's <code>Mock()</code>, and Spring's <code>@Autowired</code>. DIP is not a
+testing convenience; it is the design rule that testing makes visible. If a
+class is hard to test, it usually violates DIP.</p>
+<p><strong>Open/Closed Principle (OCP):</strong> open for extension, closed for modification.
+A fraud rule engine that uses a growing if-else chain over transaction types
+must be modified every time a new rule type is added, and all existing tests
+must re-pass a modified class. Replacing the chain with a <code>FraudRule</code> interface
+(many implementations, one per rule type) lets you add a new rule by adding a
+new class, with no modification to existing classes and no risk of breaking
+existing tests.</p>
+<p>The other two principles (Liskov Substitution, Interface Segregation) matter
+but are less directly coupled to testability in practice. Name them if asked,
+but lead with SRP and DIP: these are the ones that have visible consequences
+in test design.</p>
+<hr>
+<h2>Common interview questions</h2>
+<p><strong>What is the practical difference between TDD and writing tests after?</strong> <em>Testing whether you understand the sequence, not just the acronym.</em> TDD drives design: you write the test first as a specification of the behavior you want, and the implementation emerges to satisfy it. The test-after approach verifies an existing implementation, which tends to produce tests that test the code as written rather than the behavior that is required. The practical difference is that TDD catches untestable interfaces and hard-coded dependencies at the moment they would be introduced, rather than after the class is built. The catch: following the loop mechanically does not guarantee good tests. You can do red-green-refactor and produce tests that are fragile, over-mocked, or that pin implementation details rather than observable behavior.</p>
+<p><strong>When should you mock a dependency and when should you use a real one?</strong> <em>Testing judgment, not a rule.</em> Mock what is slow, non-deterministic, or external: network calls, time, random values, third-party services. Use real objects for domain logic with no side effects. Use Testcontainers instead of fakes for the persistence layer, because the database is exactly what you want to test at the integration level. The catch: mocking the class you are testing is a sign the test verifies the mock, not the class. Also watch for mocking collaborators you own when a real instance would work fine and be faster to set up than the mock.</p>
+<p><strong>Why Testcontainers instead of H2 for Postgres integration tests?</strong> <em>Testing awareness of the failure modes of in-memory fakes.</em> H2 speaks a different SQL dialect and does not implement Postgres semantics: certain functions (<code>gen_random_uuid()</code>, <code>JSONB</code> operators), locking behavior, and index types differ. A test suite that passes on H2 can fail on Postgres in production because the fake does not faithfully represent the real system. Testcontainers runs the actual Postgres binary, so SQL behavior and locking are identical to production. The catch: Testcontainers requires Docker and adds container startup time per test class, which is a real cost in large suites.</p>
+<p><strong>What does the Dependency Inversion Principle buy for testability?</strong> <em>Testing whether you connect design principles to practical outcomes.</em> DIP means depending on interfaces rather than on concrete classes. It creates a seam at every dependency boundary where a test double (mock, stub, fake) can be injected without framework magic or reflection hacks. Without DIP, a class that constructs its own database connection is untestable in isolation. With DIP, you pass the collaborator in via the constructor, and the test passes a mock. The catch: DIP applied mechanically (&quot;wrap everything in an interface&quot;) produces interfaces for classes that will never have a second implementation. Apply it where you genuinely need the seam: persistence, external services, time, randomness, and any collaborator you want to verify or replace in tests.</p>
+<hr>
+<h2>In the room</h2>
+<p>TDD in a live-coding round is observable. The interviewer watches the sequence:
+does the test appear before the implementation? Does the test describe
+observable behavior or probe internal state? Is the refactor step taken?</p>
+<p>The practical procedure: start by naming the first behavior out loud (&quot;I want
+to write a test for a successful debit, then for the insufficient-funds case&quot;).
+Write the assertion first, fill in the setup, let the test fail, implement,
+make it pass, add the edge case, refactor. Narrate the steps as you go so the
+interviewer can follow your thinking.</p>
+<p>The two highest-signal moves: (1) writing the assertion before the
+implementation (the interviewer sees you think about expected behavior first),
+and (2) taking the refactor step visibly (extract, rename, simplify). These are
+the observable signals that separate someone who has practiced TDD from
+someone who has read about it.</p>
+<p>The DDD guide (Domain-Driven Design) covers the payment domain model that these
+tests exercise. The Java Concurrency guide covers the thread-safe rate limiter
+and concurrent counter tasks that are other common live-coding prompts at this
+level: CAS, <code>LongAdder</code>, and <code>ConcurrentHashMap</code> with the same test-first
+approach apply there.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

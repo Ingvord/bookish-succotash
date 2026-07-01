@@ -77,6 +77,22 @@ const GUIDES = [
     subtitle: 'Load balancing, real-time transport (polling, SSE, WebSockets), caching, security, and authentication: the shared reliability vocabulary (RPS, nines, percentiles) every backend round assumes.',
     accent:   '#7a5500',  // amber
   },
+  {
+    src:      '.claude/backend-md/ddd-prep.md',
+    out:      'backend/ddd-prep.html',
+    kicker:   'Interview Preparation · Staff Backend',
+    title:    'Domain-Driven Design & CQRS',
+    subtitle: 'Bounded contexts, aggregate roots, domain events, repository and application service patterns, and CQRS, with a payment-ledger running example and the anemic-model catch interviewers listen for.',
+    accent:   '#1f6b57',  // pine -- AA on white (5.8:1)
+  },
+  {
+    src:      '.claude/backend-md/testing-tdd-prep.md',
+    out:      'backend/testing-tdd-prep.html',
+    kicker:   'Interview Preparation · Staff Backend',
+    title:    'TDD, Testing & SOLID',
+    subtitle: 'Red-green-refactor as an observable procedure, JUnit 5, AssertJ, Mockito, Spock, and Testcontainers, the over-mocking trap, and SOLID as the design layer that makes code testable.',
+    accent:   '#7d4b13',  // bronze -- AA on white (6.5:1)
+  },
 
   // ---- Frontend · Staff ----------------------------------------
   {
@@ -230,6 +246,8 @@ const GUIDES = [
 //  cobalt      #1e5fa8   system-design-backend-prep   -- AA on white (5.6:1)
 //  copper      #9a4a1f   java-concurrency-prep        -- AA on white (6.3:1)
 //  wine        #8a2c5a   elasticsearch-prep           -- AA on white
+//  pine        #1f6b57   ddd-prep                     -- AA on white (5.8:1)
+//  bronze      #7d4b13   testing-tdd-prep             -- AA on white (6.5:1)
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------

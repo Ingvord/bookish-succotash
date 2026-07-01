@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Domain-Driven Design & CQRS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #1f6b57;
+  --accent-soft:  #1f6b5714;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Domain-Driven Design & CQRS</h1>
+    <div class="sub">Bounded contexts, aggregate roots, domain events, repository and application service patterns, and CQRS, with a payment-ledger running example and the anemic-model catch interviewers listen for.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>How to use this guide</h2>
+<p>You are preparing for the system design round and the post-live-coding technical
+conversation. Senior fintech engineering interviews name DDD and CQRS
+explicitly, and the vocabulary is tested directly: bounded context, aggregate,
+domain event. This guide covers the tactical DDD patterns an interviewer probes
+in that room. The full Evans blue-book strategic layer (context mapping,
+anti-corruption layers, open-host service) is outside scope here; the probed
+layer is the vocabulary you use to describe how a payment system is structured
+and why.</p>
+<p>The running example throughout is a payment ledger, because that is where
+senior fintech design prompts converge. Account is the central aggregate,
+<code>MoneyTransferred</code> is the central domain event, and the Payments, Identity,
+and Fraud contexts supply the cross-context integration story.</p>
+<hr>
+<h2>The mental model: the model is the boundary</h2>
+<p>Before the patterns, one reframe: DDD is not a set of classes to create. It
+is a discipline of making the code model match the business rules of a specific
+domain and drawing a hard boundary around that match.</p>
+<p>A domain model is only useful inside its boundary. The moment you share a
+domain object across that boundary, you start serving two masters, and both get
+a degraded model. The bounded context is the explicit name for where the
+boundary is.</p>
+<hr>
+<h2>Bounded context</h2>
+<p>A bounded context is an explicit boundary within which a domain model is valid.
+Inside the boundary, terms have precise meanings: &quot;Account&quot; means exactly one
+thing, &quot;Transaction&quot; means exactly one thing. Outside the boundary, another
+team can reuse those words with different meanings, and that is fine, because
+the contexts are separate.</p>
+<p>The integration rule: communication between contexts happens through domain
+events or published API contracts, never through shared database tables. Sharing
+a table couples two contexts to the same schema, which means one team's
+migration can break another team's query without warning. The decoupling point
+must be at the message boundary, not the storage boundary.</p>
+<p>For a fintech system, the natural context split is:</p>
+<ul>
+<li><strong>Payments context:</strong> the Account aggregate, the debit/credit invariant, the
+transaction ledger.</li>
+<li><strong>Identity context:</strong> customer profile, KYC status, authentication. The
+concept of &quot;Account&quot; here might just be a customer reference ID with no
+financial semantics.</li>
+<li><strong>Fraud context:</strong> risk scoring, velocity checks, rule evaluation. It
+consumes domain events from Payments (<code>MoneyTransferred</code>) and publishes risk
+decisions, but it never reads the Payments database directly.</li>
+</ul>
+<p>This split is not about microservices, though it often maps to them. A bounded
+context is a modeling decision; the deployment boundary is a separate concern.
+Two contexts can live in the same deployed service initially and split later
+without redesigning the model.</p>
+<p>The catch: context boundaries require team discipline to maintain. The
+shortcut of sharing a database table or a domain class across contexts is always
+available, and always tempting when a feature spans two contexts. The boundary
+degrades gradually, not all at once, which is why naming the rule explicitly
+(&quot;we never read the Payments schema from the Fraud service&quot;) is part of
+maintaining it.</p>
+<hr>
+<h2>Aggregate and aggregate root</h2>
+<p>An aggregate is a cluster of objects that are always consistent together. The
+aggregate root is the single entry point through which all mutations to the
+cluster must pass. No code outside the aggregate may modify an object inside
+it directly.</p>
+<p>The value of this rule is that invariants can be enforced. If a debit on an
+Account must always fail when the balance is insufficient, and that invariant
+is enforced inside the root's <code>debit()</code> method, then no caller can leave the
+balance negative.</p>
+<p>A minimal Account aggregate root in Java:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Account</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> AccountId id;
+    <span class="hljs-keyword">private</span> Money balance;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> List&lt;DomainEvent&gt; domainEvents = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">Account</span><span class="hljs-params">(AccountId id, Money initialBalance)</span> {
+        <span class="hljs-built_in">this</span>.id = id;
+        <span class="hljs-built_in">this</span>.balance = initialBalance;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">debit</span><span class="hljs-params">(Money amount, TransactionId txId)</span> {
+        <span class="hljs-keyword">if</span> (balance.isLessThan(amount)) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">InsufficientFundsException</span>(id, amount, balance);
+        }
+        <span class="hljs-built_in">this</span>.balance = balance.subtract(amount);
+        domainEvents.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">AccountDebited</span>(id, txId, amount));
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">credit</span><span class="hljs-params">(Money amount, TransactionId txId)</span> {
+        <span class="hljs-built_in">this</span>.balance = balance.add(amount);
+        domainEvents.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">AccountCredited</span>(id, txId, amount));
+    }
+
+    <span class="hljs-keyword">public</span> List&lt;DomainEvent&gt; <span class="hljs-title function_">drainEvents</span><span class="hljs-params">()</span> {
+        List&lt;DomainEvent&gt; events = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;(domainEvents);
+        domainEvents.clear();
+        <span class="hljs-keyword">return</span> events;
+    }
+
+    <span class="hljs-keyword">public</span> Money <span class="hljs-title function_">balance</span><span class="hljs-params">()</span>  { <span class="hljs-keyword">return</span> balance; }
+    <span class="hljs-keyword">public</span> AccountId <span class="hljs-title function_">id</span><span class="hljs-params">()</span>   { <span class="hljs-keyword">return</span> id; }
+}
+</code></pre>
+<p>The invariant (balance cannot go negative) lives in <code>debit()</code>. The balance
+field is private; no service class or controller modifies it directly. The
+domain events are collected on the aggregate and published by the application
+layer after the transaction commits.</p>
+<p>The catch with aggregates is size. Too large an aggregate and you get lock
+contention: every mutation on any entity in the cluster requires a lock on the
+root, serializing all writes. For a payment ledger, putting every Transaction
+inside the Account aggregate looks natural, but it means loading potentially
+thousands of transaction records every time you debit the account.</p>
+<p>Too small an aggregate and you cannot enforce a cross-entity invariant in one
+transaction. If each Transaction is its own aggregate with eventual consistency
+back to Account, you cannot atomically verify the balance before debiting. You
+are pushed toward optimistic locking or a saga.</p>
+<p>The right boundary for this ledger: Account is the aggregate (balance is the
+invariant it enforces), and each Transaction is a separate aggregate that
+refers to its source and destination accounts by ID only. The debit/credit pair
+runs as two operations on two Account aggregates, coordinated by an application
+service in a single database transaction, with an outbox entry written in the
+same commit.</p>
+<hr>
+<h2>Domain events</h2>
+<p>A domain event is an immutable record of something that happened inside the
+domain. <code>MoneyTransferred</code>, <code>AccountDebited</code>, <code>FraudCheckRequested</code> are domain
+events. They are named in the past tense because they record facts, not
+commands.</p>
+<p>Domain events serve two purposes. First, they are the audit trail: the event
+log is a complete history of every state change. Second, they are the
+integration contract between bounded contexts: the Fraud context subscribes to
+<code>MoneyTransferred</code> events from the Payments context without depending on the
+Payments schema.</p>
+<p>A minimal domain event as a Java record:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">record</span> <span class="hljs-title class_">MoneyTransferred</span><span class="hljs-params">(
+    TransactionId transactionId,
+    AccountId     debitedAccount,
+    AccountId     creditedAccount,
+    Money         amount,
+    Instant       occurredAt
+)</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">DomainEvent</span> {}
+</code></pre>
+<p>Records are a natural fit: domain events are value objects. Two <code>MoneyTransferred</code>
+records with the same fields represent the same fact.</p>
+<p>The bridge to the outbox: when an Account aggregate raises <code>MoneyTransferred</code>,
+the application service persists the Account state and the event in the same
+database transaction, writing the event to an outbox table. A relay process
+then publishes it to Kafka. This guarantees the event is published if and only
+if the state change committed. The mechanism is covered in depth in the Backend
+System Design guide (the <strong>Transactional outbox</strong> section) and is the standard
+approach for reliable cross-context integration.</p>
+<p>The catch: domain events must be versioned. When a consuming context (Fraud)
+depends on the shape of <code>MoneyTransferred</code>, changing its fields is a breaking
+change. Append-only evolution (add fields, never remove) and versioned event
+types (<code>MoneyTransferredV2</code>) are the patterns that keep the integration stable.</p>
+<hr>
+<h2>Repository and application service</h2>
+<p>A repository is the persistence abstraction for an aggregate. It hides all
+database access behind a collection-like interface: <code>findById(id)</code>,
+<code>save(aggregate)</code>. The application layer never calls SQL or a query builder
+directly; it calls the repository.</p>
+<p>The application service is the use-case orchestrator: it loads the aggregate
+from the repository, invokes domain logic on it, and saves it back. It holds
+no domain logic itself. It is the seam between the transport layer (REST
+controller, message consumer) and the domain model.</p>
+<p>A transfer use case:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-meta">@Service</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">TransferApplicationService</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> AccountRepository accounts;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> EventOutbox outbox;
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">TransferApplicationService</span><span class="hljs-params">(AccountRepository accounts,
+                                      EventOutbox outbox)</span> {
+        <span class="hljs-built_in">this</span>.accounts = accounts;
+        <span class="hljs-built_in">this</span>.outbox   = outbox;
+    }
+
+    <span class="hljs-meta">@Transactional</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">transfer</span><span class="hljs-params">(TransferCommand cmd)</span> {
+        <span class="hljs-type">Account</span> <span class="hljs-variable">source</span> <span class="hljs-operator">=</span> accounts.findById(cmd.sourceId()).orElseThrow();
+        <span class="hljs-type">Account</span> <span class="hljs-variable">target</span> <span class="hljs-operator">=</span> accounts.findById(cmd.targetId()).orElseThrow();
+
+        source.debit(cmd.amount(), cmd.transactionId());
+        target.credit(cmd.amount(), cmd.transactionId());
+
+        accounts.save(source);
+        accounts.save(target);
+
+        List&lt;DomainEvent&gt; events = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+        events.addAll(source.drainEvents());
+        events.addAll(target.drainEvents());
+        outbox.append(events);
+    }
+}
+</code></pre>
+<p>The domain logic (the invariant, the balance update) lives in <code>Account</code>. The
+transaction boundary and the outbox write live in the application service. The
+REST controller just parses the request and calls the service.</p>
+<p>The catch: the anemic domain model. In an anemic model, the entities are data
+bags with only getters and setters, and all the business logic leaks into the
+application service. The service grows into a procedure that manipulates entity
+fields directly. The code is still &quot;DDD-shaped&quot; (it has classes called Account
+and Repository), but the model does not enforce its own invariants.</p>
+<p>Interviewers listen for the anemic tell: if your Account class has
+<code>setBalance()</code> and your service calls <code>account.setBalance(account.balance() .subtract(amount))</code> directly, that is the signal. The rule: logic that
+enforces a domain invariant belongs in the aggregate. Logic that coordinates
+use cases (loading, saving, publishing) belongs in the application service.</p>
+<hr>
+<h2>CQRS and event sourcing</h2>
+<p>CQRS (Command Query Responsibility Segregation) separates the write model from
+the read model. Commands change state; queries return state. The two use
+separate models optimized for their different shapes.</p>
+<p>The value: writes need strong consistency, transaction boundaries, and
+aggregate invariant enforcement. Reads need denormalized, low-latency views
+tailored to specific API or UI shapes. One shared model serves neither well.
+CQRS lets the write side be normalized and the read side be whatever the
+consumer needs.</p>
+<p>For a payment ledger, the write side processes debits and credits under ACID
+guarantees, with aggregate locks ensuring the balance invariant. The read side
+serves account balances, transaction history, and analytics queries from a
+read-optimized projection: a denormalized table or a Redis cache refreshed by
+consuming domain events. Balance queries and analytics can tolerate a short
+replication lag without poisoning the write path.</p>
+<p>A minimal CQRS split:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Write side: command handler, goes through the aggregate</span>
+<span class="hljs-meta">@Transactional</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">handle</span><span class="hljs-params">(DebitCommand cmd)</span> {
+    <span class="hljs-type">Account</span> <span class="hljs-variable">account</span> <span class="hljs-operator">=</span> accounts.findById(cmd.accountId()).orElseThrow();
+    account.debit(cmd.amount(), cmd.transactionId());
+    accounts.save(account);
+    outbox.append(account.drainEvents());
+}
+
+<span class="hljs-comment">// Read side: query handler, reads from a projection table updated by events</span>
+<span class="hljs-keyword">public</span> AccountSummaryDto <span class="hljs-title function_">handle</span><span class="hljs-params">(AccountSummaryQuery query)</span> {
+    <span class="hljs-keyword">return</span> readDb.findAccountSummary(query.accountId());
+    <span class="hljs-comment">// readDb is a separate read model, not the aggregate store</span>
+}
+</code></pre>
+<p>The catch: CQRS buys independent scaling and read-model optimization at the
+cost of eventual consistency between the write and read models, plus the
+operational weight of the projection pipeline (the process that consumes events
+and updates the read model). Most systems do not need it. If your read and
+write volumes are similar and your read shapes are simple, a single model is
+less complex and correct by construction.</p>
+<p>Event sourcing is frequently paired with CQRS but is a separable idea. In
+event sourcing, the event log is the source of truth rather than the current
+state: the current balance is derived by replaying <code>AccountDebited</code> and
+<code>AccountCredited</code> events from the log. The write model stores events; the
+current state is a projection of them.</p>
+<p>CQRS does not require event sourcing. You can keep a conventional write model
+(persist current state) with a separate read model built from domain events or
+CDC. You can also have event sourcing without CQRS: a single model where
+current state is always replayed from the event log, with no separate read
+model. Conflating the two is a common tell in a design conversation.</p>
+<hr>
+<h2>When not to reach for DDD</h2>
+<p>DDD pays off when the domain is genuinely complex: rich business rules, multiple
+collaborating entities with invariants that span them, a large team that needs
+a shared vocabulary. Payment systems, lending platforms, and logistics all fit.</p>
+<p>DDD is expensive for thin or CRUD domains. If the core operation is &quot;store
+this record, retrieve it later,&quot; the overhead of aggregates, repositories,
+domain events, and application services adds ceremony without value. A simple
+product catalog or a user-settings API does not need bounded contexts and
+aggregate roots.</p>
+<p>The senior signal in a DDD conversation is naming when not to use it. An
+interviewer who hears &quot;I would apply DDD here because we have a complex domain
+with invariants that span multiple entities, and because we have separate teams
+that should own separate models&quot; is hearing someone who understands the trade.
+An interviewer who hears &quot;I would use DDD because it is best practice&quot; is
+hearing someone who has read about it but has not had to pay the cost of it.</p>
+<hr>
+<h2>Common interview questions</h2>
+<p><strong>What is the difference between a bounded context and a microservice?</strong> <em>Testing vocabulary precision.</em> A bounded context is a modeling decision: a boundary around a domain model where a set of terms has precise meaning. A microservice is a deployment decision: a separately deployed, independently runnable unit. They often coincide, but a single microservice can contain multiple bounded contexts (a monolith decomposed by domain but not yet split by deployment), or a single bounded context can span multiple services. Conflating them reads as misunderstanding one or both. The catch: splitting by microservice before understanding context boundaries creates services with leaking models and cross-service database joins.</p>
+<p><strong>How do you choose the aggregate boundary?</strong> <em>Testing design judgment.</em> The aggregate boundary is the consistency boundary: everything that must be consistent in a single transaction. Start small; only expand when you cannot enforce a critical invariant without grouping more entities together. For the payment Account, the balance invariant requires the Account to be the aggregate root. Transactions are separate aggregates because you do not need to load all transactions to debit the account. The catch: the common mistake is making aggregates too large, which causes lock contention under concurrent load on high-traffic accounts.</p>
+<p><strong>What is the anemic domain model and why is it a problem?</strong> <em>Testing understanding of the core DDD failure mode.</em> An anemic model has entities with no behavior: only getters and setters. All logic lives in service classes. The problem is that invariants cannot be enforced at the model level; any code anywhere can set any field to any value. The model does not communicate the rules, and the service layer becomes a procedural blob. The fix is not renaming: moving <code>account.setBalance(account.balance().subtract(amount))</code> into <code>account.debit(amount)</code> and adding the guard inside that method is the change.</p>
+<p><strong>Can you use CQRS without event sourcing?</strong> <em>Testing whether you conflate the two.</em> Yes. CQRS means the write and read models are separate. The write side can persist current state using any mechanism (jOOQ, JPA, raw SQL) and publish domain events. The read side consumes those events and updates a projection. The event log is not the source of truth in this setup; the current-state table is. Event sourcing makes the event log the source of truth, and current state is always derived by replaying it. Both patterns are independently useful; most production CQRS implementations do not use event sourcing.</p>
+<p><strong>Where does the transactional outbox fit in a DDD architecture?</strong> <em>Testing cross-pattern integration.</em> Domain events raised by an aggregate need to reach other bounded contexts reliably. Publishing to a broker in the same thread as the database write loses events if the broker is unavailable at that moment. The outbox pattern writes the event to a database table in the same transaction as the aggregate state change, then a relay process publishes to Kafka. This guarantees exactly-once publication relative to the state change. The pattern lives at the application service layer: the service writes the aggregate and the outbox entries atomically, then the relay is a separate process.</p>
+<hr>
+<h2>In the room</h2>
+<p>The system design round and the post-coding technical conversation are where
+these words get spoken. Interviewers at companies with a strong DDD culture
+hear &quot;bounded context,&quot; &quot;aggregate root,&quot; and &quot;domain event&quot; dozens of times
+per week. What they calibrate is whether you can use the vocabulary precisely
+and name the trade-offs, or whether you are using it as decoration.</p>
+<p>The distinguishing answer in every case is the catch. Naming the aggregate
+boundary tension (too large vs too small), naming the anemic-model failure
+pattern, naming when not to reach for CQRS: these signal someone who has
+designed with these patterns under production constraints.</p>
+<p>Connect the patterns to mechanisms already in the repo. The outbox pattern in
+the Backend System Design guide is where domain events leave the Payments
+context. The isolation levels in the Relational Databases guide are what
+protect the Account aggregate's debit/credit invariant against concurrent
+reads. The Kafka guide's consumer-group model is what the Fraud context uses
+to subscribe to <code>MoneyTransferred</code> events. DDD vocabulary is a layer on top of
+mechanisms you already know.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

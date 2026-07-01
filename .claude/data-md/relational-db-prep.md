@@ -229,6 +229,73 @@ WHERE id = 42 AND version = 3;
 
 ---
 
+## ACID: the four properties, ranked for payments
+
+ACID describes the four guarantees a database transaction provides. The
+acronym is taught as a flat list, but for a payment system the four properties
+have different weight and different failure modes in a distributed setup.
+
+**Atomicity:** every operation in a transaction succeeds, or the transaction
+is rolled back as if it never happened. Debit and credit succeed together or
+neither commits. Within a single Postgres instance this is enforced by the
+write-ahead log: an uncommitted transaction can always be rolled back by
+replaying the undo information. The hard part is atomicity across services:
+when Payments and Identity run in separate databases, a crash between the
+debit commit and the credit commit leaves both accounts in an inconsistent
+state. The solutions are a distributed transaction (two-phase commit, high
+coordination cost) or an outbox-backed compensation pattern (saga), which
+is covered in the Backend System Design guide.
+
+**Consistency:** a transaction brings the database from one valid state to
+another. This is the property enforced by constraints (foreign keys, `CHECK`
+constraints, unique indexes) and by application-level invariants (balance must
+not go negative). Consistency is the property the database cannot fully
+enforce on your behalf; it only enforces the constraints you declare. The
+invariant that "a debit must not exceed the balance" is an application
+invariant, enforced in code. Forgetting to lock the row before reading the
+balance is how consistency is violated even with a transaction.
+
+**Isolation:** concurrent transactions must not interfere with each other.
+Postgres defaults to `READ COMMITTED`, which means a transaction can read rows
+committed by other transactions between its own statements. For a payment
+system this creates a TOCTOU race: read the balance (`SELECT balance`), check
+it is sufficient, then debit (`UPDATE balance = balance - amount`). Between
+the read and the update, another transaction may have debited the same account.
+The update executes, and the balance goes negative.
+
+The fix is either a pessimistic lock (`SELECT ... FOR UPDATE` holds the row
+lock through the check and the update, so no concurrent debit can interleave)
+or a constraint-based check inside the update itself:
+
+```sql
+UPDATE accounts
+SET balance = balance - 100
+WHERE id = 42 AND balance >= 100;
+-- Check that 1 row was updated; if 0, the balance was insufficient
+```
+
+Switching to `REPEATABLE READ` or `SERIALIZABLE` closes some races but not
+all: `SERIALIZABLE` detects conflicting serial orderings and aborts one
+transaction, requiring a retry. The isolation trade-off is covered in the MVCC
+section above, which explains how Postgres uses row versioning to implement
+each isolation level without reader-writer blocking.
+
+**Durability:** a committed transaction survives process crashes and power
+failures. Postgres guarantees this through the write-ahead log (WAL): changes
+are written to the WAL before the commit is acknowledged to the client. On
+recovery, Postgres replays the WAL from the last checkpoint. The WAL section
+above covers the mechanics. The catch: `synchronous_commit = off` disables
+the WAL flush before acknowledgement, gaining throughput at the cost of losing
+the last few commits on a crash. Acceptable for analytics; not for payment
+ledgers.
+
+Framing ACID for an interviewer: start with atomicity and isolation, because
+those are the two that have visible failure modes in production payment systems.
+Consistency and durability are largely guaranteed by the database if you declare
+your constraints and leave `synchronous_commit` on.
+
+---
+
 ## Connection pooling
 
 Postgres creates a new OS process for each client connection. Each process costs
@@ -281,6 +348,79 @@ The planner will skip an index when the query uses a function on the indexed col
 (`WHERE lower(email) = 'foo'` ignores an index on `email`; you need a functional
 index: `CREATE INDEX ON users (lower(email))`). It will also skip an index if the
 type coercion between the literal and the column type prevents a match.
+
+---
+
+## jOOQ and Flyway: type-safe SQL and migrations
+
+jOOQ is the primary Postgres interface at a number of Java-heavy fintech
+companies and is increasingly common across the industry. Understanding the
+paradigm, even before hands-on use, lets you talk about the trade-off
+accurately.
+
+**jOOQ** is a type-safe SQL builder. It generates Java classes from the live
+database schema using a code-generation step, so every table, column, and type
+has a corresponding Java type. The compiler catches column-name typos and
+type mismatches that a string-based query or a JPA `@Query` annotation would
+surface only at runtime.
+
+A jOOQ select query:
+
+```java
+// DSLContext is the entry point, injected by the jOOQ Spring Boot starter
+List<AccountRecord> accounts = dsl
+    .selectFrom(ACCOUNTS)
+    .where(ACCOUNTS.CURRENCY.eq("GBP")
+        .and(ACCOUNTS.BALANCE.gt(BigDecimal.ZERO)))
+    .orderBy(ACCOUNTS.CREATED_AT.desc())
+    .limit(100)
+    .fetchInto(AccountRecord.class);
+```
+
+`ACCOUNTS`, `ACCOUNTS.CURRENCY`, and `ACCOUNTS.BALANCE` are generated classes.
+If a migration renames the `balance` column to `amount`, the generated class
+changes and `ACCOUNTS.BALANCE` no longer compiles. The build fails at compile
+time rather than at runtime when a customer triggers the query.
+
+jOOQ is not an ORM. It does not manage an identity map, lazy-load associations,
+or maintain a first-level cache. You write SQL semantics in Java syntax and get
+exactly the query you wrote, with the query text visible in the generated SQL
+log. For query-intensive work (reporting, ledger queries, complex joins) this
+is preferable to Hibernate's N+1-prone generated SQL.
+
+The catch: jOOQ's generated code must be regenerated on every schema change.
+The standard build sequence is: Flyway migration runs (applying the schema
+change to the database), then jOOQ codegen runs (reading the updated schema
+and regenerating the Java classes), then the application compiles. This couples
+the build to a running database, which requires a test-database instance or a
+containerized Postgres (Testcontainers works here) in the CI pipeline. That
+operational overhead is the trade for compile-time safety.
+
+**Flyway** manages database schema migrations as versioned SQL files applied
+in order. Each migration file is named with a version prefix (`V1__create_accounts_table.sql`,
+`V2__add_currency_column.sql`). Flyway records applied migrations in a
+`flyway_schema_history` table so the migration state is tracked and repeatable
+across environments: running Flyway on a fresh CI database, a developer
+laptop, and production applies exactly the same set of migrations in the same
+order.
+
+```sql
+-- V1__create_accounts_table.sql
+CREATE TABLE accounts (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    currency    CHAR(3)        NOT NULL,
+    balance     NUMERIC(19, 4) NOT NULL DEFAULT 0,
+    created_at  TIMESTAMPTZ    NOT NULL DEFAULT now()
+);
+```
+
+The catch: migrations are immutable once applied. You never edit a shipped
+migration file. Flyway checksums each applied migration and compares the
+checksum on every startup: if a previously-applied file has changed, Flyway
+refuses to start the application. The correct procedure is to add a new
+migration (`V3__rename_balance_to_amount.sql`) rather than editing `V1`.
+This immutability is what makes the migration history a reliable audit trail
+for schema evolution.
 
 ---
 
