@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Java Concurrency: Collections, Primitives & Lock-Free Algorithms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #9a4a1f;
+  --accent-soft:  #9a4a1f14;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Java Fundamentals</div>
+    <h1>Java Concurrency: Collections, Primitives & Lock-Free Algorithms</h1>
+    <div class="sub">The JMM subset you need to reason about lock-free code, concurrent collection internals, VarHandle access modes, and model implementations of the Treiber stack, Michael-Scott queue, and Disruptor ring buffer.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>Why lock-free, and the ladder from <code>synchronized</code> to CAS</h2>
+<p>The cost of a lock is not the acquisition itself. It is the <strong>blocking</strong>: when one thread holds a lock, every other thread that wants it parks, yields its CPU slice, and waits for the OS to schedule it back. Under low contention that pause is cheap. Under high contention, throughput collapses and latency becomes unpredictable because threads spend more time waiting than working.</p>
+<p>The concurrency ladder has three rungs. At the bottom is <strong>blocking</strong> (<code>synchronized</code>, <code>ReentrantLock</code>): a thread that cannot proceed waits indefinitely. In the middle is <strong>lock-free</strong>: the system as a whole always makes progress even if a given thread retries, because no thread holds a resource that blocks the others. At the top is <strong>wait-free</strong>: every thread individually makes progress in a bounded number of steps regardless of what others do. Wait-free is rarely achievable without hardware support; lock-free is the practical target.</p>
+<p>The catch: lock-free code is harder to write, harder to reason about, and wins only under genuine contention. Under low contention, <code>synchronized</code> is JIT-inlined to nearly zero cost through biased locking and lock elision. Reaching for <code>AtomicReference</code> on a map that is written once and read a million times adds complexity without returning anything. Profile first, reach for lock-free structures second.</p>
+<hr>
+<h2>The memory model you need before touching lock-free code</h2>
+<p>Lock-free code coordinates threads through shared memory. Without a model that defines which writes become visible to which reads, and when, shared-memory coordination is undefined behavior in any non-trivial sense. The Java Memory Model (JMM), formalized in JSR-133 and made concrete in Java 5, answers this question through the <strong>happens-before</strong> relation.</p>
+<p>Two operations are ordered by happens-before when a later read is guaranteed to see the result of an earlier write. The key edges a practitioner must have cold:</p>
+<ul>
+<li><strong>Volatile write/read.</strong> A <code>volatile</code> write happens-before every subsequent <code>volatile</code> read of the same variable. &quot;Subsequent&quot; means in wall-clock time: some thread writes <code>v = 1</code>, and any thread that reads <code>v</code> afterward and observes that write also sees all writes the writing thread did before that <code>volatile</code> write.</li>
+<li><strong>Monitor unlock/lock.</strong> Exiting a <code>synchronized</code> block happens-before the next thread enters <code>synchronized</code> on the same monitor.</li>
+<li><strong>Thread start/join.</strong> <code>Thread.start()</code> happens-before any action in the started thread. All actions in a thread happen-before <code>Thread.join()</code> returns in the joining thread.</li>
+<li><strong>CAS as a volatile access.</strong> A successful <code>compareAndSet</code> on an <code>AtomicXxx</code> carries volatile semantics: the CAS is a volatile write, so it happens-before any subsequent read that observes its result. A failed CAS is still a volatile read.</li>
+</ul>
+<p>Without a happens-before edge, the CPU and the JIT compiler are free to reorder instructions, keep values in registers, or hold them in write buffers. Two CPUs with private caches can observe writes in different orders. What looks like sequential code can execute in any order the hardware finds convenient, constrained only by single-thread correctness, because the JVM specification permits those reorderings.</p>
+<p>The practical rule: <strong>every field read by one thread and written by another must be <code>volatile</code>, accessed under a lock, or accessed through an <code>Atomic*</code> type.</strong> Plain fields have no cross-thread guarantee, not even primitive <code>int</code>. The JIT will optimize aggressively around them.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Not safe: the JIT may hoist the read of `running` out of the loop,</span>
+<span class="hljs-comment">// caching it in a register and never re-reading from memory.</span>
+<span class="hljs-type">boolean</span> <span class="hljs-variable">running</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;   <span class="hljs-comment">// plain field, no visibility guarantee</span>
+
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">loop</span><span class="hljs-params">()</span> {
+    <span class="hljs-keyword">while</span> (running) { <span class="hljs-comment">/* work */</span> }    <span class="hljs-comment">// may spin forever after stop() is called</span>
+}
+
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">stop</span><span class="hljs-params">()</span> { running = <span class="hljs-literal">false</span>; }      <span class="hljs-comment">// write may never become visible to looping thread</span>
+</code></pre>
+<p>Mark <code>running</code> as <code>volatile</code> and the JIT must reload it from memory on every loop iteration. That is the visibility guarantee <code>volatile</code> buys, at a small throughput cost per access.</p>
+<p><strong>Acquire/release</strong> is the finer-grained model that lock-free structures use internally. A release write pairs with an acquire read on the same address: the release write happens-before the acquire read. This is cheaper than full sequential consistency (<code>volatile</code> in Java), and it is the level that <code>VarHandle</code> exposes directly. The rule of thumb: publish data via a release write, consume it via an acquire read, and the consumer will see all writes the producer did before the release.</p>
+<p>The full JMM, including final-field freeze, the semantics of <code>synchronized</code> on partially constructed objects, and compiler-fence placement under tiered compilation, is a subject in itself. The subset above is what you need to reason correctly about atomics and lock-free code. A deeper guide in this series covers the rest.</p>
+<hr>
+<h2>Atomics and CAS: the hardware primitive</h2>
+<p>The <code>java.util.concurrent.atomic</code> package wraps the CPU's compare-and-swap instruction. The classic guide for this series (Java Classic: Jakarta EE) covers the core pattern, the ABA problem, <code>LongAdder</code>, and the selection rule between them. Take that as the baseline; the following goes one level deeper.</p>
+<p><strong>How CAS interacts with the JMM.</strong> <code>AtomicLong.compareAndSet</code> is specified as both a volatile read and a volatile write on the target variable. A successful CAS establishes a happens-before edge: all writes the winner thread did before the CAS are visible to any thread that later reads the updated value with at least acquire semantics. A failed CAS is still a volatile read, so the losing thread sees the current committed value and any writes that happened-before it. This visibility guarantee is what makes CAS safe as a coordination primitive rather than just a fast trick.</p>
+<p><strong><code>compareAndExchange</code> (Java 9+).</strong> The standard <code>compareAndSet</code> returns <code>boolean</code>. The newer <code>compareAndExchange</code> returns the witness value: the actual value found in memory at the time of the attempt, whether it succeeded or not. This folds the read-on-failure and the retry into one operation without a separate <code>get()</code> call.</p>
+<pre><code class="hljs" data-lang="java">AtomicReference&lt;String&gt; ref = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AtomicReference</span>&lt;&gt;(<span class="hljs-string">&quot;initial&quot;</span>);
+
+<span class="hljs-comment">// Returns what was actually in memory, not just success/failure.</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">witness</span> <span class="hljs-operator">=</span> ref.compareAndExchange(<span class="hljs-string">&quot;initial&quot;</span>, <span class="hljs-string">&quot;updated&quot;</span>);
+<span class="hljs-keyword">if</span> (witness.equals(<span class="hljs-string">&quot;initial&quot;</span>)) {
+    <span class="hljs-comment">// CAS succeeded; ref now holds &quot;updated&quot;</span>
+} <span class="hljs-keyword">else</span> {
+    <span class="hljs-comment">// CAS failed; witness is the current value, use it to compute the next attempt</span>
+}
+</code></pre>
+<p><strong><code>weakCompareAndSet</code>.</strong> On some non-x86 architectures (ARM, POWER), a store-conditional instruction can fail spuriously even when the value matches. <code>weakCompareAndSet</code> exposes this: it may return <code>false</code> even when the old value is current, with no ordering guarantee on failure. The payoff is lower cost on weakly-ordered hardware. On x86, a strong CAS is the only option, so <code>weakCompareAndSet</code> degenerates to a normal CAS. Use it inside a retry loop where a spurious failure just causes one extra iteration and you want the cheapest possible per-attempt cost.</p>
+<p><strong>Contention and <code>LongAdder</code> revisited.</strong> <code>LongAdder</code> beats <code>AtomicLong</code> under contention because it splits the count across a <code>Striped64</code> base cell plus a lazily allocated <code>Cell[]</code> array, with each cell padded to 128 bytes to occupy two cache lines and prevent false sharing. Threads increment their own cell when they detect contention (the CAS on the base cell fails), and <code>sum()</code> adds them all. The tradeoff is that <code>sum()</code> is not atomic across all cells: a read that spans cells can be concurrent with increments, so <code>LongAdder.sum()</code> is an approximation under load. Correct for metrics; wrong for anything that needs a precise snapshot.</p>
+<hr>
+<h2>VarHandle: the modern replacement for <code>Unsafe</code></h2>
+<p>Before Java 9, code that needed fine-grained memory-order control, or CAS on array elements and non-public fields, reached for <code>sun.misc.Unsafe</code>. That class is an internal JVM API: it bypasses the normal object model and the JDK uses it for its own performance-critical structures. Using it in application code ties you to internal details that can change without notice (and have, across Java releases). Java 9 (JEP 193) introduced <code>VarHandle</code> as the supported replacement.</p>
+<p>A <code>VarHandle</code> is a typed, access-checked reference to a variable: a field, an array element, or an off-heap memory segment. You obtain one at class-loading time via <code>MethodHandles.Lookup</code> and store it as a <code>static final</code> so the JIT can treat it as a constant.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">import</span> java.lang.invoke.*;
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Counter</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-type">long</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> VarHandle COUNT;
+    <span class="hljs-keyword">static</span> {
+        <span class="hljs-keyword">try</span> {
+            COUNT = MethodHandles.lookup()
+                .findVarHandle(Counter.class, <span class="hljs-string">&quot;count&quot;</span>, <span class="hljs-type">long</span>.class);
+        } <span class="hljs-keyword">catch</span> (ReflectiveOperationException e) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ExceptionInInitializerError</span>(e);
+        }
+    }
+
+    <span class="hljs-type">long</span> <span class="hljs-title function_">increment</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">return</span> (<span class="hljs-type">long</span>) COUNT.getAndAdd(<span class="hljs-built_in">this</span>, <span class="hljs-number">1L</span>);   <span class="hljs-comment">// atomic fetch-and-add, release semantics</span>
+    }
+}
+</code></pre>
+<p><strong>Access modes</strong> are the key concept. <code>VarHandle</code> exposes four levels, in rising cost order:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Ordering</th>
+<th>Typical use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Plain</td>
+<td>None; compiler may reorder freely</td>
+<td>Trusted single-thread access or between explicit fences</td>
+</tr>
+<tr>
+<td>Opaque</td>
+<td>No tear; progress guarantee; no cross-variable ordering</td>
+<td>Lazy one-shot flags</td>
+</tr>
+<tr>
+<td>Acquire / Release</td>
+<td>Release write happens-before paired acquire read</td>
+<td>Producer/consumer handoff</td>
+</tr>
+<tr>
+<td>Volatile</td>
+<td>Sequential consistency (full fence)</td>
+<td>Equivalent to a <code>volatile</code> field access</td>
+</tr>
+</tbody>
+</table>
+<p>For a producer/consumer handoff where you want the consumer to see all work the producer did, use release on the producer side and acquire on the consumer side. You pay less than full volatile SC while still getting the necessary happens-before edge.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Producer: write payload first (plain), then signal readiness with a release-write.</span>
+PAYLOAD.set(<span class="hljs-built_in">this</span>, computeResult());           <span class="hljs-comment">// plain write</span>
+READY.setRelease(<span class="hljs-built_in">this</span>, <span class="hljs-literal">true</span>);                 <span class="hljs-comment">// release-write; pairs with consumer&#x27;s acquire</span>
+
+<span class="hljs-comment">// Consumer: acquire-read the flag, then plain-read the payload.</span>
+<span class="hljs-keyword">if</span> ((<span class="hljs-type">boolean</span>) READY.getAcquire(<span class="hljs-built_in">this</span>)) {       <span class="hljs-comment">// acquire-read: all prior releases visible</span>
+    <span class="hljs-type">Object</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> PAYLOAD.get(<span class="hljs-built_in">this</span>);        <span class="hljs-comment">// plain read is safe; happens-after the acquire</span>
+}
+</code></pre>
+<p><code>getAndAdd</code>, <code>compareAndSet</code>, <code>compareAndExchange</code>, and <code>getAndSet</code> are available at volatile, acquire/release, and opaque levels. The <code>weakCompareAndSet</code> variants map to the weak CAS described in the previous section.</p>
+<p><strong>Explicit fences.</strong> <code>VarHandle</code> also exposes static fence methods: <code>fullFence()</code> (equivalent to <code>mfence</code> on x86), <code>acquireFence()</code>, <code>releaseFence()</code>, <code>loadLoadFence()</code>, and <code>storeStoreFence()</code>. These apply a fence to a region of plain accesses rather than a single variable access. They appear in the internals of high-throughput data structures such as the Disruptor and in high-performance serialization code. In most application code, prefer access modes over raw fences because the intent is clearer and the JIT can optimize access modes more aggressively.</p>
+<p>The catch on <code>VarHandle</code>: obtaining the handle requires matching the field name, declaring class, and type exactly. A mismatch throws <code>NoSuchFieldException</code> at class initialization. Always store handles in <code>static final</code> fields so the failure surfaces immediately at startup, not at the first access in production.</p>
+<hr>
+<h2>Concurrent collections and their internals</h2>
+<p>The <code>java.util.concurrent</code> package ships production-quality concurrent data structures. Knowing their internals, not just their names, is what separates working knowledge from staff-level fluency.</p>
+<p><strong><code>ConcurrentHashMap</code>.</strong> Java 7 used 16 segments, each a separate <code>ReentrantLock</code>-guarded hash table. Java 8 replaced this with a single <code>Node[]</code> bin array, where locking is per-bin, not per-segment. An insert into an empty bin uses a CAS on the bin slot and requires no lock at all. An insert into a non-empty bin locks only that bin's head node with <code>synchronized(binHead)</code>, so two inserts collide only when they hash to the same bin.</p>
+<p>When a bin's linked list exceeds eight entries, it converts to a <code>TreeBin</code> (a red-black tree), taking lookup from O(n) to O(log n). Resize doubles the table and migrates bins incrementally using forwarding nodes: threads that arrive during migration help transfer bins rather than waiting on a single thread to finish.</p>
+<p><code>size()</code> is maintained through a combination of CAS on a <code>baseCount</code> field and a <code>CounterCell[]</code> array (the same design as <code>LongAdder</code>). The sum is not linearizable: it can miss concurrent modifications. Use <code>mappingCount()</code> (returns <code>long</code>) for large maps; use <code>size()</code> knowing it may be off under concurrent modification.</p>
+<p>The other catch is <code>computeIfAbsent</code>. The computation function runs while the calling thread holds the bin-level lock. If the function calls <code>computeIfAbsent</code> on the same map with a key that hashes to the same bin, the thread tries to re-acquire the bin lock it already holds. That deadlocks. This comes up in recursive memoization.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Deadlock trap: recursive computeIfAbsent on the same map with the same bin.</span>
+ConcurrentHashMap&lt;Integer, Integer&gt; memo = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConcurrentHashMap</span>&lt;&gt;();
+
+<span class="hljs-type">int</span> <span class="hljs-title function_">fib</span><span class="hljs-params">(<span class="hljs-type">int</span> n)</span> {
+    <span class="hljs-keyword">return</span> memo.computeIfAbsent(n, k -&gt;
+        k &lt; <span class="hljs-number">2</span> ? k : fib(k - <span class="hljs-number">1</span>) + fib(k - <span class="hljs-number">2</span>)   <span class="hljs-comment">// recursive call: deadlocks if same bin</span>
+    );
+}
+<span class="hljs-comment">// Fix: compute the value outside the lambda and use putIfAbsent, or use a separate map.</span>
+</code></pre>
+<p><strong><code>ConcurrentLinkedQueue</code>.</strong> A MPMC queue built on the Michael-Scott algorithm (covered in the next section). Enqueue is a two-step CAS: link the new node as the current tail's <code>next</code>, then advance <code>tail</code>. Dequeue CASes <code>head</code> forward over the dummy sentinel. The <code>size()</code> method traverses the entire chain in O(n), so avoid it in hot paths; use <code>isEmpty()</code> instead.</p>
+<p><strong><code>CopyOnWriteArrayList</code>.</strong> Every write copies the entire backing array, writes to the copy, and atomically swaps the reference. Reads never lock and always see a consistent snapshot. The tradeoff is stark: writes are O(n) and allocate. This is correct and efficient only for lists that are read orders of magnitude more often than written, the canonical case being event-listener registries.</p>
+<p><strong><code>ConcurrentSkipListMap</code>.</strong> A sorted concurrent map backed by a probabilistic skip list. Provides O(log n) get, put, and remove using CAS on node pointers, with no global lock. Use this when you need a <code>NavigableMap</code> (floor, ceiling, headMap, tailMap) under concurrent writes. <code>TreeMap</code> with a read-write lock is the alternative; the skip list wins under high contention because it locks at the node level rather than the tree root.</p>
+<p><strong><code>BlockingQueue</code> family.</strong> The blocking queues are not lock-free; they use <code>ReentrantLock</code> and <code>Condition</code> to park threads on empty or full. Their value is the contract: <code>put</code> blocks when full, <code>take</code> blocks when empty, which is exactly what you want for a bounded producer-consumer channel.</p>
+<table>
+<thead>
+<tr>
+<th>Implementation</th>
+<th>Bound</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ArrayBlockingQueue</code></td>
+<td>Fixed</td>
+<td>Single lock for both ends; lower throughput under high concurrency</td>
+</tr>
+<tr>
+<td><code>LinkedBlockingQueue</code></td>
+<td>Optional</td>
+<td>Separate head/tail locks; higher throughput than array variant</td>
+</tr>
+<tr>
+<td><code>PriorityBlockingQueue</code></td>
+<td>Unbounded</td>
+<td>No blocking on put; blocks only on take from empty queue</td>
+</tr>
+<tr>
+<td><code>SynchronousQueue</code></td>
+<td>Zero</td>
+<td>Each put blocks until a take matches; rendezvous handoff</td>
+</tr>
+<tr>
+<td><code>LinkedTransferQueue</code></td>
+<td>Unbounded</td>
+<td>Combines blocking and non-blocking paths; lower latency than linked</td>
+</tr>
+</tbody>
+</table>
+<p>The catch with <code>LinkedBlockingQueue</code>: when used as an <code>Executor</code> work queue without a bound (the <code>Executors.newFixedThreadPool</code> default), it accepts unlimited tasks. If producers consistently outrun consumers, the queue grows without limit until <code>OutOfMemoryError</code>. Always specify a bound in production and decide explicitly what to do when the queue is full: block, reject, or drop.</p>
+<hr>
+<h2>Implementing lock-free algorithms</h2>
+<p>Understanding how the library structures work requires seeing the algorithm from scratch. Each implementation below is the canonical version, stripped to the essential steps. Every one follows the same shape: read current state, compute desired next state, CAS it in, retry if someone else changed it first.</p>
+<h3>Treiber lock-free stack</h3>
+<p>Treiber's stack (1986) is the simplest non-trivial lock-free structure: a linked list where both push and pop operate only on the head.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">TreiberStack</span>&lt;T&gt; {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> Node&lt;T&gt; top;
+    <span class="hljs-comment">// (VarHandle TOP obtained via MethodHandles.lookup in a static initializer)</span>
+
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">push</span><span class="hljs-params">(T value)</span> {
+        Node&lt;T&gt; node = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Node</span>&lt;&gt;(value);
+        Node&lt;T&gt; curr;
+        <span class="hljs-keyword">do</span> {
+            curr = (Node&lt;T&gt;) TOP.getAcquire(<span class="hljs-built_in">this</span>);  <span class="hljs-comment">// read current top</span>
+            node.next = curr;
+        } <span class="hljs-keyword">while</span> (!TOP.compareAndSet(<span class="hljs-built_in">this</span>, curr, node)); <span class="hljs-comment">// retry if top changed</span>
+    }
+
+    T <span class="hljs-title function_">pop</span><span class="hljs-params">()</span> {
+        Node&lt;T&gt; curr;
+        <span class="hljs-keyword">do</span> {
+            curr = (Node&lt;T&gt;) TOP.getAcquire(<span class="hljs-built_in">this</span>);
+            <span class="hljs-keyword">if</span> (curr == <span class="hljs-literal">null</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;              <span class="hljs-comment">// stack is empty</span>
+        } <span class="hljs-keyword">while</span> (!TOP.compareAndSet(<span class="hljs-built_in">this</span>, curr, curr.next)); <span class="hljs-comment">// advance head</span>
+        <span class="hljs-keyword">return</span> curr.value;
+    }
+
+    <span class="hljs-keyword">record</span> <span class="hljs-title class_">Node</span>&lt;T&gt;(T value, Node&lt;T&gt; next) {
+        Node(T value) { <span class="hljs-built_in">this</span>(value, <span class="hljs-literal">null</span>); }
+    }
+}
+</code></pre>
+<p>Push reads the current top, sets the new node's <code>next</code> to it, and CASes <code>top</code> from the old value to the new node. If another thread changed <code>top</code> concurrently, the CAS fails and the loop retries. Pop reads the current top, then CASes <code>top</code> to <code>top.next</code>, atomically removing the head.</p>
+<p>The ABA trap applies immediately. Thread A reads <code>top = Node(X)</code> and pauses. Thread B pops X, pushes Y, pops Y, then pushes a recycled X (same reference). When A resumes, it finds <code>top = Node(X)</code> unchanged and the CAS succeeds. But <code>Node(X).next</code> now points somewhere different, silently corrupting the structure. In pure Java without object pooling, GC prevents address reuse before the stale reference is cleared, so this is a reduced risk; but with any form of node pooling, <code>AtomicStampedReference&lt;Node&lt;T&gt;&gt;</code> is the fix.</p>
+<h3>Michael-Scott lock-free queue</h3>
+<p>The Michael-Scott queue (1996) extends CAS to a FIFO queue with a dummy head node that decouples producers from consumers. <code>ConcurrentLinkedQueue</code> is based on a variant of this algorithm.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">MSQueue</span>&lt;T&gt; {
+    <span class="hljs-comment">// head and tail are VarHandle-accessed; both start pointing to a sentinel node.</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> Node&lt;T&gt; head, tail;
+
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">enqueue</span><span class="hljs-params">(T value)</span> {
+        Node&lt;T&gt; node = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Node</span>&lt;&gt;(value);
+        <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+            Node&lt;T&gt; t = (Node&lt;T&gt;) TAIL.getAcquire(<span class="hljs-built_in">this</span>);
+            Node&lt;T&gt; next = t.next;              <span class="hljs-comment">// null if tail is truly the last node</span>
+            <span class="hljs-keyword">if</span> (next == <span class="hljs-literal">null</span>) {
+                <span class="hljs-keyword">if</span> (NEXT.compareAndSet(t, <span class="hljs-literal">null</span>, node)) { <span class="hljs-comment">// link new node at end</span>
+                    TAIL.compareAndSet(<span class="hljs-built_in">this</span>, t, node);   <span class="hljs-comment">// advance tail (may lose race)</span>
+                    <span class="hljs-keyword">return</span>;
+                }
+            } <span class="hljs-keyword">else</span> {
+                TAIL.compareAndSet(<span class="hljs-built_in">this</span>, t, next);       <span class="hljs-comment">// help: advance lagging tail</span>
+            }
+        }
+    }
+
+    T <span class="hljs-title function_">dequeue</span><span class="hljs-params">()</span> {
+        <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+            Node&lt;T&gt; h = (Node&lt;T&gt;) HEAD.getAcquire(<span class="hljs-built_in">this</span>);
+            Node&lt;T&gt; next = h.next;
+            <span class="hljs-keyword">if</span> (next == <span class="hljs-literal">null</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;               <span class="hljs-comment">// queue empty</span>
+            <span class="hljs-keyword">if</span> (HEAD.compareAndSet(<span class="hljs-built_in">this</span>, h, next)) {     <span class="hljs-comment">// promote next to new sentinel</span>
+                <span class="hljs-keyword">return</span> next.value;
+            }
+        }
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Node</span>&lt;T&gt; { <span class="hljs-keyword">volatile</span> T value; <span class="hljs-keyword">volatile</span> Node&lt;T&gt; next; }
+}
+</code></pre>
+<p>Each enqueue needs two CAS operations: one to link the new node as the tail's <code>next</code>, and one to advance <code>tail</code>. If a thread pauses between them, <code>tail</code> lags one step behind the true last node. Any subsequent thread detects this (it sees <code>t.next != null</code>) and helps advance <code>tail</code> before doing its own work. This &quot;helping&quot; property is what distinguishes the Michael-Scott queue: progress is guaranteed even if one thread pauses indefinitely after linking its node.</p>
+<p>The catch: like the Treiber stack, this is ABA-vulnerable when nodes are pooled. In a non-pooled Java context, GC eliminates the hazard for the common case.</p>
+<h3>Single-producer bounded ring buffer (Disruptor-style)</h3>
+<p>When exactly one thread produces and one or more threads consume, you can eliminate nearly all CAS operations and exploit cache-line discipline. The LMAX Disruptor (open-sourced in 2011) popularized this pattern for high-throughput event pipelines.</p>
+<p>The core is a fixed-size ring buffer indexed by a monotonically increasing sequence number, with capacity constrained to a power of two so the modulo operation reduces to a bitwise AND.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">SingleProducerRingBuffer</span>&lt;T&gt; {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">SIZE</span> <span class="hljs-operator">=</span> <span class="hljs-number">1024</span>;       <span class="hljs-comment">// must be power of 2</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Object[] slots = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[SIZE];
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span>[] published = <span class="hljs-keyword">new</span> <span class="hljs-title class_">long</span>[SIZE]; <span class="hljs-comment">// one entry per slot</span>
+
+    <span class="hljs-comment">// Keep each sequence on its own cache line (128 bytes = two typical lines).</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-type">long</span> <span class="hljs-variable">producerSeq</span> <span class="hljs-operator">=</span> -<span class="hljs-number">1</span>;              <span class="hljs-comment">// only the producer writes this</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-type">long</span> <span class="hljs-variable">consumerSeq</span> <span class="hljs-operator">=</span> -<span class="hljs-number">1</span>;     <span class="hljs-comment">// only consumers write this</span>
+
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">publish</span><span class="hljs-params">(T event)</span> {
+        <span class="hljs-type">long</span> <span class="hljs-variable">seq</span> <span class="hljs-operator">=</span> ++producerSeq;               <span class="hljs-comment">// no CAS needed: only one producer</span>
+        <span class="hljs-type">int</span> <span class="hljs-variable">slot</span> <span class="hljs-operator">=</span> (<span class="hljs-type">int</span>)(seq &amp; (SIZE - <span class="hljs-number">1</span>));     <span class="hljs-comment">// bitwise modulo</span>
+        slots[slot] = event;
+        VarHandle.storeStoreFence();            <span class="hljs-comment">// event must be visible before sequence</span>
+        published[slot] = seq;                  <span class="hljs-comment">// release signal to consumers</span>
+    }
+
+    <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span>
+    T <span class="hljs-title function_">consume</span><span class="hljs-params">(<span class="hljs-type">long</span> expectedSeq)</span> {
+        <span class="hljs-type">int</span> <span class="hljs-variable">slot</span> <span class="hljs-operator">=</span> (<span class="hljs-type">int</span>)(expectedSeq &amp; (SIZE - <span class="hljs-number">1</span>));
+        <span class="hljs-keyword">while</span> (published[slot] != expectedSeq) { <span class="hljs-comment">/* spin-wait */</span> }
+        VarHandle.loadLoadFence();              <span class="hljs-comment">// read event after confirming sequence</span>
+        <span class="hljs-keyword">return</span> (T) slots[slot];
+    }
+}
+</code></pre>
+<p>The producer never CASes because it is the sole writer of <code>producerSeq</code>. The only synchronization is the <code>storeStoreFence</code> before writing <code>published[slot]</code>, which ensures the event payload is visible before the availability signal. The consumer spins on <code>published[slot]</code> and uses a <code>loadLoadFence</code> to ensure it reads the event after the availability check. Two memory barriers per round trip instead of one CAS, plus cache-line-sequential access patterns, is what gives the Disruptor its throughput numbers (hundreds of millions of events per second on a single producer-consumer pair).</p>
+<p>False sharing is the catch that catches almost everyone the first time. If <code>producerSeq</code> and <code>consumerSeq</code> share a 64-byte cache line, every write to either variable invalidates both CPU caches, forcing the other thread to reload. Padding each sequence variable to 128 bytes so it occupies two full cache lines eliminates this and can triple throughput on a four-core machine. Omitting the padding is one of the most surprising microbenchmark results in Java concurrent programming.</p>
+<h3>Seqlock for multi-word reads</h3>
+<p>A seqlock lets readers observe a multi-word value without acquiring any lock, retrying only when a concurrent write is detected. Writers bracket the payload update with increments of a sequence counter; readers sample the counter before and after reading the payload, and retry if the two samples differ or if the value is odd (write in progress).</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">SeqLock</span> {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-type">int</span> <span class="hljs-variable">seq</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;       <span class="hljs-comment">// odd while a write is in progress</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-type">long</span> <span class="hljs-variable">valueA</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;   <span class="hljs-comment">// payload field 1</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-type">long</span> <span class="hljs-variable">valueB</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;   <span class="hljs-comment">// payload field 2</span>
+
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">write</span><span class="hljs-params">(<span class="hljs-type">long</span> a, <span class="hljs-type">long</span> b)</span> {
+        seq++;                          <span class="hljs-comment">// mark write start: seq is now odd</span>
+        VarHandle.storeStoreFence();    <span class="hljs-comment">// payload writes must follow seq increment</span>
+        valueA = a;
+        valueB = b;
+        VarHandle.storeStoreFence();    <span class="hljs-comment">// final seq increment must follow payload writes</span>
+        seq++;                          <span class="hljs-comment">// mark write done: seq is now even</span>
+    }
+
+    <span class="hljs-type">long</span>[] read() {
+        <span class="hljs-type">int</span> s1, s2;
+        <span class="hljs-type">long</span> a, b;
+        <span class="hljs-keyword">do</span> {
+            s1 = seq;
+            VarHandle.loadLoadFence();  <span class="hljs-comment">// payload reads must follow seq read</span>
+            a = valueA; b = valueB;
+            VarHandle.loadLoadFence();  <span class="hljs-comment">// s2 read must follow payload reads</span>
+            s2 = seq;
+        } <span class="hljs-keyword">while</span> ((s1 &amp; <span class="hljs-number">1</span>) == <span class="hljs-number">1</span> || s1 != s2); <span class="hljs-comment">// retry if write in progress or seq changed</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">long</span>[]{a, b};
+    }
+}
+</code></pre>
+<p>The seqlock is the right tool when readers vastly outnumber writers and the payload spans multiple fields that CAS cannot update atomically. The catch: readers spin, so a writer that stalls indefinitely starves all readers. Use it for configuration or metrics that change rarely and where write latency is bounded.</p>
+<hr>
+<h2>Locks family, for when lock-free is the wrong call</h2>
+<p>Lock-free structures are harder to verify and win only under genuine contention. When you need to update several variables under one invariant, or when the critical section is non-trivial, <code>synchronized</code> or the explicit lock family is the right answer.</p>
+<p><strong><code>ReentrantLock</code>.</strong> The explicit-lock alternative to <code>synchronized</code>. Same monitor semantics, but with <code>tryLock(timeout)</code> for timeout-aware acquisition, <code>lockInterruptibly()</code> for cancellable waits, and <code>Condition</code> objects for fine-grained wait/signal. Fairness is configurable: <code>new ReentrantLock(true)</code> queues threads in arrival order, preventing starvation but reducing throughput due to guaranteed context switches. The default is unfair and rarely causes starvation in practice.</p>
+<p>The <code>Condition</code> API replaces the <code>Object.wait()</code> / <code>notify()</code> pattern with an explicit handle, and multiple conditions per lock are possible:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-type">ReentrantLock</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReentrantLock</span>();
+<span class="hljs-type">Condition</span> <span class="hljs-variable">notEmpty</span> <span class="hljs-operator">=</span> lock.newCondition();
+<span class="hljs-type">Condition</span> <span class="hljs-variable">notFull</span>  <span class="hljs-operator">=</span> lock.newCondition();
+
+<span class="hljs-comment">// Producer signals notEmpty; consumer signals notFull.</span>
+<span class="hljs-comment">// Each condition wakes only the relevant waiting party.</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">produce</span><span class="hljs-params">(Item item)</span> <span class="hljs-keyword">throws</span> InterruptedException {
+    lock.lock();
+    <span class="hljs-keyword">try</span> {
+        <span class="hljs-keyword">while</span> (queue.isFull()) notFull.await();   <span class="hljs-comment">// releases lock while waiting</span>
+        queue.add(item);
+        notEmpty.signal();
+    } <span class="hljs-keyword">finally</span> { lock.unlock(); }
+}
+</code></pre>
+<p><strong><code>synchronized</code> and virtual threads.</strong> Prior to Java 24, a virtual thread that blocked inside a <code>synchronized</code> block was pinned to its carrier platform thread for the duration, consuming a real OS thread and limiting scalability. Java 24 (JEP 491) removed this restriction: virtual threads now unmount from their carrier during <code>synchronized</code> waits, exactly as they do during <code>ReentrantLock.lock()</code>. On Java 24 and later, <code>synchronized</code> and <code>ReentrantLock</code> are equivalent for virtual-thread workloads. On Java 21 to 23 (the initial virtual-thread releases), prefer <code>ReentrantLock</code> for any critical section that blocks on I/O or other long operations.</p>
+<p><strong><code>ReadWriteLock</code> and <code>StampedLock</code>.</strong> When reads are far more frequent than writes, multiple readers can hold a shared read lock concurrently while writes require an exclusive lock. <code>ReentrantReadWriteLock</code> (Java 5) implements this. <code>StampedLock</code> (Java 8) adds an optimistic read mode: the reader takes a stamp before reading and validates it afterward. If a writer intervened, validation fails and the reader escalates to a real read lock.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-type">StampedLock</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StampedLock</span>();
+<span class="hljs-type">double</span> x, y;
+
+<span class="hljs-type">double</span> <span class="hljs-title function_">distance</span><span class="hljs-params">()</span> {
+    <span class="hljs-type">long</span> <span class="hljs-variable">stamp</span> <span class="hljs-operator">=</span> lock.tryOptimisticRead();         <span class="hljs-comment">// no lock acquired</span>
+    <span class="hljs-type">double</span> <span class="hljs-variable">cx</span> <span class="hljs-operator">=</span> x, cy = y;
+    <span class="hljs-keyword">if</span> (!lock.validate(stamp)) {                   <span class="hljs-comment">// did a writer intervene?</span>
+        stamp = lock.readLock();
+        <span class="hljs-keyword">try</span> { cx = x; cy = y; }
+        <span class="hljs-keyword">finally</span> { lock.unlockRead(stamp); }
+    }
+    <span class="hljs-keyword">return</span> Math.sqrt(cx * cx + cy * cy);
+}
+</code></pre>
+<p>The catch on <code>StampedLock</code>: it is not reentrant and has no <code>Condition</code> support. A thread that holds a write stamp and tries to acquire any other mode on the same lock deadlocks. Also, <code>StampedLock</code> does not implement the <code>Lock</code> interface, so it cannot be used as a drop-in replacement wherever an explicit <code>Lock</code> is expected.</p>
+<p><strong>Livelock and starvation.</strong> These are the failure modes that blocking locks introduce and lock-free structures avoid. Livelock is two or more threads that repeatedly react to each other and make no progress despite being runnable. Starvation is a thread that is perpetually pre-empted by higher-priority or more-frequent lock requesters. Fair <code>ReentrantLock</code> prevents starvation at the cost of throughput; diagnosing livelock requires thread dumps that show threads cycling without waiting on a lock.</p>
+<hr>
+<h2>Predict-the-output: interleavings and visibility puzzles</h2>
+<p>These small programs test whether you understand the mechanism rather than the label. For each: read the code, decide on the possible outputs, then check the explanation.</p>
+<p><strong>Puzzle 1: plain field, no synchronization.</strong></p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">P1</span> {
+    <span class="hljs-type">int</span> <span class="hljs-variable">x</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+    <span class="hljs-type">boolean</span> <span class="hljs-variable">ready</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;     <span class="hljs-comment">// plain fields, no happens-before</span>
+
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">writer</span><span class="hljs-params">()</span> { x = <span class="hljs-number">42</span>; ready = <span class="hljs-literal">true</span>; }   <span class="hljs-comment">// Thread A</span>
+
+    <span class="hljs-keyword">void</span> <span class="hljs-title function_">reader</span><span class="hljs-params">()</span> {                            <span class="hljs-comment">// Thread B</span>
+        <span class="hljs-keyword">while</span> (!ready) {}
+        System.out.println(x);
+    }
+}
+</code></pre>
+<p>Possible outputs: <code>42</code>, <code>0</code>, or infinite loop. The JIT may hoist <code>ready</code> out of the loop (loop-invariant code motion) and cache it in a register, making the loop infinite even after <code>stop()</code>. Even if <code>ready = true</code> eventually becomes visible, the CPU may reorder <code>x = 42</code> and <code>ready = true</code>, so the reader can observe <code>ready = true</code> before <code>x = 42</code> and print <code>0</code>. Fix: mark both <code>volatile</code>, or access both under the same <code>synchronized</code> block.</p>
+<p><strong>Puzzle 2: CAS under ABA with interned strings.</strong></p>
+<pre><code class="hljs" data-lang="java">AtomicReference&lt;String&gt; ref = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AtomicReference</span>&lt;&gt;(<span class="hljs-string">&quot;A&quot;</span>);
+
+<span class="hljs-comment">// Thread 1 reads &quot;A&quot; and pauses.</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">old</span> <span class="hljs-operator">=</span> ref.get();
+
+<span class="hljs-comment">// Thread 2 runs:</span>
+ref.compareAndSet(<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;B&quot;</span>);
+ref.compareAndSet(<span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;A&quot;</span>);
+
+<span class="hljs-comment">// Thread 1 resumes:</span>
+<span class="hljs-type">boolean</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> ref.compareAndSet(old, <span class="hljs-string">&quot;C&quot;</span>);
+System.out.println(result);   <span class="hljs-comment">// ?</span>
+</code></pre>
+<p>Output: <code>true</code>. <code>AtomicReference.compareAndSet</code> uses reference equality (<code>==</code>), not <code>equals</code>. Because <code>&quot;A&quot;</code> is an interned string literal, all occurrences refer to the same object. Thread 2 changed the value and changed it back to the same reference, so Thread 1's CAS succeeds. In production lock-free code with pooled node objects, the same story applies: the recycled object has the same address, the CAS succeeds, and the structure is silently corrupted.</p>
+<p><strong>Puzzle 3: <code>volatile</code> read ordering.</strong></p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">volatile</span> <span class="hljs-type">int</span> <span class="hljs-variable">a</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>, b = <span class="hljs-number">0</span>;
+
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">thread1</span><span class="hljs-params">()</span> { a = <span class="hljs-number">1</span>; b = <span class="hljs-number">1</span>; }   <span class="hljs-comment">// Thread 1</span>
+
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">thread2</span><span class="hljs-params">()</span> {                    <span class="hljs-comment">// Thread 2</span>
+    <span class="hljs-type">int</span> <span class="hljs-variable">rb</span> <span class="hljs-operator">=</span> b;
+    <span class="hljs-type">int</span> <span class="hljs-variable">ra</span> <span class="hljs-operator">=</span> a;
+    System.out.println(rb + <span class="hljs-string">&quot; &quot;</span> + ra);
+}
+</code></pre>
+<p>Possible outputs: <code>0 0</code>, <code>0 1</code>, <code>1 1</code>. Can <code>1 0</code> appear? No. Because <code>a = 1</code> happens-before <code>b = 1</code> (program order within Thread 1), and <code>b = 1</code> happens-before Thread 2's <code>volatile</code> read of <code>b</code> (volatile write/read edge), and that <code>volatile</code> read of <code>b</code> happens-before the subsequent read of <code>a</code> (program order within Thread 2). If Thread 2 reads <code>b = 1</code>, it must also read <code>a = 1</code>.</p>
+<p><strong>Puzzle 4: <code>LongAdder</code> accuracy after quiesce.</strong></p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-type">LongAdder</span> <span class="hljs-variable">adder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">LongAdder</span>();
+<span class="hljs-comment">// 1000 threads each call adder.increment() once, concurrently.</span>
+<span class="hljs-comment">// After all threads join: adder.sum() == ?</span>
+</code></pre>
+<p>Answer: exactly <code>1000</code>. <code>LongAdder.sum()</code> is an approximation only while threads are still incrementing concurrently with the read. After a quiesce (all incrementors have finished), the cells are stable and <code>sum()</code> is accurate. The approximation matters only during concurrent access.</p>
+<hr>
+<h2>Common interview questions</h2>
+<p>The pattern for every answer: state the mechanism, then the catch.</p>
+<p><strong>What is the difference between lock-free and non-blocking?</strong> <em>Testing vocabulary and whether you know progress guarantees.</em> Non-blocking is the umbrella term: a thread can never be indefinitely blocked by a lock held by another thread. It has three sub-levels: obstruction-free (progress when running without interference), lock-free (the system as a whole always makes progress), and wait-free (every individual thread makes progress in bounded steps). Lock-free is the practical target; wait-free is rare and expensive to implement.</p>
+<p><strong>What does <code>volatile</code> guarantee and what does it not guarantee?</strong> <em>Testing JMM literacy, a senior-only probe.</em> <code>volatile</code> guarantees visibility (a write is immediately visible to any subsequent volatile read of the same variable) and prevents certain reorderings (via acquire/release fences). It does not guarantee atomicity of compound operations: <code>i++</code> on a <code>volatile int</code> is still a read-modify-write that races. On 64-bit JVMs, <code>volatile long</code> reads and writes are specified to be atomic (plain <code>long</code> is not guaranteed atomic on 32-bit JVMs). The catch: developers reach for <code>volatile</code> to fix race conditions but miss that check-then-act sequences remain racy.</p>
+<p><strong>What is the ABA problem and when does it matter in Java?</strong> <em>Probing whether you know real-world applicability.</em> ABA occurs when a CAS succeeds because a value returned to its prior state, masking an intermediate change. In Java without object pooling, GC prevents address reuse before the old reference is cleared, which eliminates the classic pointer-recycling ABA for the common case. The hazard reappears with object pooling or off-heap memory. The fix is <code>AtomicStampedReference</code>, which compares both the reference and an integer stamp, so a recycled object no longer looks unchanged.</p>
+<p><strong>When would you use <code>StampedLock</code> over <code>ReentrantReadWriteLock</code>?</strong> <em>Testing whether you go beyond the JavaDoc.</em> When reads vastly outnumber writes and you want to try reading without acquiring any lock. The optimistic path avoids CAS entirely on the happy path. Use <code>ReentrantReadWriteLock</code> when you need reentrancy, <code>Condition</code> variables, or when writes are frequent enough that the optimistic path is invalidated more often than it succeeds (a failed optimistic read pays the fallback read-lock cost, which makes it a net loss under high write rates).</p>
+<p><strong><code>ConcurrentHashMap.size()</code> returns 5. Can you trust it for a correctness decision?</strong> <em>Probing whether you read source or just docs.</em> No, not under concurrent modification. <code>size()</code> sums <code>baseCount</code> and the distributed <code>CounterCell[]</code> without a global lock, so the result can miss concurrent puts or removes. Use it for approximate metrics or diagnostics; never as the guard in a &quot;if size &lt; 10, add this item&quot; decision. Use <code>mappingCount()</code> for large maps where <code>int</code> overflow is a concern.</p>
+<p><strong>What changed in <code>ConcurrentHashMap</code> between Java 7 and Java 8?</strong> <em>Testing implementation knowledge, not just API.</em> Java 7: 16 pre-allocated segments, each a <code>ReentrantLock</code>-guarded hash table, with a fixed concurrency level. Java 8: a single bin array, CAS for inserts into empty bins, per-bin <code>synchronized</code> on the head node for non-empty bins, and red-black tree bins beyond eight entries. The result is lower contention, better memory efficiency (no pre-allocated lock objects), and O(log n) worst-case lookup per bin instead of O(n).</p>
+<p><strong>Explain the <code>computeIfAbsent</code> deadlock trap.</strong> <em>A real-world gotcha that surfaces in code reviews.</em> The computation function runs while the calling thread holds the bin-level lock for the target key. If the function recursively calls <code>computeIfAbsent</code> on the same map with a key that hashes to the same bin, the thread attempts to re-acquire the bin lock it already holds. Because the lock is on the bin node and <code>synchronized</code> is not reentrant across different logical map operations on the same bin, this deadlocks. Fix: compute the value outside the lambda, or use a separate staging structure.</p>
+<hr>
+<h2>In the room</h2>
+<p>Come into this material knowing that interviewers ask about Java concurrency to locate the boundary between someone who has read the API surface and someone who has debugged race conditions in production. The distinguishing answers name the catch, not just the feature: not &quot;use <code>volatile</code> for visibility&quot; but &quot;use <code>volatile</code> for visibility, and know it does not make compound operations atomic.&quot; Not &quot;use <code>ConcurrentHashMap</code>&quot; but &quot;<code>size()</code> is approximate under concurrent modification and <code>computeIfAbsent</code> deadlocks on recursive use.&quot;</p>
+<p>On lock-free algorithms specifically, most interviewers expect fluency with the Treiber stack and the CAS retry loop, a clear explanation of ABA and its fix, and a reasoned argument for when lock-free is the right call versus when it adds complexity for no payoff. Being able to implement the Michael-Scott queue or the ring buffer on a whiteboard, and to name the invariant each preserves and the failure mode it is still exposed to, is a strong differentiator at the senior and staff level.</p>
+<p>This is the first guide in the Java Fundamentals series. Upcoming guides cover the Java Memory Model in full depth (reordering, final-field freeze, safe publication, and the happens-before lattice), GC and heap mechanics (G1, ZGC, Shenandoah up to Java 26, GC log reading, and tuning), threading and executors (thread lifecycle, pool sizing, <code>CompletableFuture</code>, virtual threads, and structured concurrency as finalized in Java 25), and JIT compilation (C1/C2 tiered compilation, inlining, deoptimization, GraalVM, and warmup patterns).</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

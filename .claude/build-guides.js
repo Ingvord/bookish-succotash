@@ -46,6 +46,14 @@ const GUIDES = [
     accent:   '#0a6b82',  // deep cyan
   },
   {
+    src:      '.claude/backend-md/java-concurrency-prep.md',
+    out:      'backend/java-concurrency-prep.html',
+    kicker:   'Interview Preparation · Java Fundamentals',
+    title:    'Java Concurrency: Collections, Primitives & Lock-Free Algorithms',
+    subtitle: 'The JMM subset you need to reason about lock-free code, concurrent collection internals, VarHandle access modes, and model implementations of the Treiber stack, Michael-Scott queue, and Disruptor ring buffer.',
+    accent:   '#9a4a1f',  // copper -- AA on white (6.3:1)
+  },
+  {
     src:      '.claude/backend-md/nodejs-backend-prep.md',
     out:      'backend/nodejs-backend-prep.html',
     kicker:   'Interview Preparation · Staff Backend',
@@ -212,6 +220,19 @@ const GUIDES = [
 //  ocean       #0d5c8c   kubernetes-troubleshooting   -- AA on white (6.5:1)
 //  moss        #5c6b1f   platform-engineer-prep       -- AA on white (5.3:1)
 //  cobalt      #1e5fa8   system-design-backend-prep   -- AA on white (5.6:1)
+//  copper      #9a4a1f   java-concurrency-prep        -- AA on white (6.3:1)
+// ----------------------------------------------------------------
+
+// ----------------------------------------------------------------
+//  Java Fundamentals series — future guides (drafts, not yet built):
+//   java-jmm-prep        — memory model deep-dive (reordering, final-field freeze,
+//                          safe publication, happens-before lattice, false sharing)
+//   java-gc-prep         — GC & memory management (G1, ZGC, Shenandoah, escape
+//                          analysis, GC log reading, tuning), up to Java 26
+//   java-threading-prep  — threads, executors, pool sizing, CompletableFuture,
+//                          ForkJoinPool, virtual threads, structured concurrency (Java 25)
+//   java-jit-prep        — JIT: C1/C2 tiered compilation, inlining, deopt,
+//                          GraalVM, classloading, warmup patterns
 // ----------------------------------------------------------------
 
 // ================================================================
