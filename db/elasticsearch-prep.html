@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Elasticsearch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #8a2c5a;
+  --accent-soft:  #8a2c5a14;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Elasticsearch</h1>
+    <div class="sub">The inverted-index model: mappings, analyzers and tokenization, the Query DSL, aggregations, shard routing, and BM25 relevance.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>How to use this guide</h2>
+<p>Elasticsearch interviews at the senior and staff level are not about recalling API
+endpoints. They probe your understanding of the search engine's mechanics: why a
+<code>term</code> query on a <code>text</code> field silently returns nothing, what happens to your index
+when all the shards land on one node, and why adding replicas does not buy you more
+write throughput. The signal the interviewer wants is someone who has been burned by
+the gap between the relational-database mental model and the inverted-index reality.</p>
+<p>This guide covers Elasticsearch 9.4.x (current stable, June 2026). All API shapes,
+defaults, and scoring details are verified against the 9.x documentation. Core
+behaviours (inverted index, BM25 scoring, shard routing) have been stable across
+major versions.</p>
+<hr>
+<h2>The mental model: an inverted index, not a database</h2>
+<p>Elasticsearch stores data as documents (JSON blobs), but the storage structure that
+makes it fast is the inverted index: a mapping from each unique term to the list of
+documents that contain it, including positional information. When you search for
+<code>&quot;distributed systems&quot;</code>, ES looks up the postings lists for those terms and intersects
+them, without scanning documents sequentially.</p>
+<p>Every index is backed by one or more <strong>shards</strong>, each of which is a self-contained
+Lucene index with its own inverted index. A search fans out to all relevant shards,
+each returns its top-N hits, and the coordinating node merges and re-ranks them.</p>
+<p>The catch here is the near-real-time visibility model. Documents are not visible to
+search immediately after indexing. Elasticsearch writes to an in-memory buffer first.
+A <strong>refresh</strong> (default: every 1 second) copies that buffer to a new in-memory Lucene
+segment, making it searchable. Before a refresh, the document simply does not appear
+in search results, even though it was indexed successfully. This trips up developers
+who index and then immediately search in the same test and see nothing. The document
+is there; the segment just has not been refreshed yet.</p>
+<p>The other catch is that Elasticsearch is not a transactional store. There are no
+multi-document ACID transactions, no foreign keys, no rollbacks. Documents are
+updated by version: Elasticsearch uses optimistic concurrency control via <code>_seq_no</code>
+and <code>_primary_term</code>. If two writers update the same document simultaneously, one wins
+and the other gets a conflict error it must retry. Relational data must be
+denormalized on the write side because joins at query time are not supported (the
+<code>has_child</code>/<code>has_parent</code> queries exist but are expensive and rarely used in practice).</p>
+<hr>
+<h2>Mappings: the schema you think you do not have</h2>
+<p>Every Elasticsearch index has a <strong>mapping</strong>: the schema that defines how each field
+is indexed and stored. You can choose to define it explicitly before indexing data,
+or let Elasticsearch infer it from the first documents via <strong>dynamic mapping</strong>.</p>
+<p>Dynamic mapping is convenient for prototyping but dangerous in production. When
+Elasticsearch sees a new field it has not been told about, it makes a guess: strings
+become <code>text</code> (with a <code>keyword</code> sub-field), numbers stay numbers, dates that match
+a date format become dates. Two failure modes are common. First, the guess is wrong:
+an ID field like <code>&quot;order_id&quot;: &quot;20240501-0001&quot;</code> is guessed as <code>text</code> (analyzed) when
+you needed it as <code>keyword</code> (exact). Second, a client sends an unexpected field and
+you silently grow your mapping in a way that can hit the dynamic field limit and
+break indexing for all documents in the index.</p>
+<p>The two most important field types to understand are <code>text</code> and <code>keyword</code>:</p>
+<p>A <code>text</code> field is <strong>analyzed</strong>: the raw string is passed through the analysis chain
+(character filters, tokenizer, token filters), and the resulting tokens are indexed in
+the inverted index. A search against a <code>text</code> field also runs through the same chain.
+This is what makes full-text search work: <code>&quot;Quick brown fox&quot;</code> and <code>&quot;quick brown fox&quot;</code>
+both match because lowercase normalization happens at index time and query time.</p>
+<p>A <code>keyword</code> field is <strong>not analyzed</strong>: the raw string is indexed as-is, as a single
+token. It is used for exact matches, sorting, and aggregations. <code>&quot;Quick brown fox&quot;</code> as
+a <code>keyword</code> field will only match a <code>term</code> query of <code>&quot;Quick brown fox&quot;</code> precisely.</p>
+<p>The typical pattern is to index a string as both: a <code>text</code> field for full-text search
+and a <code>keyword</code> sub-field for exact matches and aggregations.</p>
+<pre><code class="hljs" data-lang="json">PUT /products
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;mappings&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;properties&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;text&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;analyzer&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;english&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;fields&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">&quot;keyword&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;keyword&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;ignore_above&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">256</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;sku&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;keyword&quot;</span>
+      <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;price&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;float&quot;</span>
+      <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;text&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;index&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span>
+      <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;tags&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;keyword&quot;</span>
+      <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Several things in this mapping are worth calling out. <code>name</code> gets the <code>english</code>
+analyzer (removes stop words, applies stemming) for full-text search, plus
+<code>name.keyword</code> as an exact-match and aggregation-friendly sub-field. <code>sku</code> is a
+<code>keyword</code> because order IDs and SKUs must match exactly. <code>description</code> has
+<code>&quot;index&quot;: false</code>: the text is stored but not indexed, so you can retrieve it in
+results but cannot search on it. This saves significant heap pressure on large free-text
+fields you only need to display.</p>
+<p>The critical catch with mappings: <strong>you cannot change a field's type after it has been
+indexed</strong>. The inverted index for a field is built at index time based on the field's
+type. If you map <code>price</code> as <code>text</code> by mistake and later realize it should be <code>float</code>,
+you cannot update the mapping in place. You must create a new index with the correct
+mapping, reindex all documents into it, and swap aliases so clients point to the new
+index. This is the canonical production workflow for mapping changes and is worth
+knowing cold.</p>
+<hr>
+<h2>Analyzers and tokenization</h2>
+<p>An <strong>analyzer</strong> is a pipeline that transforms a string into a sequence of tokens. The
+same analysis pipeline runs at index time (to build the inverted index) and at query
+time (to tokenize the search query). If they disagree, searches will miss documents
+they should have matched.</p>
+<p>Every analyzer has three stages:</p>
+<ol>
+<li>
+<p><strong>Character filters</strong> run on the raw text first. They can strip HTML (<code>html_strip</code>),
+replace characters (map <code>&amp;</code> to <code>and</code>), or apply regular expression replacements.
+Character filters are optional.</p>
+</li>
+<li>
+<p><strong>Tokenizer</strong> splits the filtered text into tokens. The <code>standard</code> tokenizer splits
+on whitespace and punctuation, lowercases, and discards punctuation tokens. The
+<code>keyword</code> tokenizer emits the entire input as one token (used in <code>keyword</code> analyzers).
+The <code>whitespace</code> tokenizer splits only on whitespace, preserving punctuation.</p>
+</li>
+<li>
+<p><strong>Token filters</strong> transform the token stream: <code>lowercase</code> converts to lowercase,
+<code>stop</code> removes stop words (the, a, is), <code>stemmer</code> reduces words to their root form
+(<code>running</code> becomes <code>run</code>), <code>synonym</code> expands tokens with synonyms.</p>
+</li>
+</ol>
+<p>Elasticsearch ships several named analyzers. The <code>standard</code> analyzer uses the standard
+tokenizer, lowercases, and optionally removes stop words. The <code>english</code> analyzer uses
+stemming and a language-specific stop-word list. The <code>keyword</code> analyzer uses the
+keyword tokenizer and no filters, so the entire value becomes one token.</p>
+<p>You can define custom analyzers in the index settings:</p>
+<pre><code class="hljs" data-lang="json">PUT /articles
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;settings&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;analysis&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;analyzer&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;custom_english&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;custom&quot;</span><span class="hljs-punctuation">,</span>
+          <span class="hljs-attr">&quot;char_filter&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;html_strip&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+          <span class="hljs-attr">&quot;tokenizer&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;standard&quot;</span><span class="hljs-punctuation">,</span>
+          <span class="hljs-attr">&quot;filter&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;lowercase&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;stop&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;stemmer_english&quot;</span><span class="hljs-punctuation">]</span>
+        <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;filter&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;stemmer_english&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;stemmer&quot;</span><span class="hljs-punctuation">,</span>
+          <span class="hljs-attr">&quot;language&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;english&quot;</span>
+        <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;mappings&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;properties&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;body&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;text&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;analyzer&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;custom_english&quot;</span>
+      <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>This analyzer strips HTML tags from the input, tokenizes, lowercases, removes English
+stop words, and stems the remaining tokens. An article body containing
+<code>&lt;p&gt;Running distributed systems at scale requires planning&lt;/p&gt;</code> would be tokenized
+as <code>[&quot;run&quot;, &quot;distribut&quot;, &quot;system&quot;, &quot;scale&quot;, &quot;requir&quot;, &quot;plan&quot;]</code>. Stop words (<code>at</code>) and
+HTML tags are discarded; each word is stemmed.</p>
+<p>You can test any analyzer using the <code>_analyze</code> API before committing it to a mapping:</p>
+<pre><code class="hljs" data-lang="bash">GET /articles/_analyze
+{
+  <span class="hljs-string">&quot;analyzer&quot;</span>: <span class="hljs-string">&quot;custom_english&quot;</span>,
+  <span class="hljs-string">&quot;text&quot;</span>: <span class="hljs-string">&quot;&lt;p&gt;Running distributed systems at scale requires planning&lt;/p&gt;&quot;</span>
+}
+</code></pre>
+<p>The response lists each emitted token along with its start and end offsets in the
+original string. This is the fastest way to debug why a search is not matching what
+you expect: run the query text through the same analyzer and see what tokens it
+produces.</p>
+<p>The catch here is analyzer mismatch. If you index with the <code>english</code> analyzer
+(which stems) but query with the <code>standard</code> analyzer (which does not), a search for
+<code>&quot;running&quot;</code> will not stem to <code>&quot;run&quot;</code>, and it will not match documents that were indexed
+with the stemmed token. The analyzer used at query time for a <code>match</code> query defaults
+to the analyzer set on the field's mapping, so explicit mappings protect you. Where
+things go wrong is when someone assigns the analyzer at index creation but later
+queries with an explicit <code>analyzer</code> override in the query without realizing the mismatch.</p>
+<hr>
+<h2>The Query DSL</h2>
+<p>Elasticsearch queries are JSON documents passed in the request body. The two most
+important concepts are <strong>query context</strong> and <strong>filter context</strong>.</p>
+<p><strong>Query context</strong> asks &quot;how well does this document match?&quot; Elasticsearch scores
+each matching document using BM25 (see the Relevance section). Scoring is
+expensive and the results are not cached. Use query context for full-text search
+where ranking by relevance matters.</p>
+<p><strong>Filter context</strong> asks &quot;does this document match, yes or no?&quot; There is no score
+computed. Filter results are cached in the node's filter cache as bitsets, so
+repeated filter queries are very fast. Use filter context for structured data:
+exact field values, ranges, existence checks.</p>
+<p>The <code>bool</code> query is the workhorse that combines both contexts:</p>
+<pre><code class="hljs" data-lang="json">GET /products/_search
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;query&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;bool&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;must&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+        <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">&quot;match&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;wireless headphones&quot;</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;filter&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+        <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">&quot;term&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;tags&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;electronics&quot;</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">&quot;range&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;price&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+              <span class="hljs-attr">&quot;gte&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">50</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;lte&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">300</span>
+            <span class="hljs-punctuation">}</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;must_not&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+        <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">&quot;term&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;tags&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;refurbished&quot;</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;should&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+        <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">&quot;term&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;tags&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;noise-cancelling&quot;</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">]</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Walking through each clause: <code>must</code> contains the full-text <code>match</code> query on <code>name</code>.
+This runs in query context, so it scores documents by how well they match
+&quot;wireless headphones&quot; and only documents that match are included in results.
+<code>filter</code> contains two conditions in filter context: the document must have the
+<code>electronics</code> tag and its price must be between 50 and 300. These are applied as
+a bitset filter before scoring, with no BM25 cost, and the results are cached.
+<code>must_not</code> excludes refurbished items, also in filter context (no scoring).
+<code>should</code> is an optional boost: documents tagged <code>noise-cancelling</code> get a higher
+score, but their absence does not exclude the document (unless <code>minimum_should_match</code>
+is set).</p>
+<p>The classic gotcha is using <code>term</code> on a <code>text</code> field. A <code>term</code> query performs an
+exact lookup in the inverted index: it takes your query value as-is, with no
+analysis, and looks for it. A <code>text</code> field stores analyzed tokens. If you indexed
+<code>&quot;Wireless Headphones&quot;</code> with the <code>standard</code> analyzer, the tokens stored are
+<code>[&quot;wireless&quot;, &quot;headphones&quot;]</code>. A <code>term</code> query for <code>&quot;Wireless Headphones&quot;</code> (with
+capital W and H) looks for that exact string as a single token and finds nothing.
+The fix is to use <code>term</code> on a <code>keyword</code> field (which stores the raw value), or to
+use <code>match</code> on the <code>text</code> field (which analyzes the query string first).</p>
+<p>The <code>match</code> query runs the query string through the field's analyzer and then searches
+the inverted index for those tokens. It is the correct choice for full-text search
+on <code>text</code> fields.</p>
+<hr>
+<h2>Aggregations</h2>
+<p>Aggregations let you compute summaries over a result set, similar to SQL <code>GROUP BY</code>
+and aggregate functions. They run alongside the query in a single request. There are
+two main families.</p>
+<p><strong>Metric aggregations</strong> compute a single value over a set of documents: <code>sum</code>, <code>avg</code>,
+<code>min</code>, <code>max</code>, <code>value_count</code>, and <code>cardinality</code> (approximate distinct count). They
+operate on numeric or date fields.</p>
+<p><strong>Bucket aggregations</strong> partition documents into groups (buckets) based on a criterion.
+Each bucket can then have nested sub-aggregations. <code>terms</code> creates one bucket per
+unique value of a field. <code>date_histogram</code> creates time buckets. <code>range</code> creates
+buckets from numeric or date ranges.</p>
+<p>Here is a <code>terms</code> aggregation with a nested <code>avg</code> metric:</p>
+<pre><code class="hljs" data-lang="json">GET /products/_search
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;size&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;query&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;term&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;tags&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;electronics&quot;</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;aggs&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;by_tag&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;terms&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;field&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tags&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;size&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">10</span>
+      <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;aggs&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;avg_price&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+          <span class="hljs-attr">&quot;avg&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;field&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;price&quot;</span>
+          <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span>
+      <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p><code>&quot;size&quot;: 0</code> at the top level means: do not return matching documents, only the
+aggregation results. The <code>by_tag</code> terms aggregation groups all electronics documents
+by their <code>tags</code> field values, returning the top 10 tags by document count. Inside
+each bucket, <code>avg_price</code> computes the average price for that tag. The response
+will have one bucket per tag with a <code>doc_count</code> and an <code>avg_price.value</code>.</p>
+<p>The important catch with <code>terms</code> aggregations is that the result is approximate. On
+a multi-shard index, each shard independently computes its local top-N values by
+document count and returns them to the coordinator. The coordinator merges these
+partial lists. If a tag ranks 11th on one shard but 8th on another, it can fall
+below the cutoff on the first shard and be omitted from the merge, even though
+it would have been in the global top 10. The <code>shard_size</code> parameter (default:
+<code>size * 1.5 + 10</code>) controls how many candidates each shard returns. Increasing
+<code>shard_size</code> improves accuracy at the cost of more data transferred from shards to
+the coordinator. For most production use cases the default is fine, but when you
+need exact top-N counts, you need either a single shard (impractical) or a different
+approach like a terms aggregation with <code>execution_hint: &quot;map&quot;</code> and a <code>min_doc_count</code>
+filter.</p>
+<p>The <code>cardinality</code> aggregation counts distinct values using HyperLogLog (HLL), a
+probabilistic algorithm. By default the error rate is around 5% but can be reduced
+by increasing <code>precision_threshold</code> (up to 40,000). This is important to understand
+when an interviewer asks for exact distinct counts at scale: exact cardinality
+requires loading all values into memory, which is expensive. For approximate counts,
+<code>cardinality</code> agg is the right answer; for exact counts on small cardinality fields,
+use <code>value_count</code> on a collapsed result.</p>
+<hr>
+<h2>Shard routing and sizing</h2>
+<p>When you index a document, Elasticsearch must decide which primary shard to route it
+to. The default routing formula is:</p>
+<pre><code class="hljs" data-lang="text">shard = hash(_routing) % number_of_primary_shards
+</code></pre>
+<p>By default <code>_routing</code> is the document's <code>_id</code>. Because the formula uses modulo of
+the primary shard count, the number of primary shards is <strong>fixed at index creation</strong>
+and cannot be changed without reindexing. This is one of the most consequential
+decisions in Elasticsearch operations. The <code>_split</code> and <code>_shrink</code> APIs can change
+shard count on new indices, but they require specific constraints and are not a
+substitute for planning upfront.</p>
+<p>You can override routing by providing a custom <code>_routing</code> value at index time. This
+is useful for co-locating related documents on the same shard to enable more efficient
+queries. For example, routing all documents for a tenant by tenant ID ensures that
+a tenant-scoped query touches only one shard instead of broadcasting to all shards.</p>
+<pre><code class="hljs" data-lang="bash">PUT /orders/_doc/1001?routing=tenant-42
+{
+  <span class="hljs-string">&quot;tenant_id&quot;</span>: <span class="hljs-string">&quot;tenant-42&quot;</span>,
+  <span class="hljs-string">&quot;order_total&quot;</span>: 149.99,
+  <span class="hljs-string">&quot;status&quot;</span>: <span class="hljs-string">&quot;shipped&quot;</span>
+}
+</code></pre>
+<p>With this custom routing, a search scoped to <code>tenant-42</code> can include the same routing
+value and Elasticsearch will only query the shard that holds that tenant's documents.</p>
+<pre><code class="hljs" data-lang="bash">GET /orders/_search?routing=tenant-42
+{
+  <span class="hljs-string">&quot;query&quot;</span>: {
+    <span class="hljs-string">&quot;term&quot;</span>: {
+      <span class="hljs-string">&quot;tenant_id&quot;</span>: <span class="hljs-string">&quot;tenant-42&quot;</span>
+    }
+  }
+}
+</code></pre>
+<p>The catch with custom routing is hot shards. If you route by a field that has uneven
+cardinality (a few tenants with millions of documents and many tenants with a handful),
+some shards grow much larger than others. Elasticsearch cannot rebalance by splitting
+a shard across nodes in real time; it can only move whole shards. An overloaded
+shard becomes a performance bottleneck for every query that touches it.</p>
+<p>For shard sizing, Elastic's general guidance is 10 to 50 GB per shard, with a goal
+of no more than a few hundred shards per node. The &quot;too many small shards&quot; anti-pattern
+is a common operational problem: an index created with 20 primary shards for a data
+set that only ever grows to 5 GB means 20 shards each holding 250 MB. The per-shard
+overhead (open file descriptors, heap for segment metadata) adds up. On a 10-node
+cluster with 200 such indices, you can hit heap saturation before indexing any
+significant volume.</p>
+<p>Replicas are copies of primary shards that provide fault tolerance and additional
+search throughput (searches can be served by replicas, not just primaries). Adding
+replicas does not increase write throughput because every indexed document must be
+written to the primary first and then replicated. Write throughput scales by adding
+primary shards, which means more nodes or shards per node, not replicas.</p>
+<hr>
+<h2>Relevance and scoring</h2>
+<p>Elasticsearch scores documents in query context using <strong>BM25</strong> (Best Match 25), which
+replaced the original TF/IDF model as the default in version 5. Understanding BM25
+at a mechanical level tells you how to tune relevance and debug poor rankings.</p>
+<p>Classic TF/IDF scores a document higher the more times a term appears (TF: term
+frequency) and the fewer documents contain that term (IDF: inverse document
+frequency). The problem is that TF grows without a ceiling: a 10,000-word document
+that mentions a term 100 times scores much higher than a 200-word document that
+mentions it 10 times, even though the shorter document is almost entirely about
+that term.</p>
+<p>BM25 adds two corrections. <strong>TF saturation</strong>: the contribution of additional term
+occurrences levels off via a logarithmic curve controlled by the <code>k1</code> parameter
+(default 1.2). After a certain point, more occurrences add almost nothing to the
+score. <strong>Length normalization</strong>: shorter documents are scored higher for the same
+term frequency, controlled by the <code>b</code> parameter (default 0.75). A 200-word
+document and a 10,000-word document that each mention a term 10 times will have
+very different scores under BM25; the shorter document wins because its term
+density is higher.</p>
+<p>You can boost fields and queries to shift relevance weight:</p>
+<pre><code class="hljs" data-lang="json">GET /products/_search
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;query&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;multi_match&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;query&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;wireless headphones&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;fields&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;name^3&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;description&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;tags^2&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;best_fields&quot;</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Here <code>name^3</code> means the score contribution from matching in <code>name</code> is multiplied
+by 3 before being combined. A match in the product name matters three times as much
+as a match in the description.</p>
+<p>When a document does not rank where you expect, the <code>explain</code> API tells you exactly
+why. Adding <code>&quot;explain&quot;: true</code> to a search request returns a full scoring breakdown
+for each hit:</p>
+<pre><code class="hljs" data-lang="json">GET /products/_search
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;explain&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;query&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;match&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;wireless headphones&quot;</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>The <code>_explanation</code> object in each hit shows the final score and decomposes it into
+IDF for each term, TF saturation for that document, and field-length normalization.
+You can see exactly which term contributed what fraction of the score and why.</p>
+<p>The catch with relevance tuning is over-boosting. It is tempting to add high boost
+values to multiple fields to make everything rank first. BM25 already incorporates
+field length normalization, so adding a <code>^10</code> boost to a short title field and a
+<code>^5</code> to a tags field often produces surprising results when documents have unexpected
+field lengths. Start with small boosts (2 or 3) and validate with the <code>explain</code> API
+before pushing to production.</p>
+<p>The <code>function_score</code> query lets you combine the BM25 score with arbitrary score
+modifiers: a <code>field_value_factor</code> that multiplies the BM25 score by the value of a
+numeric field (e.g., a popularity score or recency weight), a <code>gauss</code> decay function
+that reduces scores for documents further from a target date or geo-point, or a
+<code>random_score</code> for deterministic randomization. These are used when pure text
+relevance is not enough and you need to inject business logic into ranking.</p>
+<hr>
+<h2>Common interview questions</h2>
+<p><strong>Why does a <code>term</code> query on a <code>text</code> field return nothing?</strong> The <code>text</code> field
+stores analyzed tokens in the inverted index. A <code>term</code> query performs an exact,
+unanalyzed lookup: it takes the query string as-is and looks for it in the inverted
+index. If the original value was <code>&quot;Wireless Headphones&quot;</code> and the <code>standard</code> analyzer
+lowercased and split it into <code>[&quot;wireless&quot;, &quot;headphones&quot;]</code>, then a <code>term</code> query for
+<code>&quot;Wireless Headphones&quot;</code> finds no matching token because that exact string was never
+stored. Use <code>match</code> for full-text <code>text</code> fields (it analyzes the query), or use
+<code>term</code> on the <code>.keyword</code> sub-field for exact matches on the original string.</p>
+<p><strong>What is the difference between refresh, flush, and fsync in Elasticsearch?</strong>
+A <strong>refresh</strong> copies documents from the in-memory indexing buffer into a new Lucene
+segment in memory, making them searchable. It happens every second by default and
+is the boundary for near-real-time visibility. A <strong>flush</strong> writes the in-memory
+Lucene segments to disk and advances the translog checkpoint: it makes data durable
+on disk without relying on the OS page cache. Elasticsearch triggers a flush
+periodically (when the translog reaches a threshold) or explicitly via the
+<code>_flush</code> API. A <strong>sync</strong> (fsync at the OS level) is what the flush calls under the
+hood to ensure kernel buffers are written to physical storage. They are three
+different levels of the durability pipeline: visibility in search, durability on
+disk, and physical write-through.</p>
+<p><strong>When does a bad shard count hurt you?</strong> Too few primary shards caps your write
+throughput and means each shard is large, so segment merges are slow and recovery
+after a node failure takes a long time. Too many primary shards means high per-shard
+overhead (file descriptors, heap for segment metadata), slow scatter-gather search
+latency because the coordinator waits for the slowest shard, and poor BM25 accuracy
+because IDF is computed per-shard using local document frequencies rather than global
+ones (small shards have skewed IDF). The rule of thumb is tens of GB per shard and
+no more than a few hundred shards per node. For time-series data, use ILM
+(Index Lifecycle Management) to roll over to new indices and delete old shards as data
+ages out.</p>
+<p><strong>When are aggregation results approximate rather than exact?</strong> <code>terms</code> aggregations
+are approximate on multi-shard indices because each shard returns its local top-N
+results and the coordinator merges them: values that appear frequently globally but
+not in the top-N locally on some shards are underrepresented. Increase <code>shard_size</code>
+to trade accuracy for coordinator memory and bandwidth. <code>cardinality</code> aggregations
+use HyperLogLog and are always approximate (default error rate around 5%); increase
+<code>precision_threshold</code> for tighter bounds at higher heap cost. Metric aggregations
+(<code>sum</code>, <code>avg</code>, <code>min</code>, <code>max</code>) are exact because every shard computes the metric over
+all its documents and the coordinator combines the partial results arithmetically.</p>
+<p><strong>When would you choose <code>text</code> vs <code>keyword</code> for a string field?</strong> Use <code>text</code> when
+the field is natural language that users will full-text search (article body, product
+description, review text). Use <code>keyword</code> when you need exact matches, aggregations,
+or sorting (user IDs, status enums, email addresses, SKUs, tag labels). For string
+fields that need both, use the multi-field pattern: map the field as <code>text</code> with
+an analyzer and add a <code>keyword</code> sub-field. The <code>keyword</code> sub-field can also have
+<code>ignore_above: 256</code> to skip indexing strings longer than 256 bytes (protecting
+against accidentally indexing large values as keywords).</p>
+<p><strong>How do you change a field's mapping in production?</strong> You cannot change a field type
+in an existing index. The production workflow is: create a new index with the
+corrected mapping (often named with a version suffix, e.g. <code>products-v2</code>), reindex
+all documents from the old index to the new one using the <code>_reindex</code> API, verify
+document count and spot-check a sample, then atomically swap the alias that your
+application uses from the old index to the new one with <code>POST /_aliases</code>. Aliases
+decouple the application from the physical index name, so the swap is transparent
+to clients. If you skipped aliases when you built the original index, you have to
+update the application to point to the new index name during a maintenance window.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

@@ -195,6 +195,14 @@ const GUIDES = [
     subtitle: 'The log abstraction: partitions, consumer groups, ISR, at-least-once vs exactly-once delivery, log compaction, consumer-lag diagnosis, and ordering guarantees.',
     accent:   '#3f5566',  // steel
   },
+  {
+    src:      '.claude/data-md/elasticsearch-prep.md',
+    out:      'db/elasticsearch-prep.html',
+    kicker:   'Interview Preparation · Staff Backend',
+    title:    'Elasticsearch',
+    subtitle: 'The inverted-index model: mappings, analyzers and tokenization, the Query DSL, aggregations, shard routing, and BM25 relevance.',
+    accent:   '#8a2c5a',  // wine
+  },
 ]
 
 // ----------------------------------------------------------------
@@ -221,6 +229,7 @@ const GUIDES = [
 //  moss        #5c6b1f   platform-engineer-prep       -- AA on white (5.3:1)
 //  cobalt      #1e5fa8   system-design-backend-prep   -- AA on white (5.6:1)
 //  copper      #9a4a1f   java-concurrency-prep        -- AA on white (6.3:1)
+//  wine        #8a2c5a   elasticsearch-prep           -- AA on white
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------
