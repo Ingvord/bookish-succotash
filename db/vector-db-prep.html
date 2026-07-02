@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vector Databases: A Primer with Qdrant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #0b6e4f;
+  --accent-soft:  #0b6e4f14;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Vector Databases</div>
+    <h1>Vector Databases: A Primer with Qdrant</h1>
+    <div class="sub">What a vector database is and how it differs from a B-tree store: embeddings and ANN search, HNSW, a runnable Pet Shop semantic-search app on Qdrant via Docker, and the pgvector "you already have Postgres" contrast.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>How to use this guide</h2>
+<p>This guide is a primer, not a survey of every vector database on the market. It exists
+for the moment an interview turns to &quot;how would you build semantic search over our
+product catalog&quot; or a system-design round drops &quot;how would you ground an LLM in our
+docs&quot; (the retrieval half of RAG) and you need to explain, correctly and concretely,
+what a vector database actually does differently from the relational store you already
+know.</p>
+<p>It covers one purpose-built engine (Qdrant, walked through with a runnable example) and
+one &quot;you already have Postgres&quot; alternative (pgvector), because those two answers cover
+almost every real decision you will face: stand up a dedicated engine, or add an
+extension to the database you already run. Versions are pinned and verified as of
+July 2026: Qdrant v1.17.x and pgvector v0.8.0.</p>
+<hr>
+<h2>The mental model: search by meaning, not by match</h2>
+<p>A conventional database answers questions with an exact predicate: &quot;give me the rows
+where <code>species = 'dog'</code>&quot; or &quot;give me the rows where <code>price &lt; 50</code>.&quot; The index (a B-tree,
+a hash) exists to make that predicate fast, but the predicate itself is exact. Either a
+row satisfies <code>species = 'dog'</code> or it does not.</p>
+<p>A vector database answers a different kind of question: &quot;give me the listings most
+<em>similar in meaning</em> to 'a calm lap companion for a small flat.'&quot; There is no column
+that equals that string. Nothing in the data literally matches the query. The only way
+to answer it is to convert both the query and every candidate row into a numeric
+representation of their meaning, a vector, and then ask which vectors are closest
+together in that space.</p>
+<pre><code class="hljs" data-lang="text">                       &quot;a calm lap companion
+                        for a small flat&quot;  (query)
+                              *
+                             / \
+                            /   \
+                    o------o     o------o
+                 Persian cat   Senior beagle
+                  (close)       (close)
+                                            o
+                                      Border Collie
+                                       (far: high energy,
+                                        not &quot;calm&quot;)
+</code></pre>
+<p>This is the whole reframe: embeddings turn unstructured meaning into geometry, and
+&quot;search&quot; becomes &quot;find the nearest points.&quot; Everything else in this guide, why the
+index looks different, why results are ranked instead of matched, why the search is
+approximate, follows from that one idea.</p>
+<hr>
+<h2>How this differs from a conventional database</h2>
+<p>The difference is not &quot;vector databases are databases with an extra data type.&quot; The
+query model, the index structure, and the correctness guarantees are all different.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Conventional (B-tree / SQL)</th>
+<th>Vector (ANN)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Query type</td>
+<td>Exact match, range, join</td>
+<td>Nearest-neighbour by distance</td>
+</tr>
+<tr>
+<td>What the index encodes</td>
+<td>Sorted keys or hash buckets</td>
+<td>A graph or partitioning of the vector space</td>
+</tr>
+<tr>
+<td>Result semantics</td>
+<td>Rows that satisfy the predicate</td>
+<td>Top-k rows ranked by distance, always returns k results even if the closest one is a poor match</td>
+</tr>
+<tr>
+<td>Correctness</td>
+<td>Exact: every matching row is returned</td>
+<td>Approximate: recall is a tunable number below 100%</td>
+</tr>
+<tr>
+<td><code>WHERE</code> clause</td>
+<td>Native, first-class</td>
+<td>Bolted on: has to interact with the ANN index (see below)</td>
+</tr>
+<tr>
+<td>Write cost</td>
+<td>O(log n) index insert</td>
+<td>HNSW insert is more expensive; graph edges must be rewired</td>
+</tr>
+</tbody>
+</table>
+<p>Three catches sit underneath that table:</p>
+<p><strong>The search is approximate on purpose.</strong> Exact nearest-neighbour search means
+computing the distance from the query to every single vector, which is O(n) per query
+and does not scale past a few tens of thousands of vectors. Approximate Nearest
+Neighbour (ANN) indexes trade a small, tunable amount of accuracy (recall, the fraction
+of true nearest neighbours actually returned) for orders-of-magnitude faster queries.
+&quot;Approximate&quot; is not a bug to route around, it is the mechanism that makes vector
+search viable at scale, but it means two identical queries against an ANN index can
+occasionally return slightly different top-k sets, and it means recall is a dial you
+tune, not a promise you get for free.</p>
+<p><strong>There is no <code>LIKE</code>, and filtering interacts with the index.</strong> A vector index has no
+concept of &quot;starts with&quot; or &quot;contains&quot; (that is a text-search problem, solved by an
+inverted index like Elasticsearch, not a vector index). More subtly, combining a
+structured filter (<code>species = 'dog'</code>) with a vector search is not just &quot;run the filter
+then run the search.&quot; <strong>Pre-filtering</strong> (filter first, then search only the surviving
+vectors) can break the ANN graph's navigation and hurt recall if the filter is
+selective. <strong>Post-filtering</strong> (run the ANN search, then discard results that fail the
+filter) can return fewer than k results if the filter is selective, because the
+discarded ones are already gone. Production vector databases (Qdrant included) build
+filtering into the graph traversal itself to avoid both failure modes, which is a
+non-trivial part of what you are paying a purpose-built engine for.</p>
+<p><strong>You still need a source of truth.</strong> A vector database stores an embedding plus
+whatever metadata (payload) you attached to it. It is not where you keep your
+authoritative product catalog, user records, or order history. The normal architecture
+is: relational or document store holds the record, a background job embeds the
+relevant text and writes the vector (plus enough payload to filter and render results)
+into the vector store. This means the vector store can go stale relative to the source
+of truth, and re-sync is a pipeline you own.</p>
+<pre><code class="hljs" data-lang="text">Conventional lookup (B-tree):           ANN lookup (HNSW, simplified):
+
+  root                                   layer 2:  A ----------- E
+   |                                                |             |
+  [k5]                                   layer 1:  A --- C --- E --- G
+  /   \                                             |     |     |     |
+[k2,k4] [k7,k9]                          layer 0:  A-B-C-D-E-F-G-H  (every point)
+   |        |
+ exact     exact                         query descends from sparse top layer,
+ match     match                         greedily hops toward the query point,
+                                          gets denser near the bottom
+</code></pre>
+<hr>
+<h2>Embeddings: the bridge</h2>
+<p>An embedding is a fixed-length vector of floating-point numbers produced by a trained
+model, positioned so that inputs with similar meaning end up close together in that
+space. <code>all-MiniLM-L6-v2</code> (the model used later in this guide) produces 384-dimensional
+vectors; larger models commonly produce 768 or 1536 dimensions. More dimensions can
+capture more nuance but cost more memory and more distance-computation time per query.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">from</span> sentence_transformers <span class="hljs-keyword">import</span> SentenceTransformer
+
+model = SentenceTransformer(<span class="hljs-string">&quot;all-MiniLM-L6-v2&quot;</span>)
+vector = model.encode(<span class="hljs-string">&quot;a calm lap companion for a small flat&quot;</span>)
+<span class="hljs-built_in">print</span>(<span class="hljs-built_in">len</span>(vector))   <span class="hljs-comment"># 384</span>
+<span class="hljs-built_in">print</span>(vector[:<span class="hljs-number">5</span>])    <span class="hljs-comment"># [0.0123, -0.0456, 0.0789, ...]</span>
+</code></pre>
+<p>&quot;Closeness&quot; needs a distance metric. <strong>Cosine similarity</strong> measures the angle between
+two vectors and ignores magnitude, the standard default for text embeddings, where
+direction encodes meaning more reliably than length. <strong>Dot product</strong> is cosine
+similarity without the normalization step, cheaper to compute, and correct only if
+your vectors are already unit-length (many embedding models, including MiniLM,
+normalize their output, which makes dot product and cosine equivalent and lets you
+use the cheaper one). <strong>Euclidean distance</strong> measures straight-line distance and
+matters more for embeddings where magnitude itself is meaningful (some image or
+audio embeddings), which is rarer in text search.</p>
+<p>The catch that bites in production: <strong>the same model has to embed both the documents
+and the queries</strong>, because the vector space a model produces is specific to that
+model's training. Swapping to a different embedding model (even a &quot;better&quot; one) does
+not mean re-pointing the same index at new vectors, it means every stored vector is
+now meaningless relative to new queries, and you have to re-embed and re-index the
+entire dataset. Budget for that migration cost before you pick a model, not after.</p>
+<hr>
+<h2>ANN and the HNSW index</h2>
+<p>Brute-force k-nearest-neighbour search computes the distance from the query to every
+stored vector, an O(n · d) scan (n vectors, d dimensions) per query. At a few thousand
+vectors that is fine. At tens of millions, it is not: a single query would touch every
+vector, every time.</p>
+<p><strong>HNSW</strong> (Hierarchical Navigable Small World) is the ANN index both Qdrant and pgvector
+use by default. It builds a multi-layer graph where each point is a node and edges
+connect it to nearby points. The top layer is sparse and connects distant points (fast,
+long hops); each layer down is denser (short, precise hops), until the bottom layer
+contains every point. A query starts at the sparse top layer, greedily walks toward the
+query point, then drops down a layer and repeats, refining as it goes, until it lands
+on a small candidate set at the bottom layer to rank.</p>
+<p>Three knobs control the recall/latency/memory tradeoff, and every vector-DB interview
+question about tuning maps back to one of them:</p>
+<ul>
+<li><strong><code>m</code></strong> (Qdrant) / graph degree: how many edges each node keeps. Higher <code>m</code> means
+better recall and a larger, slower-to-build graph.</li>
+<li><strong><code>ef_construct</code></strong>: how wide the search is during index build. Higher values produce
+a better-quality graph at the cost of much slower ingestion.</li>
+<li><strong><code>ef_search</code></strong> (Qdrant's <code>hnsw_ef</code>, pgvector's <code>hnsw.ef_search</code>): how wide the search
+is at query time. Higher values improve recall at the cost of query latency. This is
+the one knob you can safely tune per-query without rebuilding anything.</li>
+</ul>
+<p>The catch: HNSW graphs are memory-resident and expensive to build (they cannot be
+built incrementally as cheaply as a B-tree insert, since inserting a point may rewire
+neighbouring edges). <strong>IVFFlat</strong>, pgvector's other index type, partitions vectors into
+clusters via k-means at build time and only searches the nearest clusters at query
+time. It builds faster and stores more compactly than HNSW, but its clustering is fixed
+at build time (a <code>CREATE INDEX</code> on data that later grows or shifts distributionally
+degrades its quality until you rebuild it), and it generally trails HNSW on the
+recall/latency curve. As of pgvector 0.8.0, HNSW is the recommended default for most
+applications (RAG pipelines, semantic search, recommendation) because it needs less
+tuning and handles ongoing writes better; IVFFlat remains the right call when build
+time and index size matter more than query recall, typically at large scale with
+infrequent, batched updates.</p>
+<hr>
+<h2>The Pet Shop app: deploy Qdrant with Docker</h2>
+<p>The rest of this guide is one runnable example: a small pet shop's listing search,
+where a shopper can type &quot;a calm lap companion for a small flat&quot; and get ranked
+results, optionally filtered by species. It uses Qdrant v1.17.1 and a local embedding
+model, so it needs no API key and runs entirely offline after the first <code>docker compose up</code>.</p>
+<h3>Project layout</h3>
+<pre><code class="hljs" data-lang="text">petshop/
+  docker-compose.yml
+  requirements.txt
+  app/
+    pets.json
+    ingest.py
+    search.py
+</code></pre>
+<h3>docker-compose.yml</h3>
+<p>Qdrant ships as a single container. Pin the tag rather than tracking <code>latest</code>:
+v1.17 removed Qdrant's RocksDB storage backend in favour of a new engine called
+Gridstore, and the project's supported upgrade path is one minor version at a time
+(1.14 to 1.15 to 1.16 to 1.17), so an unpinned image can jump you across that
+boundary on a routine <code>docker compose pull</code>. Port <code>6333</code> serves the REST/dashboard
+API, <code>6334</code> serves gRPC. The named volume is what makes data survive a container
+restart, the single most common Qdrant demo mistake is forgetting it and losing the
+collection on the next <code>docker compose down</code>.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">services:</span>
+  <span class="hljs-attr">qdrant:</span>
+    <span class="hljs-attr">image:</span> <span class="hljs-string">qdrant/qdrant:v1.17.1</span>
+    <span class="hljs-attr">ports:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;6333:6333&quot;</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">&quot;6334:6334&quot;</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">qdrant_storage:/qdrant/storage</span>
+
+  <span class="hljs-attr">app:</span>
+    <span class="hljs-attr">build:</span> <span class="hljs-string">./app</span>
+    <span class="hljs-attr">depends_on:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">qdrant</span>
+    <span class="hljs-attr">volumes:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-string">./app:/app</span>
+    <span class="hljs-attr">working_dir:</span> <span class="hljs-string">/app</span>
+    <span class="hljs-attr">command:</span> <span class="hljs-string">sleep</span> <span class="hljs-string">infinity</span>
+
+<span class="hljs-attr">volumes:</span>
+  <span class="hljs-attr">qdrant_storage:</span>
+</code></pre>
+<pre><code class="hljs" data-lang="text"># app/Dockerfile
+FROM python:3.12-slim
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+</code></pre>
+<pre><code class="hljs" data-lang="text"># requirements.txt
+qdrant-client==1.12.*
+sentence-transformers==3.*
+</code></pre>
+<h3>The dataset</h3>
+<p>A dozen listings is enough to see ranking behave sensibly without hand-picking a
+trivial two-item example.</p>
+<pre><code class="hljs" data-lang="json"><span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Milo&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;species&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;cat&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;temperament&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;calm, affectionate&quot;</span><span class="hljs-punctuation">,</span>
+   <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;A quiet Persian cat who loves lap time and short naps in sunny spots. Great for a small apartment.&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Rex&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;species&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;dog&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;temperament&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;high-energy, loyal&quot;</span><span class="hljs-punctuation">,</span>
+   <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;A young Border Collie that needs daily runs and mental stimulation. Best for an active owner with a yard.&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Biscuit&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;species&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;dog&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;temperament&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;gentle, low-energy&quot;</span><span class="hljs-punctuation">,</span>
+   <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;A senior beagle, content with short walks and a lot of couch time. Good fit for a quiet household.&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">4</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Nova&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;species&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;cat&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;temperament&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;playful, independent&quot;</span><span class="hljs-punctuation">,</span>
+   <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;A curious tabby who chases toys but is happy to be left alone during the workday.&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">5</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Pepper&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;species&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;bird&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;temperament&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;vocal, social&quot;</span><span class="hljs-punctuation">,</span>
+   <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;A talkative parakeet that bonds closely with one person and needs daily interaction.&quot;</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">]</span>
+</code></pre>
+<h3>Ingest</h3>
+<p>The collection is created once with a fixed vector size (matching the embedding
+model's output dimension) and a distance metric. <code>upsert</code> writes a point per listing:
+the vector for similarity search, and a <code>payload</code> dict for the metadata you filter and
+render on, in this case the whole listing so results are self-contained.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># app/ingest.py</span>
+<span class="hljs-keyword">import</span> json
+<span class="hljs-keyword">from</span> qdrant_client <span class="hljs-keyword">import</span> QdrantClient
+<span class="hljs-keyword">from</span> qdrant_client.models <span class="hljs-keyword">import</span> Distance, VectorParams, PointStruct
+<span class="hljs-keyword">from</span> sentence_transformers <span class="hljs-keyword">import</span> SentenceTransformer
+
+model = SentenceTransformer(<span class="hljs-string">&quot;all-MiniLM-L6-v2&quot;</span>)
+client = QdrantClient(host=<span class="hljs-string">&quot;qdrant&quot;</span>, port=<span class="hljs-number">6333</span>)
+
+COLLECTION = <span class="hljs-string">&quot;pets&quot;</span>
+
+<span class="hljs-keyword">if</span> client.collection_exists(COLLECTION):
+    client.delete_collection(COLLECTION)
+client.create_collection(
+    collection_name=COLLECTION,
+    vectors_config=VectorParams(size=<span class="hljs-number">384</span>, distance=Distance.COSINE),
+)
+
+pets = json.load(<span class="hljs-built_in">open</span>(<span class="hljs-string">&quot;pets.json&quot;</span>))
+points = [
+    PointStruct(
+        <span class="hljs-built_in">id</span>=pet[<span class="hljs-string">&quot;id&quot;</span>],
+        vector=model.encode(pet[<span class="hljs-string">&quot;description&quot;</span>]).tolist(),
+        payload=pet,
+    )
+    <span class="hljs-keyword">for</span> pet <span class="hljs-keyword">in</span> pets
+]
+
+client.upsert(collection_name=COLLECTION, points=points)
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Ingested <span class="hljs-subst">{<span class="hljs-built_in">len</span>(points)}</span> pets&quot;</span>)
+</code></pre>
+<h3>Query</h3>
+<p>This is where the &quot;combined structured and semantic search&quot; point becomes concrete.
+The <code>Filter</code> runs as a metadata predicate (exactly like a <code>WHERE</code> clause), while
+<code>query</code> runs as a vector similarity search, and Qdrant applies both together during
+graph traversal rather than as two separate passes.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># app/search.py</span>
+<span class="hljs-keyword">import</span> sys
+<span class="hljs-keyword">from</span> qdrant_client <span class="hljs-keyword">import</span> QdrantClient
+<span class="hljs-keyword">from</span> qdrant_client.models <span class="hljs-keyword">import</span> Filter, FieldCondition, MatchValue
+<span class="hljs-keyword">from</span> sentence_transformers <span class="hljs-keyword">import</span> SentenceTransformer
+
+model = SentenceTransformer(<span class="hljs-string">&quot;all-MiniLM-L6-v2&quot;</span>)
+client = QdrantClient(host=<span class="hljs-string">&quot;qdrant&quot;</span>, port=<span class="hljs-number">6333</span>)
+
+query_text = sys.argv[<span class="hljs-number">1</span>] <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;a calm companion for a small flat&quot;</span>
+species_filter = sys.argv[<span class="hljs-number">2</span>] <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">2</span> <span class="hljs-keyword">else</span> <span class="hljs-literal">None</span>
+
+query_filter = <span class="hljs-literal">None</span>
+<span class="hljs-keyword">if</span> species_filter:
+    query_filter = Filter(
+        must=[FieldCondition(key=<span class="hljs-string">&quot;species&quot;</span>, <span class="hljs-keyword">match</span>=MatchValue(value=species_filter))]
+    )
+
+results = client.query_points(
+    collection_name=<span class="hljs-string">&quot;pets&quot;</span>,
+    query=model.encode(query_text).tolist(),
+    query_filter=query_filter,
+    limit=<span class="hljs-number">3</span>,
+).points
+
+<span class="hljs-keyword">for</span> r <span class="hljs-keyword">in</span> results:
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">{r.score:<span class="hljs-number">.3</span>f}</span>  <span class="hljs-subst">{r.payload[<span class="hljs-string">&#x27;name&#x27;</span>]}</span> (<span class="hljs-subst">{r.payload[<span class="hljs-string">&#x27;species&#x27;</span>]}</span>): &quot;</span>
+          <span class="hljs-string">f&quot;<span class="hljs-subst">{r.payload[<span class="hljs-string">&#x27;description&#x27;</span>][:<span class="hljs-number">60</span>]}</span>...&quot;</span>)
+</code></pre>
+<h3>Run it</h3>
+<pre><code class="hljs" data-lang="bash">docker compose up -d
+docker compose <span class="hljs-built_in">exec</span> app python ingest.py
+docker compose <span class="hljs-built_in">exec</span> app python search.py <span class="hljs-string">&quot;a calm lap companion for a small flat&quot;</span>
+docker compose <span class="hljs-built_in">exec</span> app python search.py <span class="hljs-string">&quot;an active dog for daily runs&quot;</span> dog
+</code></pre>
+<pre><code class="hljs" data-lang="text">0.444  Biscuit (dog): A senior beagle, content with short walks and a lot...
+0.368  Milo (cat): A quiet Persian cat who loves lap time and short naps...
+0.359  Nova (cat): A curious tabby who chases toys but is happy to be left...
+
+0.605  Rex (dog): A young Border Collie that needs daily runs and mental...
+0.401  Biscuit (dog): A senior beagle, content with short walks and a lot...
+</code></pre>
+<p>(Output captured from an actual run against Qdrant v1.17.1 and
+<code>all-MiniLM-L6-v2</code>; exact scores can shift slightly across model or Qdrant
+versions, but the ranking logic below holds.) Note the second query only
+returned dogs (the filter narrowed the candidate set before ranking, there
+are only two dogs in the dataset) and ranked Rex above Biscuit because
+&quot;active&quot; and &quot;daily runs&quot; sit closer to Rex's description in embedding
+space, not because of any keyword overlap: neither query contains the word
+&quot;Rex&quot; or &quot;Collie.&quot; That is the semantic-search payoff in one example. The
+Qdrant web dashboard at <code>http://localhost:6333/dashboard</code> lets you browse
+the collection and re-run queries visually, useful for demoing this live.</p>
+<hr>
+<h2>The pgvector alternative: staying in Postgres</h2>
+<p>Not every project justifies a new datastore. If the data already lives in Postgres and
+the scale is moderate (roughly under a few million vectors, though this depends
+heavily on dimension count and query load), adding the <code>vector</code> extension is often the
+right call: one fewer system to operate, and vector search participates in the same
+transactions as the rest of your data, so a listing and its embedding are written and
+rolled back together.</p>
+<pre><code class="hljs" data-lang="sql"><span class="hljs-keyword">CREATE</span> EXTENSION IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> vector;
+
+<span class="hljs-keyword">CREATE TABLE</span> pets (
+    id          serial <span class="hljs-keyword">PRIMARY KEY</span>,
+    name        text <span class="hljs-keyword">NOT NULL</span>,
+    species     text <span class="hljs-keyword">NOT NULL</span>,
+    description text <span class="hljs-keyword">NOT NULL</span>,
+    embedding   vector(<span class="hljs-number">384</span>)
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX <span class="hljs-keyword">ON</span> pets <span class="hljs-keyword">USING</span> hnsw (embedding vector_cosine_ops);
+
+<span class="hljs-comment">-- nearest neighbours, filtered by species, in one query</span>
+<span class="hljs-keyword">SELECT</span> name, species, description,
+       embedding <span class="hljs-operator">&lt;=&gt;</span> <span class="hljs-string">&#x27;[0.012, -0.045, ...]&#x27;</span> <span class="hljs-keyword">AS</span> distance
+<span class="hljs-keyword">FROM</span> pets
+<span class="hljs-keyword">WHERE</span> species <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;dog&#x27;</span>
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> embedding <span class="hljs-operator">&lt;=&gt;</span> <span class="hljs-string">&#x27;[0.012, -0.045, ...]&#x27;</span>
+LIMIT <span class="hljs-number">3</span>;
+</code></pre>
+<p><code>&lt;=&gt;</code> is pgvector's cosine-distance operator (<code>&lt;-&gt;</code> is Euclidean, <code>&lt;#&gt;</code> is negative
+inner product); the same operator used in the index and the <code>ORDER BY</code> is what lets
+Postgres's planner use the HNSW index instead of a sequential scan.</p>
+<p>The tradeoff runs the other way at scale and under load: Qdrant is purpose-built for
+vector workloads, so its filtering-aware graph traversal, horizontal sharding, and
+payload indexing are first-class and tuned for exactly this access pattern. pgvector
+shares Postgres's resource budget, so a large HNSW index build competes with your
+transactional workload for memory and I/O, and its filtered-search behaviour depends
+on the query planner choosing to use the index at all, which for highly selective
+<code>WHERE</code> clauses it does not always do. The honest framing in an interview: reach for
+pgvector when the data is already relational and the scale is moderate; reach for a
+dedicated engine when vector search is the primary access pattern, the dataset is
+large, or you need filtering and vector search to genuinely co-optimize.</p>
+<hr>
+<h2>Common interview questions</h2>
+<p><strong>Why is vector search approximate instead of exact?</strong> Exact k-nearest-neighbour
+search requires computing the distance from the query to every stored vector, an
+O(n) scan per query. That does not scale past tens of thousands of vectors at
+interactive latency. ANN indexes like HNSW trade a small, tunable amount of recall
+for a massive speedup by searching a graph or a partitioned subset instead of
+everything. Recall is not a fixed number, it is controlled by <code>ef_search</code> (query
+time) and <code>ef_construct</code>/<code>m</code> (build time), and the right value is a latency budget
+decision, not a correctness bug to eliminate.</p>
+<p><strong>How is this different from full-text search (Elasticsearch, BM25)?</strong> BM25 and
+inverted indexes match on tokens: they find documents containing specific words, and
+rank by term frequency and rarity. Vector search matches on meaning: it finds
+documents whose embedding is close to the query's embedding, even with zero shared
+vocabulary (&quot;a calm lap companion&quot; and &quot;quiet Persian cat&quot; share no words). They fail
+in opposite ways: keyword search misses semantically relevant results with different
+wording, vector search can surface results that are topically related but miss an
+exact term the user actually needs (a specific product SKU, an error code). Production
+search systems increasingly run <strong>hybrid search</strong>: BM25 and vector search in parallel,
+merged with a reranking step (often reciprocal rank fusion), to get both exact-term
+precision and semantic recall.</p>
+<p><strong>How do you combine a structured filter with a vector search?</strong> Naively you have two
+bad options: pre-filter (filter first, search only survivors) which can break the ANN
+graph's connectivity and tank recall when the filter is selective, or post-filter
+(search first, then discard non-matching results) which can return fewer than k
+results if the filter is selective, since discarded results are gone and not replaced.
+Purpose-built engines like Qdrant push the filter into the graph traversal itself so it
+only follows edges to points that satisfy the filter, avoiding both failure modes. This
+is a genuine engineering difference from bolting a <code>WHERE</code> clause onto a separate
+vector index.</p>
+<p><strong>How many dimensions should an embedding have, and does it matter?</strong> It is
+determined by the embedding model, not chosen independently: <code>all-MiniLM-L6-v2</code>
+produces 384, many OpenAI/Anthropic-class embedding APIs produce 1536 or higher.
+More dimensions can capture finer semantic distinctions but cost more memory per
+vector and more time per distance computation, so a larger model is not automatically
+better for a given application, it is a tradeoff between semantic fidelity and index
+size/latency you should benchmark for your data, not assume.</p>
+<p><strong>When do you reach for pgvector instead of a dedicated vector database?</strong> When the
+vectors are naturally attached to data that already lives in Postgres, the scale is
+moderate, and you value transactional consistency (write the row and its embedding
+together, roll both back together) and operational simplicity (one fewer system) over
+the filtering-aware traversal, sharding, and payload-indexing that a purpose-built
+engine offers. Re-evaluate once vector search becomes the dominant access pattern or
+the dataset grows past what a single Postgres instance comfortably indexes.</p>
+<p><strong>How do you keep the vector store in sync with the source of truth?</strong> The vector
+store is a derived index, not the record of truth. The common pattern is
+event-driven: a write to the primary store (Postgres, a document DB) emits an event
+(via an outbox pattern or CDC) that triggers re-embedding and an upsert into the
+vector store. Because embedding is comparatively expensive (a model inference call
+per document), most systems batch and debounce this rather than embedding
+synchronously on every write, which means the vector index is eventually consistent
+with the source of truth, and that lag is a design parameter you should be able to
+state a number for.</p>
+<p><strong>What breaks when you change the embedding model?</strong> Every existing vector becomes
+incomparable to new queries, because the vector space a model produces is specific to
+that model's training run. This is not a config change, it is a full re-embed and
+re-index of the entire dataset, and during the cutover you either accept a period of
+mixed-model inconsistency or run both the old and new collections in parallel and
+cut over atomically. Budget for this migration cost when picking a model, since
+&quot;swap to a better embedding model later&quot; is a much bigger project than it sounds.</p>
+<hr>
+<h2>Framing it in the room</h2>
+<p>Lead with the reframe: conventional databases match on exact predicates, vector
+databases rank by distance in a learned embedding space, and that difference in kind
+(not just implementation) is why the index, the query semantics, and the correctness
+guarantees are all different. Name ANN and HNSW specifically rather than saying
+&quot;it's fast,&quot; and be ready to name the recall/latency knob (<code>ef_search</code>) that trades
+between them. Always mention that the vector store is a derived index with a source
+of truth behind it, that single sentence signals you have actually operated one of
+these systems rather than read about them.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

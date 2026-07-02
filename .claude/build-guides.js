@@ -227,6 +227,14 @@ const GUIDES = [
     subtitle: 'A ground-up primer on the three layers that turn a stateless LLM into an agent: retrieval-augmented generation for knowledge, the Model Context Protocol for tools and data, and Agent2Agent for multi-agent collaboration.',
     accent:   '#8e2d6b',  // magenta
   },
+  {
+    src:      '.claude/data-md/vector-db-prep.md',
+    out:      'db/vector-db-prep.html',
+    kicker:   'Interview Preparation · Vector Databases',
+    title:    'Vector Databases: A Primer with Qdrant',
+    subtitle: 'What a vector database is and how it differs from a B-tree store: embeddings and ANN search, HNSW, a runnable Pet Shop semantic-search app on Qdrant via Docker, and the pgvector "you already have Postgres" contrast.',
+    accent:   '#0b6e4f',  // emerald
+  },
 ]
 
 // ----------------------------------------------------------------
@@ -257,6 +265,7 @@ const GUIDES = [
 //  magenta     #8e2d6b   ai-agent-infra-prep          -- AA on white
 //  pine        #1f6b57   ddd-prep                     -- AA on white (5.8:1)
 //  bronze      #7d4b13   testing-tdd-prep             -- AA on white (6.5:1)
+//  emerald     #0b6e4f   vector-db-prep               -- AA on white (6.3:1)
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------
