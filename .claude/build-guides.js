@@ -219,6 +219,14 @@ const GUIDES = [
     subtitle: 'The inverted-index model: mappings, analyzers and tokenization, the Query DSL, aggregations, shard routing, and BM25 relevance.',
     accent:   '#8a2c5a',  // wine
   },
+  {
+    src:      '.claude/data-md/ai-agent-infra-prep.md',
+    out:      'db/ai-agent-infra-prep.html',
+    kicker:   'Interview Preparation · AI Agent Infrastructure',
+    title:    'AI Agent Infrastructure: RAG, MCP & A2A',
+    subtitle: 'A ground-up primer on the three layers that turn a stateless LLM into an agent: retrieval-augmented generation for knowledge, the Model Context Protocol for tools and data, and Agent2Agent for multi-agent collaboration.',
+    accent:   '#8e2d6b',  // magenta
+  },
 ]
 
 // ----------------------------------------------------------------
@@ -246,6 +254,7 @@ const GUIDES = [
 //  cobalt      #1e5fa8   system-design-backend-prep   -- AA on white (5.6:1)
 //  copper      #9a4a1f   java-concurrency-prep        -- AA on white (6.3:1)
 //  wine        #8a2c5a   elasticsearch-prep           -- AA on white
+//  magenta     #8e2d6b   ai-agent-infra-prep          -- AA on white
 //  pine        #1f6b57   ddd-prep                     -- AA on white (5.8:1)
 //  bronze      #7d4b13   testing-tdd-prep             -- AA on white (6.5:1)
 // ----------------------------------------------------------------

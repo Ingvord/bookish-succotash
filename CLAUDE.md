@@ -52,6 +52,7 @@ All colours pass WCAG AA contrast on white. The authoritative list is the palett
 | Moss | `#5c6b1f` | platform-engineer-prep |
 | Cobalt | `#1e5fa8` | system-design-backend-prep |
 | Wine | `#8a2c5a` | elasticsearch-prep |
+| Magenta | `#8e2d6b` | ai-agent-infra-prep |
 
 ### Sanity-check after build
 
