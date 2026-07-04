@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Python Data Libraries: NumPy, Pandas & PySpark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #a8431c;
+  --accent-soft:  #a8431c14;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Python Data</div>
+    <h1>Python Data Libraries: NumPy, Pandas & PySpark</h1>
+    <div class="sub">The vectorized-array foundation under Pandas, a worked live data-manipulation task, and an honest bridge from Hadoop/MapReduce to Spark: the DAG, the shuffle, and when a cluster is actually worth it.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>How to use this guide</h2>
+<p>This guide exists for two moments in the same interview loop. The first is a live
+data-manipulation task: you get a CSV or two, a laptop, and a request to load, clean,
+aggregate, and join, then explain your choices out loud. The second is a knowledge
+question that drifts toward &quot;big data&quot;: have you used Spark, how would you scale this
+past one machine.</p>
+<p>The honest starting position matters more here than in most guides. If your production
+depth is Hadoop and MapReduce, not Spark, the wrong move is to bluff cluster experience
+you don't have. The right move is to show you own the underlying distributed-computing
+model (partitioning, shuffling, fault tolerance) cold, and to name precisely what changed
+when Spark replaced MapReduce, rather than reciting Spark API calls you've only seen in
+docs. That position is more credible to an interviewer than shaky Spark trivia, and it's
+the position this guide builds.</p>
+<p>Versions verified as of July 2026: <strong>pandas 3.0.4</strong>, <strong>NumPy 2.x</strong>, <strong>PySpark 4.1.2</strong>
+(Apache Spark 4.x). This is not a Spark operations guide, there is no cluster to stand up
+here. The Spark sections are a conceptual bridge from MapReduce, enough to reason about
+the API and answer questions honestly, not enough to claim production Spark experience
+you don't have.</p>
+<hr>
+<h2>The mental model: vectorized arrays, not Python loops</h2>
+<p>Everything in this guide sits on one reframe. A Python <code>for</code> loop over a list processes
+one boxed <code>PyObject</code> at a time: each number in a plain Python list is a full Python
+object with type info and refcounting overhead, and the interpreter dispatches a fresh
+bytecode instruction per element. A NumPy array (<code>ndarray</code>) is a single contiguous block
+of raw, typed memory (all <code>int64</code>, all <code>float64</code>, whatever one <code>dtype</code> you picked), and
+operations on it run as a tight compiled C loop over that memory, with no per-element
+Python object overhead.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+
+<span class="hljs-comment"># Python loop: dispatches one Python-level add per element</span>
+data = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">range</span>(<span class="hljs-number">1_000_000</span>))
+result = [x * <span class="hljs-number">2</span> <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> data]
+
+<span class="hljs-comment"># NumPy: one vectorized C loop over contiguous memory</span>
+arr = np.arange(<span class="hljs-number">1_000_000</span>)
+result = arr * <span class="hljs-number">2</span>
+</code></pre>
+<p>On a typical machine, the vectorized version runs 20 to 100 times faster than the loop,
+not because NumPy is &quot;optimized code&quot; in some vague sense, but because it eliminates the
+per-element interpreter dispatch and type-checking that the loop pays for every single
+iteration. This is the one idea that explains almost everything else in this guide: why
+Pandas is fast when you use it right and slow when you don't, why <code>.apply()</code> is a trap,
+and why &quot;vectorize it&quot; is the answer to most performance questions in this space.</p>
+<pre><code class="hljs" data-lang="text">Python list of ints:              NumPy ndarray (dtype=int64):
+
+[ PyObject ]-&gt;[ PyObject ]-&gt;...    [ 8 bytes | 8 bytes | 8 bytes | ... ]
+  (type, refcount,                 (one contiguous typed buffer,
+   value, scattered                 no per-element overhead,
+   in memory)                       a single C loop walks it)
+</code></pre>
+<hr>
+<h2>NumPy: the array is the foundation</h2>
+<p>An <code>ndarray</code> is defined by its <code>dtype</code> (the type of every element, uniform across the
+array) and its <code>shape</code>. Operations that look elementwise (<code>arr * 2</code>, <code>arr + other_arr</code>)
+are <strong>ufuncs</strong> (universal functions): compiled loops that apply an operation across the
+whole buffer without Python-level iteration.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+
+prices = np.array([<span class="hljs-number">19.99</span>, <span class="hljs-number">5.50</span>, <span class="hljs-number">42.00</span>, <span class="hljs-number">8.25</span>])
+qty    = np.array([<span class="hljs-number">2</span>, <span class="hljs-number">10</span>, <span class="hljs-number">1</span>, <span class="hljs-number">4</span>])
+
+revenue = prices * qty              <span class="hljs-comment"># elementwise, vectorized</span>
+total   = revenue.<span class="hljs-built_in">sum</span>()             <span class="hljs-comment"># 199.98 + 55.0 + 42.0 + 33.0 = 329.98</span>
+discounted = prices[prices &gt; <span class="hljs-number">10</span>]    <span class="hljs-comment"># boolean mask: array([19.99, 42.0])</span>
+</code></pre>
+<p><strong>Broadcasting</strong> lets NumPy apply an operation between arrays of different shapes
+without you writing an explicit loop or manually replicating data, by stretching the
+smaller array's dimensions to match, as long as the shapes are compatible from the
+trailing dimension inward.</p>
+<pre><code class="hljs" data-lang="python">matrix = np.array([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>]])   <span class="hljs-comment"># shape (2, 3)</span>
+row_means = np.array([<span class="hljs-number">2</span>, <span class="hljs-number">5</span>])                <span class="hljs-comment"># shape (2,) -&gt; needs (2, 1) to broadcast</span>
+centered = matrix - row_means[:, np.newaxis]
+<span class="hljs-comment"># subtracts 2 from row 0, 5 from row 1, without an explicit loop</span>
+</code></pre>
+<p>Two catches sit under this, and both cause real bugs in production code.</p>
+<p><strong>Views versus copies.</strong> Basic slicing (<code>arr[1:3]</code>) returns a <strong>view</strong>: a new <code>ndarray</code>
+object that shares the same underlying memory buffer as the original. Mutating a view
+mutates the original array, silently, because there is only one buffer underneath both
+names.</p>
+<pre><code class="hljs" data-lang="python">arr = np.array([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>])
+view = arr[<span class="hljs-number">1</span>:<span class="hljs-number">3</span>]        <span class="hljs-comment"># view, shares memory with arr</span>
+view[<span class="hljs-number">0</span>] = <span class="hljs-number">99</span>
+<span class="hljs-built_in">print</span>(arr)              <span class="hljs-comment"># [1, 99, 3, 4, 5]  &lt;- original changed too</span>
+</code></pre>
+<p>Fancy indexing (a list or array of indices, or a boolean mask) instead returns a
+<strong>copy</strong>, so the same mutation on a fancy-indexed result leaves the original untouched.
+The rule to hold onto: slicing shares memory, fancy indexing doesn't. When you need to be
+sure, call <code>.copy()</code> explicitly rather than relying on which indexing style you used.</p>
+<p><strong>Falling back to <code>object</code> dtype.</strong> If you build an array from mixed types, or values
+that don't fit a numeric dtype, NumPy silently falls back to <code>dtype=object</code>, an array of
+boxed Python objects. You get <code>ndarray</code> syntax back, but every operation on it is a
+Python-level loop again, the exact overhead vectorization was supposed to remove. This
+is easy to trigger by accident (a column with a stray string mixed into otherwise numeric
+data) and easy to miss, because the code still runs, just 50 to 100 times slower with no
+error raised.</p>
+<p>NumPy 2.0 also changed its default type-promotion rules (NEP 50): mixing a Python <code>int</code>
+or <code>float</code> scalar with an array used to sometimes upcast to a wider dtype, and now
+generally respects the array's existing dtype instead. If you learned NumPy on 1.x, this
+is worth a quick skim before a live round, it changes what dtype falls out of <code>arr + 1</code>
+in some edge cases.</p>
+<hr>
+<h2>Pandas: labeled data on top of NumPy</h2>
+<p>A Pandas <code>Series</code> is a NumPy array plus a labeled <code>Index</code>. A <code>DataFrame</code> is a collection
+of <code>Series</code> sharing one index, one column per <code>Series</code>. The vectorization story is
+identical to NumPy's: column operations are vectorized, and reaching for a Python-level
+loop over rows throws away exactly the speed you're using Pandas for.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+
+df = pd.DataFrame({
+    <span class="hljs-string">&quot;customer_id&quot;</span>: [<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">3</span>, <span class="hljs-number">3</span>],
+    <span class="hljs-string">&quot;amount&quot;</span>:      [<span class="hljs-number">25.00</span>, <span class="hljs-number">40.00</span>, <span class="hljs-number">15.50</span>, <span class="hljs-number">9.99</span>, <span class="hljs-number">12.00</span>, <span class="hljs-number">8.00</span>],
+})
+
+<span class="hljs-comment"># vectorized column op</span>
+df[<span class="hljs-string">&quot;amount_with_tax&quot;</span>] = df[<span class="hljs-string">&quot;amount&quot;</span>] * <span class="hljs-number">1.08</span>
+
+<span class="hljs-comment"># split-apply-combine: group, then aggregate each group</span>
+totals = df.groupby(<span class="hljs-string">&quot;customer_id&quot;</span>)[<span class="hljs-string">&quot;amount&quot;</span>].agg([<span class="hljs-string">&quot;sum&quot;</span>, <span class="hljs-string">&quot;count&quot;</span>])
+</code></pre>
+<p><code>groupby</code> implements <strong>split-apply-combine</strong>: Pandas splits the frame into groups by key
+(internally, a hash of the group key maps each row to a bucket), applies the aggregation
+per group, and combines the per-group results back into one result. This is the same
+shape of problem MapReduce solves at cluster scale (group by key, then reduce), just
+running in one process against one machine's memory, worth noticing now because it
+reappears when this guide gets to Spark.</p>
+<p><code>merge</code> joins two frames on a key, mirroring a SQL join:</p>
+<pre><code class="hljs" data-lang="python">customers = pd.DataFrame({<span class="hljs-string">&quot;customer_id&quot;</span>: [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], <span class="hljs-string">&quot;name&quot;</span>: [<span class="hljs-string">&quot;Aya&quot;</span>, <span class="hljs-string">&quot;Ben&quot;</span>, <span class="hljs-string">&quot;Cy&quot;</span>]})
+joined = totals.reset_index().merge(customers, on=<span class="hljs-string">&quot;customer_id&quot;</span>, how=<span class="hljs-string">&quot;left&quot;</span>)
+</code></pre>
+<p><strong>The catch that bites here:</strong> if the join key isn't unique on one side, <code>merge</code>
+produces a Cartesian product of the matching rows, not a simple one-to-one row count.
+Joining a 10-row orders table against a &quot;customers&quot; table that has three duplicate rows
+for one customer ID silently triples every order row for that customer in the output.
+Always check <code>len(result)</code> against what you expect, or verify key uniqueness with
+<code>.duplicated()</code> before trusting a join's row count.</p>
+<p>Pandas 3.0 shipped two changes worth knowing cold, because both change behavior you may
+have learned as &quot;the Pandas way&quot; on an older version.</p>
+<p><strong>Copy-on-Write is now the default.</strong> Before this, whether slicing or chained indexing
+returned a view or a copy was an implementation detail you couldn't reliably predict:
+sometimes mutating a slice silently changed the original frame, sometimes it raised the
+infamous <code>SettingWithCopyWarning</code>, and which one happened depended on internal memory
+layout you weren't meant to know about. Under Copy-on-Write (CoW), every result that
+looks like a view now behaves as if it were a copy: mutating it never silently mutates
+the source. The practical fallout is that chained assignment, <code>df[mask][&quot;col&quot;] = value</code>,
+which used to sometimes work, now reliably does not touch <code>df</code> at all, because the
+<code>[mask]</code> step returns an intermediate object and the assignment lands on that, not on
+<code>df</code>. The idiom that was always correct and is now the only correct one is a single
+<code>.loc</code> call directly against the frame you want to change:</p>
+<pre><code class="hljs" data-lang="python">df.loc[df[<span class="hljs-string">&quot;amount&quot;</span>] &gt; <span class="hljs-number">20</span>, <span class="hljs-string">&quot;amount_with_tax&quot;</span>] = df[<span class="hljs-string">&quot;amount&quot;</span>] * <span class="hljs-number">1.10</span>
+</code></pre>
+<p><strong>A dedicated, PyArrow-backed string dtype is the default.</strong> Strings used to live in
+<code>object</code> dtype columns, boxed Python <code>str</code> objects with the same per-element overhead
+NumPy has for any <code>object</code> array. Pandas 3.0 defaults string columns to a dedicated
+<code>string</code> dtype backed by PyArrow (if PyArrow is installed; it falls back to the old
+<code>object</code>-backed behavior if not), which is both faster for string operations and more
+memory-compact. The catch: missing values in the new string dtype are <code>pd.NA</code>, not
+<code>np.nan</code>, and code that checks <code>== np.nan</code> or relies on <code>NaN</code>-specific float semantics
+for missing strings needs <code>.isna()</code> instead, which has always been the more correct check
+anyway.</p>
+<p>One more number worth having ready: a Pandas DataFrame typically occupies <strong>2 to 5 times</strong>
+the size of the source file in memory, driven by per-column dtype overhead (an <code>int64</code>
+column read from an 8-bit-range CSV column is still 8 bytes per value unless you specify
+a narrower dtype), index overhead, and, historically, <code>object</code>-backed strings (less true
+now with the Arrow-backed default). If a file is comfortably 2 GB, don't assume the
+resulting DataFrame is too, plan for meaningfully more.</p>
+<hr>
+<h2>A live data-manipulation task, worked</h2>
+<p>A realistic version of the live round: you're given <code>orders.csv</code> and <code>customers.csv</code>,
+and asked to produce, per customer, total spend and order count for orders placed in the
+last 90 days, sorted by spend descending, written back out.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+
+<span class="hljs-comment"># 1. Read with explicit dtypes and date parsing up front, not as an afterthought.</span>
+<span class="hljs-comment">#    Specifying dtype narrows memory and catches type surprises immediately</span>
+<span class="hljs-comment">#    instead of three steps later.</span>
+orders = pd.read_csv(
+    <span class="hljs-string">&quot;orders.csv&quot;</span>,
+    dtype={<span class="hljs-string">&quot;order_id&quot;</span>: <span class="hljs-string">&quot;int64&quot;</span>, <span class="hljs-string">&quot;customer_id&quot;</span>: <span class="hljs-string">&quot;int64&quot;</span>, <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-string">&quot;float64&quot;</span>},
+    parse_dates=[<span class="hljs-string">&quot;order_date&quot;</span>],
+)
+customers = pd.read_csv(<span class="hljs-string">&quot;customers.csv&quot;</span>, dtype={<span class="hljs-string">&quot;customer_id&quot;</span>: <span class="hljs-string">&quot;int64&quot;</span>})
+
+<span class="hljs-comment"># 2. Clean: drop exact duplicate order rows, drop rows missing the join key or amount.</span>
+orders = orders.drop_duplicates(subset=<span class="hljs-string">&quot;order_id&quot;</span>)
+orders = orders.dropna(subset=[<span class="hljs-string">&quot;customer_id&quot;</span>, <span class="hljs-string">&quot;amount&quot;</span>])
+
+<span class="hljs-comment"># 3. Filter: last 90 days, using a vectorized boolean mask, not a row-by-row loop.</span>
+cutoff = pd.Timestamp.now() - pd.Timedelta(days=<span class="hljs-number">90</span>)
+recent = orders.loc[orders[<span class="hljs-string">&quot;order_date&quot;</span>] &gt;= cutoff]
+
+<span class="hljs-comment"># 4. Aggregate: split-apply-combine via groupby, not a manual accumulator loop.</span>
+summary = (
+    recent.groupby(<span class="hljs-string">&quot;customer_id&quot;</span>)[<span class="hljs-string">&quot;amount&quot;</span>]
+    .agg(total_spend=<span class="hljs-string">&quot;sum&quot;</span>, order_count=<span class="hljs-string">&quot;count&quot;</span>)
+    .reset_index()
+)
+
+<span class="hljs-comment"># 5. Join: bring in customer names, then sort.</span>
+result = (
+    summary.merge(customers, on=<span class="hljs-string">&quot;customer_id&quot;</span>, how=<span class="hljs-string">&quot;left&quot;</span>)
+    .sort_values(<span class="hljs-string">&quot;total_spend&quot;</span>, ascending=<span class="hljs-literal">False</span>)
+)
+
+<span class="hljs-comment"># 6. Write out.</span>
+result.to_csv(<span class="hljs-string">&quot;customer_spend_summary.csv&quot;</span>, index=<span class="hljs-literal">False</span>)
+</code></pre>
+<p>Two idioms to actively avoid, both because they silently reintroduce the Python-loop
+overhead the vectorization mental model warned about:</p>
+<p><code>DataFrame.iterrows()</code> constructs a fresh <code>Series</code> object per row, which is slow enough
+to be a real production incident on anything past a few thousand rows, easily 50 to 100
+times slower than the equivalent vectorized operation on a few hundred thousand rows.
+If you're reaching for <code>iterrows()</code>, there is almost always a vectorized column
+expression, a <code>groupby</code>, or a <code>merge</code> that replaces the loop entirely.</p>
+<p><code>DataFrame.apply()</code> with a Python function applied row-wise has the same problem in a
+more disguised form, it looks vectorized because it's one line, but under the hood it
+calls your Python function once per row. Prefer a direct vectorized expression
+(<code>df[&quot;col&quot;] &gt; threshold</code>), a built-in string/datetime accessor (<code>df[&quot;col&quot;].str.upper()</code>,
+<code>df[&quot;date&quot;].dt.month</code>), or <code>np.where</code> for conditional logic, over <code>.apply()</code> with a
+custom function, whenever one of those covers the case.</p>
+<hr>
+<h2>From Hadoop to Spark: a short primer</h2>
+<p>Hadoop is two things bolted together: <strong>HDFS</strong> (Hadoop Distributed File System), which
+splits a file into blocks and replicates each block across several machines so a single
+disk or node failure doesn't lose data, and <strong>MapReduce</strong>, a programming model for
+processing that data as a <strong>map</strong> stage (transform each record independently, emit
+key-value pairs) followed by a <strong>shuffle</strong> (group all values by key, moving data across
+the network so every value for a given key lands on the same machine) and a <strong>reduce</strong>
+stage (aggregate the grouped values per key). <strong>YARN</strong> sits underneath as the resource
+scheduler that decides which machine runs which task. Hadoop existed to make &quot;process
+more data than fits on one machine&quot; affordable on racks of ordinary commodity servers,
+tolerating the fact that, at that scale, some node is always failing.</p>
+<p>A minimal illustration, word count, the &quot;hello world&quot; of MapReduce:</p>
+<pre><code class="hljs" data-lang="text">Input:  &quot;the cat sat&quot; | &quot;the dog sat&quot;
+
+Map:    (the,1)(cat,1)(sat,1) | (the,1)(dog,1)(sat,1)
+
+Shuffle &amp; sort (group by key across the cluster):
+        the: [1,1]   cat: [1]   sat: [1,1]   dog: [1]
+
+Reduce: the:2   cat:1   sat:2   dog:1
+</code></pre>
+<p>The limit that motivated Spark: a MapReduce job reads its input from HDFS (disk), writes
+the shuffled intermediate data to disk between the map and reduce stages, and writes its
+final output back to disk. A pipeline that needs several passes over the data (an
+iterative algorithm, or several chained transformations) is several separate MapReduce
+jobs, each paying a full disk-in, disk-out round trip, plus per-job scheduling and JVM
+startup overhead that adds tens of seconds even to a job processing very little data.</p>
+<p>Spark's core change is keeping data <strong>in memory</strong> across stages and building a <strong>DAG</strong>
+(directed acyclic graph) of transformations that Spark plans and optimizes before running
+anything, rather than forcing every pipeline into a rigid map-then-reduce shape. The
+result, cited from Spark's original benchmarks for iterative workloads like logistic
+regression, was a 10 to 100 times speedup over the equivalent MapReduce job chain. Treat
+that number as the headline case, not a universal one: for a simple single-pass ETL job
+that MapReduce would already do in one map-shuffle-reduce pass, the gap is far smaller,
+Spark's advantage compounds specifically when a computation would otherwise mean several
+sequential MapReduce jobs each round-tripping through disk.</p>
+<table>
+<thead>
+<tr>
+<th>MapReduce concept</th>
+<th>Spark equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mapper</td>
+<td>Narrow transformation (<code>map</code>, <code>filter</code>, <code>select</code>): each partition processed independently, no data movement</td>
+</tr>
+<tr>
+<td>Reducer</td>
+<td>Wide transformation (<code>groupBy</code>, <code>reduceByKey</code>, <code>join</code>): requires a shuffle</td>
+</tr>
+<tr>
+<td>Shuffle &amp; sort</td>
+<td>Shuffle (same cost profile: network transfer plus disk spill when data exceeds memory)</td>
+</tr>
+<tr>
+<td>A chain of MapReduce jobs</td>
+<td>Stages within one DAG, planned together and executed largely in memory</td>
+</tr>
+<tr>
+<td>HDFS between every job</td>
+<td>In-memory RDDs/DataFrames, spilling to disk only under memory pressure</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>PySpark, honestly</h2>
+<p>PySpark's DataFrame API is intentionally close to Pandas syntax (<code>.select()</code>,
+<code>.filter()</code>, <code>.groupBy().agg()</code>, <code>.join()</code>), but the execution model underneath is not
+Pandas's, and this is the part worth being precise about rather than guessing at.</p>
+<p>PySpark builds a <strong>logical plan</strong> of every transformation and does nothing until an
+<strong>action</strong> (<code>.show()</code>, <code>.collect()</code>, <code>.write.parquet()</code>) triggers execution. Pandas runs
+each line the moment you write it; PySpark stays lazy until you force a result.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># Illustrative shape of a PySpark job (conceptual, no cluster assumed here):</span>
+df = spark.read.csv(<span class="hljs-string">&quot;orders.csv&quot;</span>, header=<span class="hljs-literal">True</span>, inferSchema=<span class="hljs-literal">True</span>)
+recent = df.<span class="hljs-built_in">filter</span>(df.order_date &gt;= cutoff)          <span class="hljs-comment"># narrow transformation, no shuffle</span>
+summary = recent.groupBy(<span class="hljs-string">&quot;customer_id&quot;</span>).agg({<span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-string">&quot;sum&quot;</span>})  <span class="hljs-comment"># wide, triggers a shuffle</span>
+summary.write.csv(<span class="hljs-string">&quot;output/&quot;</span>)                          <span class="hljs-comment"># the action: everything above</span>
+                                                       <span class="hljs-comment"># actually runs now</span>
+</code></pre>
+<p>The narrow-versus-wide distinction from the MapReduce table above is the load-bearing
+idea here. <code>.filter()</code> and <code>.select()</code> are narrow: each partition is transformed
+independently, no data crosses the network. <code>.groupBy()</code> and <code>.join()</code> are wide: rows
+with the same key have to be co-located on the same executor before they can be
+aggregated together, which means a <strong>shuffle</strong>, exactly the same operation, and the same
+cost, as the shuffle-and-sort stage between Map and Reduce. If you already understand why
+a MapReduce shuffle is expensive (network transfer of every row keyed for regrouping,
+plus disk spill when it doesn't fit in memory), you already understand why a Spark
+shuffle is the thing to watch for in a query plan.</p>
+<p>Two catches worth naming directly, because they are the kind of production detail that
+distinguishes &quot;has read the docs&quot; from &quot;has been paged for this&quot;:</p>
+<p><strong>Lazy evaluation delays errors.</strong> A typo in a column name referenced only inside a
+<code>.select()</code> doesn't raise until the action executes, which can be minutes into a job that
+has already shuffled terabytes across the cluster. The defensive habit is to validate on
+a small sample (<code>df.limit(100).show()</code>) and check <code>.explain()</code> for the physical plan
+before letting a transformation chain loose on the full dataset.</p>
+<p><strong>Shuffle partition count is a tuning knob, not a constant.</strong> <code>spark.sql.shuffle.partitions</code>
+defaults to 200 regardless of data size; too many partitions on a small shuffle wastes
+time on task-scheduling overhead, too few on a large shuffle means each task handles more
+data than it can hold in memory and spills to disk. Adaptive Query Execution (AQE,
+enabled by default since Spark 3.2) coalesces shuffle partitions at runtime based on
+actual data size, which is the answer to &quot;how do you handle this&quot; if it comes up: you
+generally let AQE handle it rather than hand-tuning the number up front.</p>
+<hr>
+<h2>Pandas or PySpark: which, when</h2>
+<p>The honest rule of thumb: if the working set fits comfortably in one machine's memory,
+Pandas wins on simplicity and iteration speed, with no cluster to configure, no shuffle
+tuning, no JVM startup cost. &quot;Fits in memory&quot; in practice means anywhere from a few
+hundred MB up to tens of GB on a well-resourced single node, remembering the 2-to-5x
+in-memory expansion factor from the Pandas section above. Reach for Spark specifically
+when the data genuinely does not fit on one machine, or when you need distributed,
+fault-tolerant compute across many nodes, not by default because the word &quot;big data&quot;
+came up in the conversation.</p>
+<p>It's worth naming, briefly and honestly, that Pandas and Spark aren't the only two
+points on this axis anymore: Polars and DuckDB are single-node engines built on Arrow
+with multithreaded, often out-of-core execution, and commonly outperform Pandas on the
+same hardware for exactly the workloads that don't need a cluster. If the interviewer
+asks &quot;why not just use bigger Pandas,&quot; naming that middle ground shows you've thought
+about the tradeoff rather than treating it as a binary between one laptop and a cluster.</p>
+<p>The cost that's easy to underweight in an interview answer: standing up and tuning a
+Spark cluster (executor memory and core counts, shuffle partition counts, driver memory
+for collecting results) is real operational overhead with its own failure modes. Running
+a 200 MB CSV through Spark adds cluster startup latency and JVM overhead without a
+corresponding payoff, that CSV was never the problem Spark was built to solve.</p>
+<hr>
+<h2>Common interview questions</h2>
+<p><strong>What's the difference between a view and a copy in NumPy, and why does it matter?</strong>
+Basic slicing returns a view (shares the same memory buffer; mutating it mutates the
+original), fancy indexing (a list or boolean array of indices) returns a copy. It matters
+because code that mutates a slice expecting it to be independent of the source silently
+corrupts the original data, a bug that shows up far from where it was introduced. Call
+<code>.copy()</code> explicitly when independence matters.</p>
+<p><strong>What is broadcasting, and when does it fail?</strong> Broadcasting lets NumPy operate on
+arrays of different shapes by virtually stretching the smaller one to match the larger,
+comparing shapes from the trailing dimension inward. It fails (raises a <code>ValueError</code>)
+when the shapes aren't compatible in any dimension, for example adding a shape-<code>(3,)</code>
+array to a shape-<code>(4,)</code> array with no dimension of size 1 to stretch.</p>
+<p><strong>Why is <code>.apply()</code> often slower than a vectorized expression?</strong> <code>.apply()</code> with a
+custom Python function calls that function once per row (or per group), reintroducing
+the per-element Python interpreter overhead that vectorization exists to remove. A direct
+vectorized expression, a built-in accessor (<code>.str</code>, <code>.dt</code>), or <code>np.where</code> runs as a
+compiled loop instead.</p>
+<p><strong>What happens internally during <code>groupby().agg()</code>?</strong> Pandas computes a hash of the
+grouping key to bucket every row into its group (the &quot;split&quot;), applies the aggregation
+function to each group's data (the &quot;apply&quot;), and assembles the per-group results back
+into one indexed result (the &quot;combine&quot;). It's the same conceptual shape as a MapReduce
+job's shuffle-then-reduce, running against one process's memory instead of a cluster.</p>
+<p><strong>Why would you reach for Spark instead of Hadoop MapReduce?</strong> Because MapReduce writes
+intermediate results to disk between every map and reduce stage and treats every pipeline
+as a fresh job with its own scheduling and JVM startup cost, while Spark keeps data in
+memory across stages and plans a whole pipeline as one DAG, which mainly pays off for
+pipelines that would otherwise be several chained MapReduce jobs, iterative algorithms
+especially.</p>
+<p><strong>What is a shuffle, and why is it the thing to watch in a Spark query plan?</strong> A shuffle
+is the data movement required to co-locate rows sharing a key onto the same executor
+before a wide transformation (<code>groupBy</code>, <code>join</code>) can run, network transfer for every row
+being regrouped plus disk spill if it exceeds available memory. It's the same operation,
+and the same cost, as the shuffle-and-sort stage in MapReduce, and it's almost always the
+dominant cost in a Spark job that's running slower than expected.</p>
+<p><strong>What's the practical difference between lazy and eager evaluation here?</strong> Pandas
+executes each line as you write it (eager); PySpark builds a logical plan and defers all
+execution until an action like <code>.collect()</code> or <code>.write()</code> (lazy). The tradeoff is that
+Spark can optimize the whole plan before running it, but errors in transformations
+(a bad column reference) don't surface until the action runs, possibly after a large
+shuffle has already happened.</p>
+<p><strong>When would you deliberately not use Spark?</strong> When the dataset fits comfortably in one
+machine's memory, when the job is a simple single-pass transform that doesn't benefit
+from Spark's DAG optimization over a chain of MapReduce jobs, or when the operational
+cost of configuring and running a cluster (executor sizing, shuffle tuning, startup
+latency) outweighs the compute problem you're actually solving. Pandas, or a single-node
+engine like Polars or DuckDB, is the right default until the data or the fault-tolerance
+requirement forces a cluster.</p>
+<hr>
+<h2>Framing it in the room</h2>
+<p>If Spark comes up and your production depth is Hadoop and MapReduce, the credible answer
+leads with what you actually know, not with a Spark API demo you'd be improvising. Name
+the MapReduce mental model directly: map, shuffle, reduce, why the shuffle is expensive,
+why each job round-trips through disk. Then name the specific deltas Spark introduces
+over that model: an in-memory DAG instead of a chain of disk-bound jobs, lazy evaluation
+that lets the whole pipeline get planned and optimized before it runs, and the same
+shuffle cost you already reason about, just triggered by <code>.groupBy()</code> or <code>.join()</code>
+instead of the reduce stage of a job. Close with where you'd start closing the gap: a
+local PySpark session against a small dataset to see the DAG and <code>.explain()</code> output
+firsthand, not a claim of cluster experience you don't have. That's a stronger answer
+than a fluent-sounding recitation of Spark APIs that collapses under one follow-up
+question about how a shuffle actually works, because you can back every part of it with
+a mechanism, which is exactly what a staff-level interviewer is listening for.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

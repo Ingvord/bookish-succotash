@@ -70,6 +70,15 @@ const GUIDES = [
     accent:   '#2e5280',  // slate
   },
   {
+    src:      '.claude/backend-md/python-language-prep.md',
+    out:      'backend/python-language-prep.html',
+    kicker:   'Interview Preparation · Staff Backend',
+    title:    'Python Deep Dive (3.14)',
+    h1:       'Python Deep Dive: Language & Idioms',
+    subtitle: 'The object and data model, closures and descriptors, the type system and error model, plus idiomatic worker pools, caches, retries, and rate limiters, assuming Python 3.14.',
+    accent:   '#1c4fa0',  // sapphire
+  },
+  {
     src:      '.claude/backend-md/scaling-foundations-prep.md',
     out:      'backend/scaling-foundations-prep.html',
     kicker:   'Interview Preparation · Staff Backend',
@@ -235,6 +244,14 @@ const GUIDES = [
     subtitle: 'What a vector database is and how it differs from a B-tree store: embeddings and ANN search, HNSW, a runnable Pet Shop semantic-search app on Qdrant via Docker, and the pgvector "you already have Postgres" contrast.',
     accent:   '#0b6e4f',  // emerald
   },
+  {
+    src:      '.claude/data-md/python-data-libs-prep.md',
+    out:      'data/python-data-libs-prep.html',
+    kicker:   'Interview Preparation · Python Data',
+    title:    'Python Data Libraries: NumPy, Pandas & PySpark',
+    subtitle: 'The vectorized-array foundation under Pandas, a worked live data-manipulation task, and an honest bridge from Hadoop/MapReduce to Spark: the DAG, the shuffle, and when a cluster is actually worth it.',
+    accent:   '#a8431c',  // rust
+  },
 ]
 
 // ----------------------------------------------------------------
@@ -266,6 +283,8 @@ const GUIDES = [
 //  pine        #1f6b57   ddd-prep                     -- AA on white (5.8:1)
 //  bronze      #7d4b13   testing-tdd-prep             -- AA on white (6.5:1)
 //  emerald     #0b6e4f   vector-db-prep               -- AA on white (6.3:1)
+//  rust        #a8431c   python-data-libs-prep        -- AA on white (6.0:1)
+//  sapphire    #1c4fa0   python-language-prep         -- AA on white (~8:1)
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------

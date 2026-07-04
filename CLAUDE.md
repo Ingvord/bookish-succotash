@@ -54,6 +54,7 @@ All colours pass WCAG AA contrast on white. The authoritative list is the palett
 | Wine | `#8a2c5a` | elasticsearch-prep |
 | Magenta | `#8e2d6b` | ai-agent-infra-prep |
 | Emerald | `#0b6e4f` | vector-db-prep |
+| Sapphire | `#1c4fa0` | python-language-prep |
 
 ### Sanity-check after build
 

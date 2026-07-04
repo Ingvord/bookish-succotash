@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Python Deep Dive (3.14)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #1c4fa0;
+  --accent-soft:  #1c4fa014;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Backend</div>
+    <h1>Python Deep Dive: Language & Idioms</h1>
+    <div class="sub">The object and data model, closures and descriptors, the type system and error model, plus idiomatic worker pools, caches, retries, and rate limiters, assuming Python 3.14.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>How to read what changed and what did not</h2>
+<p>Python moves slower than JavaScript's yearly edition cycle, but 3.14 (released October 2025) is a real inflection point: deferred annotation evaluation went from opt-in to default, template strings shipped, subinterpreters entered the standard library, and free-threaded builds went from experimental to officially supported. Frame your own instinct like this in the room: the syntax that used to signal seniority (understanding the GIL, knowing <code>%</code>-formatting) is table stakes now, and the topics that separate senior from staff are the data model, the concurrency model, and knowing precisely which recent changes are real versus still a proposal.</p>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Status</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>%</code>-formatting, <code>str.format()</code></td>
+<td>Faded</td>
+<td>f-strings (3.6) and now t-strings (3.14) cover almost every case</td>
+</tr>
+<tr>
+<td><code>from __future__ import annotations</code></td>
+<td>Faded as of 3.14</td>
+<td>deferred evaluation is the default now (PEP 649/749), the import is a no-op</td>
+</tr>
+<tr>
+<td><code>typing.List</code>, <code>typing.Dict</code>, <code>Optional[X]</code></td>
+<td>Faded</td>
+<td>builtin generics (<code>list[int]</code>) and <code>X | None</code> (3.9/3.10) replaced them</td>
+</tr>
+<tr>
+<td>&quot;Python cannot do real threads&quot;</td>
+<td>Partly faded</td>
+<td>free-threaded builds are officially supported (3.14, PEP 779), though most production code still runs the GIL build</td>
+</tr>
+<tr>
+<td>The GIL as a scaling constraint</td>
+<td>Evergreen, more nuanced</td>
+<td>still the default build; still decides process versus thread versus async</td>
+</tr>
+<tr>
+<td>Closures, scope (LEGB)</td>
+<td>Evergreen</td>
+<td>the late-binding loop trap still catches people</td>
+</tr>
+<tr>
+<td>Descriptors and the data model</td>
+<td>Evergreen, more central</td>
+<td>dataclasses, ORMs, and Pydantic are all built on it</td>
+</tr>
+<tr>
+<td>Context managers</td>
+<td>Evergreen</td>
+<td>resource safety is tested in nearly every round</td>
+</tr>
+</tbody>
+</table>
+<p>The sections below open with the object model, because everything else (mutability, closures, the data model) is a consequence of it, then move through the language features, then land on the flagship section: idiomatic implementations of the patterns actually asked in live coding.</p>
+<hr>
+<h2>1. The object model: names, references, and identity</h2>
+<p>Every value in Python is an object, and a variable is a name bound to an object, not a box that holds one. Assignment binds a name to whatever object is on the right; it never copies. Two names can point at the same object, and mutating through one name is visible through the other, which is the single most consequential fact in the language.</p>
+<pre><code class="hljs" data-lang="python">a = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]
+b = a                <span class="hljs-comment"># b is another name for the SAME list object</span>
+b.append(<span class="hljs-number">4</span>)
+a                     <span class="hljs-comment"># [1, 2, 3, 4], both names see the mutation</span>
+</code></pre>
+<p><code>is</code> checks identity (are these the same object), and <code>==</code> checks equality (does <code>__eq__</code> say these are equal). They agree for immutable primitives most of the time, which is exactly what makes the disagreement a good puzzle. CPython caches small integers from -5 to 256 and some string literals as an implementation detail, not a language guarantee, so <code>is</code> can appear to work on small integers and silently stop working once you leave that range.</p>
+<pre><code class="hljs" data-lang="python">x, y = <span class="hljs-number">256</span>, <span class="hljs-number">256</span>
+x <span class="hljs-keyword">is</span> y                <span class="hljs-comment"># True, CPython reuses the cached int object</span>
+x, y = <span class="hljs-number">257</span>, <span class="hljs-number">257</span>
+x <span class="hljs-keyword">is</span> y                <span class="hljs-comment"># False in most builds, two distinct objects</span>
+x == y                <span class="hljs-comment"># True regardless, value equality does not care about identity</span>
+</code></pre>
+<p>The catch to name explicitly: never use <code>is</code> for value comparison. Use it only for <code>None</code>, sentinels, and singleton checks, where identity is the actual question being asked.</p>
+<hr>
+<h2>2. Mutability, copying, and the default-argument trap</h2>
+<p>Immutable types (<code>int</code>, <code>float</code>, <code>str</code>, <code>tuple</code>, <code>frozenset</code>, <code>bytes</code>) cannot be changed in place, so &quot;modifying&quot; one always produces a new object. Mutable types (<code>list</code>, <code>dict</code>, <code>set</code>, most user-defined objects) can be changed in place, and that is exactly where sharing becomes dangerous.</p>
+<p>The single most-asked gotcha in this territory is the mutable default argument. Default values are evaluated once, at function definition time, not on every call, so a mutable default is one object shared across every call that does not pass its own.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">append_item</span>(<span class="hljs-params">item, bucket=[]</span>):    <span class="hljs-comment"># bucket is created ONCE, when the function is defined</span>
+    bucket.append(item)
+    <span class="hljs-keyword">return</span> bucket
+
+append_item(<span class="hljs-number">1</span>)        <span class="hljs-comment"># [1]</span>
+append_item(<span class="hljs-number">2</span>)        <span class="hljs-comment"># [1, 2], the same list object leaked across calls</span>
+</code></pre>
+<p>The fix is to default to <code>None</code> and create the mutable value fresh inside the body.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">append_item</span>(<span class="hljs-params">item, bucket=<span class="hljs-literal">None</span></span>):
+    bucket = [] <span class="hljs-keyword">if</span> bucket <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">else</span> bucket
+    bucket.append(item)
+    <span class="hljs-keyword">return</span> bucket
+</code></pre>
+<p>Dataclasses close this hole at the language level: <code>@dataclass</code> raises a <code>ValueError</code> if you write a mutable default directly, and forces you to use <code>field(default_factory=list)</code>, which runs the factory fresh per instance. Know that this is the same bug, just caught earlier.</p>
+<p>Copying has the same shallow-versus-deep split as any language. <code>list(x)</code>, <code>x[:]</code>, and <code>copy.copy(x)</code> copy the top level only, so nested mutable objects stay shared between the original and the copy. <code>copy.deepcopy(x)</code> recursively clones everything, including cycles (it keeps a memo dict so it does not recurse forever on self-referential structures), but it is slower and cannot clone objects that hold external resources like open sockets or locks unless the class defines a <code>__deepcopy__</code> hook.</p>
+<pre><code class="hljs" data-lang="python">original = {<span class="hljs-string">&quot;a&quot;</span>: <span class="hljs-number">1</span>, <span class="hljs-string">&quot;nested&quot;</span>: {<span class="hljs-string">&quot;b&quot;</span>: <span class="hljs-number">2</span>}}
+shallow = original.copy()
+shallow[<span class="hljs-string">&quot;nested&quot;</span>][<span class="hljs-string">&quot;b&quot;</span>] = <span class="hljs-number">99</span>      <span class="hljs-comment"># also changes original[&quot;nested&quot;][&quot;b&quot;], shared reference</span>
+
+<span class="hljs-keyword">import</span> copy
+deep = copy.deepcopy(original)
+deep[<span class="hljs-string">&quot;nested&quot;</span>][<span class="hljs-string">&quot;b&quot;</span>] = <span class="hljs-number">99</span>         <span class="hljs-comment"># original is untouched</span>
+</code></pre>
+<hr>
+<h2>3. Scope and closures: LEGB and the late-binding trap</h2>
+<p>Name resolution follows LEGB, checked in order: Local (the current function), Enclosing (any enclosing function), Global (the module), Built-in (<code>len</code>, <code>print</code>, and friends). A closure is a function that keeps access to names from an enclosing scope after that scope has returned, and like JavaScript, every nested function is a closure over its definition scope, not a special opt-in feature.</p>
+<p>The trap is that closures capture the <em>name</em>, not the value at the moment of creation. A closure built inside a loop reads whatever the loop variable holds when the closure actually runs, which is normally the value left over after the loop finishes. This is Python's version of the <code>var</code>-in-a-loop trap.</p>
+<pre><code class="hljs" data-lang="python">fns = [<span class="hljs-keyword">lambda</span>: i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>)]
+[f() <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> fns]              <span class="hljs-comment"># [2, 2, 2], every lambda shares the same &#x27;i&#x27; binding</span>
+
+fns = [<span class="hljs-keyword">lambda</span> i=i: i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>)]   <span class="hljs-comment"># fix: bind the CURRENT value as a default argument</span>
+[f() <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> fns]              <span class="hljs-comment"># [0, 1, 2], defaults are evaluated at definition time</span>
+</code></pre>
+<p>Assigning to a name inside a nested function makes that name local to the nested function for its entire body, even on lines before the assignment, which is a separate and equally common trap. <code>nonlocal</code> tells the nested function to rebind the enclosing function's variable instead of shadowing it, and <code>global</code> does the same for the module scope. Without one of these, an in-place-looking <code>count += 1</code> inside a closure raises <code>UnboundLocalError</code>, not the value you expected.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">make_counter</span>():
+    count = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">increment</span>():
+        <span class="hljs-keyword">nonlocal</span> count      <span class="hljs-comment"># without this, &#x27;count += 1&#x27; below creates a new local and raises UnboundLocalError</span>
+        count += <span class="hljs-number">1</span>
+        <span class="hljs-keyword">return</span> count
+    <span class="hljs-keyword">return</span> increment
+</code></pre>
+<p>Comprehensions get their own scope in Python 3 (list, set, dict, and generator expressions all do), so a variable used inside one does not leak into, or clobber, an outer variable of the same name, unlike a plain <code>for</code> loop. The one exception: the iterable of the outermost <code>for</code> clause is evaluated in the enclosing scope before the comprehension's own scope starts.</p>
+<hr>
+<h2>4. The data model: what makes a class a class</h2>
+<p>Python's data model, the <code>__dunder__</code> methods, is the single most load-bearing feature for a staff conversation, because dataclasses, ORMs, and validation libraries are all thin layers over it.</p>
+<p>The <code>__eq__</code>/<code>__hash__</code> contract is the one that bites people. If you define <code>__eq__</code> on a class, Python automatically sets <code>__hash__</code> to <code>None</code> unless you also define it, because equal objects are required to hash equally, and the default identity-based hash can no longer guarantee that once you have redefined what &quot;equal&quot; means. The result: your objects silently become unhashable, and you find out the first time someone puts one in a <code>set</code> or uses it as a dict key.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Point</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, x, y</span>): <span class="hljs-variable language_">self</span>.x, <span class="hljs-variable language_">self</span>.y = x, y
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__eq__</span>(<span class="hljs-params">self, other</span>): <span class="hljs-keyword">return</span> (<span class="hljs-variable language_">self</span>.x, <span class="hljs-variable language_">self</span>.y) == (other.x, other.y)
+    <span class="hljs-comment"># no __hash__ defined, so Point is now unhashable</span>
+
+{Point(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>)}    <span class="hljs-comment"># TypeError: unhashable type: &#x27;Point&#x27;</span>
+</code></pre>
+<p>The fix is to define <code>__hash__</code> consistently with <code>__eq__</code>, or reach for <code>@dataclass(frozen=True)</code>, which generates both correctly for you.</p>
+<p>The iterator protocol underlies every <code>for</code> loop and unpacking: an object is iterable if <code>__iter__</code> returns an iterator, and an iterator is anything with <code>__next__</code> that raises <code>StopIteration</code> when exhausted. <code>__getattr__</code> is called only when normal attribute lookup fails, the right hook for lazy attributes or proxies; <code>__getattribute__</code> intercepts <em>every</em> attribute access unconditionally, and referencing <code>self.anything</code> inside it without care recurses infinitely, so reach for <code>__getattr__</code> unless you specifically need to override the whole lookup.</p>
+<p><code>__slots__</code> removes the per-instance <code>__dict__</code> and replaces it with a fixed C-level slot layout, which meaningfully cuts memory when you have millions of instances and blocks accidental dynamic attributes as a side effect. The catch: it breaks straightforward multiple inheritance from more than one slotted base, and you must add <code>'__weakref__'</code> explicitly if anything needs a weak reference to your instances.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Point</span>:
+    __slots__ = (<span class="hljs-string">&#x27;x&#x27;</span>, <span class="hljs-string">&#x27;y&#x27;</span>)
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, x, y</span>): <span class="hljs-variable language_">self</span>.x, <span class="hljs-variable language_">self</span>.y = x, y
+
+p = Point(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>)
+p.z = <span class="hljs-number">3</span>    <span class="hljs-comment"># AttributeError: no __dict__, no room for a new attribute</span>
+</code></pre>
+<p><code>@dataclass</code> is the modern idiom for plain data holders: it generates <code>__init__</code>, <code>__repr__</code>, and <code>__eq__</code> from annotated fields, <code>frozen=True</code> adds a correct <code>__hash__</code> and blocks reassignment, and <code>field(default_factory=...)</code> is the sanctioned escape from the mutable-default trap in section 2.</p>
+<hr>
+<h2>5. Iterators, generators, and laziness</h2>
+<p>A generator function (any function with <code>yield</code>) pauses at each <code>yield</code>, holding its full local state on a suspended frame, and resumes exactly there on the next <code>next()</code> call. This is far cheaper than building a list up front when you only need to walk the values once.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">read_large_file</span>(<span class="hljs-params">path</span>):
+    <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(path) <span class="hljs-keyword">as</span> f:
+        <span class="hljs-keyword">for</span> line <span class="hljs-keyword">in</span> f:
+            <span class="hljs-keyword">yield</span> line.strip()     <span class="hljs-comment"># one line in memory at a time, never the whole file</span>
+</code></pre>
+<p><code>yield from</code> delegates iteration (and exception propagation) to a sub-generator or any iterable, which is how generator-based pipelines compose without manual loop-and-yield boilerplate. A generator expression, <code>(x * x for x in range(n))</code>, is lazy the same way: it produces values on demand rather than building the whole sequence, so use one whenever you only need a single pass, and reach for a list only when you need length, random access, or to iterate more than once.</p>
+<p><code>itertools</code> is the standard toolbox for lazy pipelines: <code>islice</code> for a lazy slice, <code>chain</code> to concatenate iterables without copying, <code>tee</code> to fan one iterator out into several independent ones. <code>groupby</code> is the one with a real gotcha: it only groups <em>consecutive</em> runs of equal keys, so ungrouped or unsorted input silently produces many small groups instead of the few large ones you expected. Sort by the grouping key first.</p>
+<p>The exhaustion catch applies to every iterator, generator or otherwise: once consumed, it stays consumed. Iterating it again yields nothing, with no error, which is a real production bug when a generator is accidentally shared between two consumers or materialized twice.</p>
+<pre><code class="hljs" data-lang="python">gen = (x * x <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>))
+<span class="hljs-built_in">list</span>(gen)         <span class="hljs-comment"># [0, 1, 4]</span>
+<span class="hljs-built_in">list</span>(gen)         <span class="hljs-comment"># [], already exhausted, silently</span>
+</code></pre>
+<hr>
+<h2>6. Decorators and descriptors</h2>
+<p>A decorator is an ordinary function that takes a callable and returns a replacement. <code>@decorator</code> above <code>def f</code> desugars to <code>f = decorator(f)</code>, applied exactly once, at definition time, not on every call. <code>functools.wraps</code> copies the original function's <code>__name__</code>, <code>__doc__</code>, and other metadata onto the wrapper; skip it and every decorated function's introspection, stack trace, and <code>help()</code> output shows <code>wrapper</code> instead of the real name.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> functools, time
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">timed</span>(<span class="hljs-params">fn</span>):
+<span class="hljs-meta">    @functools.wraps(<span class="hljs-params">fn</span>)</span>
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">wrapper</span>(<span class="hljs-params">*args, **kwargs</span>):
+        start = time.perf_counter()
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-keyword">return</span> fn(*args, **kwargs)
+        <span class="hljs-keyword">finally</span>:
+            <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">{fn.__name__}</span> took <span class="hljs-subst">{time.perf_counter() - start:<span class="hljs-number">.4</span>f}</span>s&quot;</span>)
+    <span class="hljs-keyword">return</span> wrapper
+</code></pre>
+<p>Descriptors are the mechanism underneath <code>property</code>, <code>classmethod</code>, <code>staticmethod</code>, and most ORM field types. Any object placed on a <em>class</em> that defines <code>__get__</code> (and optionally <code>__set__</code>/<code>__delete__</code>) controls attribute access for every instance of that class. A descriptor that defines <code>__set__</code> (a &quot;data descriptor&quot;) takes priority over the instance's own <code>__dict__</code>; one that only defines <code>__get__</code> does not, which is why plain methods can be shadowed by an instance attribute of the same name but a <code>property</code> cannot.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Celsius</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__set_name__</span>(<span class="hljs-params">self, owner, name</span>):
+        <span class="hljs-variable language_">self</span>._name = <span class="hljs-string">&quot;_&quot;</span> + name          <span class="hljs-comment"># called automatically, gives the descriptor its own attribute name</span>
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__get__</span>(<span class="hljs-params">self, instance, owner</span>):
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">getattr</span>(instance, <span class="hljs-variable language_">self</span>._name, <span class="hljs-literal">None</span>)
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__set__</span>(<span class="hljs-params">self, instance, value</span>):
+        <span class="hljs-keyword">if</span> value &lt; -<span class="hljs-number">273.15</span>:
+            <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">&quot;below absolute zero&quot;</span>)
+        <span class="hljs-built_in">setattr</span>(instance, <span class="hljs-variable language_">self</span>._name, value)
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Weather</span>:
+    temp = Celsius()
+</code></pre>
+<p>This is exactly what <code>@property</code> compiles down to internally, which is why an ORM or a validation library can make a field look like a plain attribute while still validating or lazily loading behind the scenes.</p>
+<hr>
+<h2>7. Context managers and deterministic cleanup</h2>
+<p><code>with</code> guarantees <code>__exit__</code> runs on the way out of the block, whether the block returns normally or raises, which is Python's answer to writing <code>try</code>/<code>finally</code> by hand for every file, lock, socket, or transaction.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Transaction</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__enter__</span>(<span class="hljs-params">self</span>):
+        <span class="hljs-variable language_">self</span>.conn.begin()
+        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.conn
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__exit__</span>(<span class="hljs-params">self, exc_type, exc, tb</span>):
+        <span class="hljs-keyword">if</span> exc_type <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:
+            <span class="hljs-variable language_">self</span>.conn.commit()
+        <span class="hljs-keyword">else</span>:
+            <span class="hljs-variable language_">self</span>.conn.rollback()
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">False</span>    <span class="hljs-comment"># False (or None) lets the exception propagate; True would silently swallow it</span>
+</code></pre>
+<p><code>contextlib.contextmanager</code> turns a generator function into a context manager without writing a class: everything before <code>yield</code> is <code>__enter__</code>, everything after is <code>__exit__</code>, and wrapping the <code>yield</code> in <code>try</code>/<code>except</code>/<code>else</code> is how you route the commit-versus-rollback decision.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> contextlib
+
+<span class="hljs-meta">@contextlib.contextmanager</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">transaction</span>(<span class="hljs-params">conn</span>):
+    conn.begin()
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">yield</span> conn
+    <span class="hljs-keyword">except</span> Exception:
+        conn.rollback()
+        <span class="hljs-keyword">raise</span>
+    <span class="hljs-keyword">else</span>:
+        conn.commit()
+</code></pre>
+<p><code>contextlib.ExitStack</code> is for a number of context managers that is not known until runtime, such as opening every file in a list, or building up cleanup steps conditionally as a function runs. Every context manager entered through the stack is exited in reverse order when the stack itself exits.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">with</span> contextlib.ExitStack() <span class="hljs-keyword">as</span> stack:
+    files = [stack.enter_context(<span class="hljs-built_in">open</span>(p)) <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> paths]
+    <span class="hljs-comment"># every opened file is closed, in reverse order, when the with-block exits</span>
+</code></pre>
+<p>Async resources need the async variants, <code>__aenter__</code>/<code>__aexit__</code> and <code>async with</code>. The catch worth naming: there is no automatic bridge between the two. Wrapping an async resource in a plain <code>with</code> either fails outright or, worse, runs cleanup without awaiting it, so pick the async form end to end whenever the resource is async.</p>
+<hr>
+<h2>8. The type system today</h2>
+<p>Python's typing is dynamic and duck-typed at runtime, full stop. Annotations (<code>x: int</code>) are optional and, by themselves, do nothing at execution time; a type checker (mypy, pyright) or a runtime validator (Pydantic) is what turns an annotation into an enforced guarantee.</p>
+<p>The 3.14 headline is deferred annotation evaluation becoming the default (PEP 649 and PEP 749). Historically, annotations were evaluated eagerly at function or class definition time, which broke straightforward forward references (a class annotated with itself, or two classes referencing each other) and forced the workaround of putting <code>from __future__ import annotations</code> at the top of every file, turning every annotation into an unevaluated string. In 3.14, annotations are evaluated lazily on first access instead, through a generated function rather than a stringified blob, so forward references just work, most new code does not need the future import at all, and <code>typing.get_type_hints</code> still resolves everything correctly whenever something actually inspects it. The one catch: code that depended on annotations running eagerly as a side effect at class-body time behaves differently now.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Tree</span>:
+    left: <span class="hljs-string">&quot;Tree | None&quot;</span> = <span class="hljs-literal">None</span>      <span class="hljs-comment"># in 3.14 the quotes and the future import are no longer required</span>
+    right: Tree | <span class="hljs-literal">None</span> = <span class="hljs-literal">None</span>
+</code></pre>
+<p>Builtin generics replaced the parallel <code>typing</code> hierarchy: <code>list[int]</code>, <code>dict[str, int]</code>, and <code>tuple[int, ...]</code> have worked directly since 3.9, no <code>typing.List</code> import needed, and <code>X | Y</code> (3.10) replaced <code>Optional[X]</code> and <code>Union[X, Y]</code> as the everyday union syntax. <code>typing.Protocol</code> (PEP 544) gives structural typing: a class satisfies a <code>Protocol</code> by having the right shape, with no explicit inheritance required, the same idea as a Go interface or a TypeScript structural type, and <code>@runtime_checkable</code> lets <code>isinstance</code> check for attribute presence (not full signatures) against one. <code>TypedDict</code> describes the shape of a plain dict at an API boundary without creating a real class. <code>Self</code> (3.11, PEP 673) types &quot;an instance of whatever class this actually is,&quot; correctly through inheritance, replacing the older <code>TypeVar('T', bound=...)</code> workaround.</p>
+<p>Reach the catch every time: none of this is enforced by the interpreter itself. <code>def f(x: int): return x</code> happily accepts a string at runtime; the annotation is a promise to tooling, not a guard.</p>
+<hr>
+<h2>9. Error handling: EAFP, exception groups, and the chain</h2>
+<p>Idiomatic Python favors EAFP (easier to ask forgiveness than permission) over LBYL (look before you leap): try the operation and catch the specific exception, rather than checking a precondition first. The reason is not style, it is correctness: a check and the operation it guards are rarely atomic, so a file can be deleted between an <code>os.path.exists</code> check and the <code>open</code> call that follows it. EAFP collapses that race to a single operation.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># LBYL: two separate operations, a race between them</span>
+<span class="hljs-keyword">if</span> key <span class="hljs-keyword">in</span> d:
+    value = d[key]
+
+<span class="hljs-comment"># EAFP: one operation, race-free, and the idiomatic choice</span>
+<span class="hljs-keyword">try</span>:
+    value = d[key]
+<span class="hljs-keyword">except</span> KeyError:
+    value = default
+</code></pre>
+<p><code>raise ... from ...</code> chains exceptions explicitly, setting <code>__cause__</code>, so a translated exception still carries the original traceback with an honest &quot;the above exception was the direct cause&quot; note. A bare <code>raise</code> inside an <code>except</code> block sets <code>__context__</code> implicitly, which is noisier and less intentional than stating the cause on purpose.</p>
+<p>Exception groups (3.11, PEP 654) let code raise several unrelated exceptions from concurrent work as a single <code>ExceptionGroup</code> object, most notably from <code>asyncio.TaskGroup</code> (section 11). <code>except*</code> matches against the exceptions <em>inside</em> the group individually rather than matching the group as a whole, so different failure types can be handled separately even though they arrived together.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">try</span>:
+    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> asyncio.TaskGroup() <span class="hljs-keyword">as</span> tg:
+        tg.create_task(fetch_a())
+        tg.create_task(fetch_b())
+<span class="hljs-keyword">except</span>* ValueError <span class="hljs-keyword">as</span> eg:
+    <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> eg.exceptions: log(e)
+<span class="hljs-keyword">except</span>* TimeoutError <span class="hljs-keyword">as</span> eg:
+    <span class="hljs-keyword">for</span> e <span class="hljs-keyword">in</span> eg.exceptions: schedule_retry(e)
+</code></pre>
+<p>Two catches worth naming out loud. A bare <code>except:</code> (not <code>except Exception:</code>) also catches <code>KeyboardInterrupt</code> and <code>SystemExit</code>, so it can swallow a user's Ctrl-C or block a clean shutdown. And a <code>return</code> (or <code>break</code>) inside a <code>finally</code> block silently discards any exception in flight, no warning, no traceback, which is one of the more surprising control-flow gotchas in the language.</p>
+<hr>
+<h2>10. Concurrency, briefly: the GIL, free threading, and subinterpreters</h2>
+<p>The mental model, restated at the language level rather than the tuning level: one process runs under the Global Interpreter Lock by default, so threads buy I/O concurrency but not CPU parallelism; <code>asyncio</code> gives cooperative single-thread concurrency through an event loop, the same conceptual shape as JavaScript's; <code>multiprocessing</code> buys real CPU parallelism at the cost of process startup and serializing data across the process boundary.</p>
+<p>3.14 changed two things at the language level. Free-threaded builds (run as <code>python3.14t</code>, PEP 779) moved from experimental in 3.13 to officially supported, meaning a build that removes the GIL entirely is now a first-class option, at roughly 5 to 10 percent single-threaded overhead, though C extensions that have not yet been updated still force the GIL back on for that process. And <code>concurrent.interpreters</code> (PEP 734) brought subinterpreters into the standard library: multiple interpreters, each with its own GIL, running in one process and communicating over explicit channels rather than shared memory, a middle ground between the isolation of processes and the low overhead of threads.</p>
+<p>For the GIL's tradeoffs in depth, the asyncio-versus-threading-versus-multiprocessing decision tree, and a worked <code>asyncio.Queue</code> producer-consumer pipeline, see the FastAPI backend guide; this section is deliberately about how the language models concurrency, not how to tune a service around it.</p>
+<hr>
+<h2>11. Idioms to implement: worker pools, caches, retries, and rate limits</h2>
+<p>This is the section that gets asked live. Each pattern below is a model implementation, paired with the anti-pattern it replaces and the reason.</p>
+<p><strong>Bounded concurrency: an asyncio worker pool.</strong> <code>asyncio.gather(*(worker(item) for item in items))</code> fires every coroutine at once, so ten thousand items means ten thousand concurrent sockets, DB connections, or rate-limited calls hitting whatever is on the other end simultaneously. A worker pool caps how many run at once while keeping the &quot;start everything, wait once&quot; shape.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> asyncio
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">worker_pool</span>(<span class="hljs-params">items, worker, limit</span>):
+    sem = asyncio.Semaphore(limit)
+
+    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">run_one</span>(<span class="hljs-params">item</span>):
+        <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> sem:                 <span class="hljs-comment"># blocks here once &#x27;limit&#x27; workers are already inside</span>
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> worker(item)
+
+    <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> asyncio.TaskGroup() <span class="hljs-keyword">as</span> tg:   <span class="hljs-comment"># structured concurrency: waits for every task, collects every failure</span>
+        tasks = [tg.create_task(run_one(item)) <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> items]
+
+    <span class="hljs-keyword">return</span> [t.result() <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> tasks]
+</code></pre>
+<p>Key point: <code>TaskGroup</code> over <code>gather</code> also fixes an older footgun. With <code>gather</code>'s default <code>return_exceptions=False</code>, the first failure cancels the remaining tasks but returns before they have actually finished cancelling, so cleanup can still be running when your <code>except</code> block starts. <code>TaskGroup</code> waits for every child task to fully finish before propagating, and raises an <code>ExceptionGroup</code> with every failure instead of just the first one.</p>
+<p><strong>Request cache with single-flight de-duplication.</strong> <code>functools.lru_cache</code> is the default answer to &quot;cache this,&quot; but it has a specific hole under concurrency: the check-and-store is not atomic across an <code>await</code>, so N concurrent calls for the same missing key can all miss the cache and all make the real call, the same thundering-herd bug the worker pool avoided, now at the cache layer. Single-flight fixes it: the first caller stores its in-flight future as the cache entry itself, so later callers for the same key await that future instead of starting a second call.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> asyncio
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">SingleFlightCache</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):
+        <span class="hljs-variable language_">self</span>._entries: <span class="hljs-built_in">dict</span>[<span class="hljs-built_in">str</span>, asyncio.Future] = {}
+
+    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">get</span>(<span class="hljs-params">self, key, fetch</span>):
+        <span class="hljs-keyword">if</span> key <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>._entries:
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> <span class="hljs-variable language_">self</span>._entries[key]      <span class="hljs-comment"># join the call already in flight, no new request</span>
+
+        future = asyncio.get_running_loop().create_future()
+        <span class="hljs-variable language_">self</span>._entries[key] = future
+        <span class="hljs-keyword">try</span>:
+            result = <span class="hljs-keyword">await</span> fetch(key)
+            future.set_result(result)
+            <span class="hljs-keyword">return</span> result
+        <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> exc:
+            future.set_exception(exc)
+            <span class="hljs-keyword">raise</span>
+        <span class="hljs-keyword">finally</span>:
+            <span class="hljs-keyword">del</span> <span class="hljs-variable language_">self</span>._entries[key]               <span class="hljs-comment"># never cache a failure, and never hold the slot forever</span>
+</code></pre>
+<p>Key point: plain <code>lru_cache</code> is still correct for pure, fast, synchronous functions, there is no <code>await</code> point inside for two callers to interleave on. Single-flight is specifically for async I/O, where two callers really can race.</p>
+<p><strong>Retry with exponential backoff and jitter.</strong> Real resilience against a flaky dependency, and jitter is the detail that separates a working retry from one that makes an outage worse: without it, every client that failed at the same moment also retries at the same moment, hammering the dependency in lockstep right as it is recovering.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> asyncio, random
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">retry</span>(<span class="hljs-params">fn, *, attempts=<span class="hljs-number">4</span>, base=<span class="hljs-number">0.2</span>, max_delay=<span class="hljs-number">5.0</span></span>):
+    <span class="hljs-keyword">for</span> attempt <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(attempts):
+        <span class="hljs-keyword">try</span>:
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> fn()
+        <span class="hljs-keyword">except</span> RetryableError:
+            <span class="hljs-keyword">if</span> attempt == attempts - <span class="hljs-number">1</span>:
+                <span class="hljs-keyword">raise</span>
+            delay = <span class="hljs-built_in">min</span>(max_delay, base * <span class="hljs-number">2</span> ** attempt)
+            <span class="hljs-keyword">await</span> asyncio.sleep(delay + random.uniform(<span class="hljs-number">0</span>, delay * <span class="hljs-number">0.1</span>))   <span class="hljs-comment"># jitter breaks the lockstep</span>
+</code></pre>
+<p><strong>Token-bucket rate limiter, and an LRU cache from scratch.</strong> A token bucket refills continuously rather than resetting on a fixed window, which smooths bursts instead of allowing a spike right at every window boundary.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">import</span> asyncio, time
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">TokenBucket</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, rate, capacity</span>):
+        <span class="hljs-variable language_">self</span>.rate, <span class="hljs-variable language_">self</span>.capacity = rate, capacity
+        <span class="hljs-variable language_">self</span>.tokens = capacity
+        <span class="hljs-variable language_">self</span>.last = time.monotonic()
+        <span class="hljs-variable language_">self</span>._lock = asyncio.Lock()
+
+    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">acquire</span>(<span class="hljs-params">self</span>):
+        <span class="hljs-keyword">async</span> <span class="hljs-keyword">with</span> <span class="hljs-variable language_">self</span>._lock:
+            now = time.monotonic()
+            <span class="hljs-variable language_">self</span>.tokens = <span class="hljs-built_in">min</span>(<span class="hljs-variable language_">self</span>.capacity, <span class="hljs-variable language_">self</span>.tokens + (now - <span class="hljs-variable language_">self</span>.last) * <span class="hljs-variable language_">self</span>.rate)
+            <span class="hljs-variable language_">self</span>.last = now
+            <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.tokens &lt; <span class="hljs-number">1</span>:
+                wait = (<span class="hljs-number">1</span> - <span class="hljs-variable language_">self</span>.tokens) / <span class="hljs-variable language_">self</span>.rate
+                <span class="hljs-keyword">await</span> asyncio.sleep(wait)
+                <span class="hljs-variable language_">self</span>.tokens = <span class="hljs-number">0</span>
+            <span class="hljs-keyword">else</span>:
+                <span class="hljs-variable language_">self</span>.tokens -= <span class="hljs-number">1</span>
+</code></pre>
+<p>An LRU cache built from scratch is the companion question, and <code>OrderedDict</code> is the right tool because it is a dict backed by a doubly linked list, giving O(1) move-to-end and pop-from-front, which is exactly the two operations an LRU needs.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> OrderedDict
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">LRUCache</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, capacity</span>):
+        <span class="hljs-variable language_">self</span>.capacity = capacity
+        <span class="hljs-variable language_">self</span>._data: OrderedDict = OrderedDict()
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">get</span>(<span class="hljs-params">self, key</span>):
+        <span class="hljs-keyword">if</span> key <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>._data:
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>
+        <span class="hljs-variable language_">self</span>._data.move_to_end(key)         <span class="hljs-comment"># mark as most recently used</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>._data[key]
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">put</span>(<span class="hljs-params">self, key, value</span>):
+        <span class="hljs-keyword">if</span> key <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>._data:
+            <span class="hljs-variable language_">self</span>._data.move_to_end(key)
+        <span class="hljs-variable language_">self</span>._data[key] = value
+        <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(<span class="hljs-variable language_">self</span>._data) &gt; <span class="hljs-variable language_">self</span>.capacity:
+            <span class="hljs-variable language_">self</span>._data.popitem(last=<span class="hljs-literal">False</span>)  <span class="hljs-comment"># evict the least recently used entry</span>
+</code></pre>
+<p>Key point: <code>functools.lru_cache</code> already does this internally, so hand-rolling one in an interview is a signal that you understand the eviction mechanism, not a suggestion to replace the standard tool in production.</p>
+<hr>
+<h2>12. Python 3.14 features worth name-dropping</h2>
+<p>Knowing these signals that you have kept current, which staff postings ask for explicitly.</p>
+<p>Template strings (PEP 750) add a <code>t&quot;...&quot;</code> prefix that looks like an f-string but produces a <code>Template</code> object holding the literal parts and interpolations unevaluated, rather than a finished string. A processing function decides how to render it, which is exactly the shape you want for auto-escaping HTML, safely parameterizing SQL, or building a small DSL. The catch: a t-string is not a drop-in replacement for an f-string; <code>print(t&quot;hi {name}&quot;)</code> prints a <code>Template</code> repr, not &quot;hi Ada&quot;, until something renders it.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">from</span> string.templatelib <span class="hljs-keyword">import</span> Template
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">render_html</span>(<span class="hljs-params">template: Template</span>) -&gt; <span class="hljs-built_in">str</span>:
+    parts = []
+    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> template:
+        <span class="hljs-keyword">if</span> <span class="hljs-built_in">isinstance</span>(item, <span class="hljs-built_in">str</span>):
+            parts.append(item)
+        <span class="hljs-keyword">else</span>:
+            parts.append(html_escape(<span class="hljs-built_in">str</span>(item.value)))   <span class="hljs-comment"># every interpolation escaped, injection-safe by construction</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&quot;</span>.join(parts)
+
+name = <span class="hljs-string">&quot;&lt;script&gt;&quot;</span>
+render_html(t<span class="hljs-string">&quot;Hello {name}&quot;</span>)    <span class="hljs-comment"># &quot;Hello &amp;lt;script&amp;gt;&quot;, safe by default</span>
+</code></pre>
+<p><code>match</code>/<code>case</code> (3.10) is worth a mention as structural pattern matching, not a value switch: it matches on shape, with guards, and destructures as it matches.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-keyword">match</span> command.split():
+    <span class="hljs-keyword">case</span> [<span class="hljs-string">&quot;go&quot;</span>, direction] <span class="hljs-keyword">if</span> direction <span class="hljs-keyword">in</span> DIRECTIONS:
+        move(direction)
+    <span class="hljs-keyword">case</span> [<span class="hljs-string">&quot;look&quot;</span>]:
+        describe_room()
+    <span class="hljs-keyword">case</span> _:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;unknown command&quot;</span>)
+</code></pre>
+<p>Rounding out the current edition: <code>tomllib</code> (3.11) parses TOML natively, no third-party dependency needed to read <code>pyproject.toml</code>; <code>pathlib</code> remains the evergreen replacement for manual <code>os.path</code> string joining; exception groups and <code>except*</code> (section 9) are still worth naming as 3.11-and-later, not brand new, since interviewers sometimes assume they are newer than they are.</p>
+<p>What is not shipped, so do not claim it: verify any feature you have only seen discussed against the current <code>docs.python.org/3.14/whatsnew</code> page before naming it, because a proposal under active discussion is not the same as a released feature, and claiming otherwise reads as exactly the stale-knowledge signal this guide is trying to help you avoid.</p>
+<hr>
+<h2>13. Predict-the-output puzzles</h2>
+<p>These test whether you reason about the mechanism, not whether you have memorized the syntax. Read the code, predict the output, then check.</p>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># Puzzle 1: the default-argument trap</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">item, bucket=[]</span>):
+    bucket.append(item)
+    <span class="hljs-keyword">return</span> bucket
+
+<span class="hljs-built_in">print</span>(add(<span class="hljs-number">1</span>))    <span class="hljs-comment"># [1]</span>
+<span class="hljs-built_in">print</span>(add(<span class="hljs-number">2</span>))    <span class="hljs-comment"># [1, 2], the same list object, shared across every call</span>
+</code></pre>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># Puzzle 2: closures capture the name, not a snapshot of the value</span>
+fns = [<span class="hljs-keyword">lambda</span>: i <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>)]
+<span class="hljs-built_in">print</span>([f() <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> fns])    <span class="hljs-comment"># [2, 2, 2]</span>
+</code></pre>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># Puzzle 3: identity versus equality</span>
+a, b = <span class="hljs-number">256</span>, <span class="hljs-number">256</span>
+<span class="hljs-built_in">print</span>(a <span class="hljs-keyword">is</span> b)     <span class="hljs-comment"># True, small ints are cached (-5 to 256)</span>
+a, b = <span class="hljs-number">257</span>, <span class="hljs-number">257</span>
+<span class="hljs-built_in">print</span>(a <span class="hljs-keyword">is</span> b)     <span class="hljs-comment"># False in most builds, two distinct objects</span>
+<span class="hljs-built_in">print</span>(a == b)     <span class="hljs-comment"># True regardless, value equality never depends on identity</span>
+</code></pre>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># Puzzle 4: a generator runs exactly once</span>
+gen = (x * x <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">3</span>))
+<span class="hljs-built_in">print</span>(<span class="hljs-built_in">list</span>(gen))    <span class="hljs-comment"># [0, 1, 4]</span>
+<span class="hljs-built_in">print</span>(<span class="hljs-built_in">list</span>(gen))    <span class="hljs-comment"># [], already exhausted, no error</span>
+</code></pre>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># Puzzle 5: overriding __eq__ silently removes __hash__</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Pair</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, a, b</span>): <span class="hljs-variable language_">self</span>.a, <span class="hljs-variable language_">self</span>.b = a, b
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__eq__</span>(<span class="hljs-params">self, other</span>): <span class="hljs-keyword">return</span> (<span class="hljs-variable language_">self</span>.a, <span class="hljs-variable language_">self</span>.b) == (other.a, other.b)
+
+{Pair(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>)}    <span class="hljs-comment"># TypeError: unhashable type: &#x27;Pair&#x27;</span>
+</code></pre>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># Puzzle 6: a return inside finally discards the in-flight exception</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">f</span>():
+    <span class="hljs-keyword">try</span>:
+        <span class="hljs-keyword">raise</span> ValueError(<span class="hljs-string">&quot;boom&quot;</span>)
+    <span class="hljs-keyword">finally</span>:
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;swallowed&quot;</span>
+
+<span class="hljs-built_in">print</span>(f())    <span class="hljs-comment"># &#x27;swallowed&#x27;, the ValueError never propagates</span>
+</code></pre>
+<pre><code class="hljs" data-lang="python"><span class="hljs-comment"># Puzzle 7: assignment makes a name local for the whole function, retroactively</span>
+count = <span class="hljs-number">0</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">bump</span>():
+    <span class="hljs-built_in">print</span>(count)      <span class="hljs-comment"># UnboundLocalError, not 0</span>
+    count = count + <span class="hljs-number">1</span>
+bump()
+</code></pre>
+<hr>
+<h2>14. What staff-level actually demonstrates</h2>
+<p>The trivia filters candidates; it is not the goal. Above the senior line, interviewers want to see the mechanism explained, the tradeoff named instead of the rule recited, and a language detail connected to a failure mode you have actually debugged. When you hit one of these caveats, do three things: say what happens, say why the interpreter does that, and say where it bites in production. Do not just answer that a mutable default argument is a bug; explain that defaults are evaluated once at definition time, that the same list object is therefore reused across every call missing that argument, and that this is exactly the kind of leak that shows up as &quot;why does this cache have entries from a request that never touched it.&quot;</p>
+<p>Cross-reference rather than re-derive: point to the FastAPI guide for the GIL, the asyncio-versus-threading-versus-multiprocessing decision, and worker tuning under load, and to the data-libraries guide for NumPy and Pandas. This guide's job is the language underneath all of it, the object model, the data model, and the idioms you are expected to write cold.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>
