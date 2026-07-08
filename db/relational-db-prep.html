@@ -482,14 +482,35 @@ LIMIT <span class="hljs-number">10</span>;
 <hr>
 <h2>Deadlocks</h2>
 <p>A deadlock occurs when two transactions each hold a lock the other needs, so both
-wait forever. The database detects the cycle (typically within a second) and
-terminates one transaction with an error, releasing its locks so the other can
-proceed. The terminated transaction must be retried by the application.</p>
+wait forever. The database detects the cycle and terminates one transaction with
+an error, releasing its locks so the other can proceed. The terminated transaction
+must be retried by the application.</p>
+<p><strong>The mechanism:</strong> Postgres doesn't scan for deadlocks on a global clock. Detection
+is per-backend and lazy. Every transaction stuck waiting on a lock starts a timer,
+and once that wait exceeds <code>deadlock_timeout</code> (default 1 second), that specific
+backend triggers a check, not the database as a whole. The check builds a
+<strong>wait-for graph</strong>: each transaction is a node, and a directed edge A to B means
+&quot;A is blocked, waiting on a lock that B currently holds.&quot; Starting from itself,
+the blocked backend walks the graph outward, transaction by transaction, following
+whichever lock each one is in turn waiting on. A deadlock is exactly a cycle in
+this graph: the walk leads back to the node it started from. Two transactions
+produce the simplest cycle (A waits on B, B waits on A), but the same walk catches
+longer cycles spanning three or more transactions just as well.</p>
+<p>If the walk finds a cycle, Postgres first tries a cheaper fix: reordering the
+queue of processes waiting on a lock, in case a different wait order breaks the
+cycle without aborting anything. Only if that fails does it fall back to picking
+a victim (typically the transaction whose wait triggered the check) and killing
+it with an error so the rest of the cycle can proceed. This whole check, build
+the graph, walk it, resolve or abort, is what people mean by &quot;the database breaks
+the deadlock.&quot; It is not a periodic sweep; it's triggered independently by
+whichever transaction has been stuck the longest.</p>
 <p>The pattern to know: deadlocks on the same table almost always mean two transactions
 are acquiring row locks in different orders. Transaction A locks row 1 then row 2;
-transaction B locks row 2 then row 1. They meet in the middle. The standard fix is
-to ensure all transactions that touch multiple rows do so in a consistent, canonical
-order (by primary key, for example).</p>
+transaction B locks row 2 then row 1. They meet in the middle, each holding the lock
+the other's graph walk needs next, which is exactly the cycle described above. The
+standard fix is to ensure all transactions that touch multiple rows do so in a
+consistent, canonical order (by primary key, for example): that ordering makes the
+wait-for graph acyclic by construction, so there is never a cycle to find.</p>
 <p>The log entry to look for in Postgres: <code>ERROR: deadlock detected</code>, followed by a
 detail showing the two transactions and the locks. The <code>log_lock_waits</code> setting
 (default: off) logs lock waits that exceed <code>deadlock_timeout</code> (default: 1 second)
@@ -798,11 +819,14 @@ scans and growing file size; or when a table's age approaches the 2-billion-ID
 wraparound limit, which causes Postgres to refuse writes until VACUUM runs.</p>
 <p><strong>What is a deadlock and how does the database resolve it?</strong>
 Testing: whether you know the mechanism and the fix.
-A deadlock is a cycle: transaction A holds lock X and waits for Y; transaction B
-holds Y and waits for X. The database detects the cycle (within <code>deadlock_timeout</code>,
-default 1 second) and kills one transaction with an error, releasing its locks. The
-fix is canonical lock ordering: ensure all transactions that lock multiple rows do
-so in the same order.</p>
+A deadlock is a cycle in the transactions' wait-for graph: transaction A holds lock
+X and waits for Y; transaction B holds Y and waits for X. Detection isn't a global
+sweep: each backend that's been blocked past <code>deadlock_timeout</code> (default 1 second)
+walks the graph from itself looking for a path back to itself. If it finds one,
+Postgres kills one transaction (after first trying to reorder the lock wait queue
+to avoid it) with an error, releasing its locks. The fix is canonical lock
+ordering: ensure all transactions that lock multiple rows do so in the same order,
+which keeps the graph acyclic.</p>
 <p><strong>Connection pooling: what is it and why does it exist?</strong>
 Testing: operational understanding of Postgres connection cost.
 Postgres spawns an OS process per connection, costing 5-10 MB RAM and startup time.
