@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Engineering Leadership Interview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #3d4552;
+  --accent-soft:  #3d455214;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Engineering Leadership</div>
+    <h1>The Engineering Leadership Interview</h1>
+    <div class="sub">The behavioral leadership round decoded through the Michigan leadership model: how to inspire, influence without authority, build teams that hold, and grow people, with the frameworks, evidence, and STAR templates that make each claim land.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>What the leadership round is really testing</h2>
+<p>An engineering-management loop, at any level from team lead to director, is not testing whether you are likeable, or whether you have read the right management books. It is testing whether you have a repeatable model for four things: getting people to want to do the work, moving people who do not report to you, building a team structure that produces good outcomes on its own, and growing the people inside it. Anyone can tell one good story about a time a team pulled together. What separates a candidate who passes from one who does not is whether the story reveals a mechanism you would apply again on a different team with different people, or whether it was a one-off that happened to work.</p>
+<p>The frame is the same one that runs through the companion guide &quot;Depth That Survives Probing,&quot; applied to people instead of systems. A staff engineer's claim collapses when &quot;we redesigned the architecture&quot; turns out to be a set of suggestions nobody enforced. A leadership claim collapses the same way: &quot;I motivated the team&quot; turns out, under one follow-up question, to mean nothing more specific than being enthusiastic in standup. The interviewer keeps asking &quot;how&quot; and &quot;why did that work&quot; until they hit either a real mechanism (a reward structure you redesigned, a goal-acceptance conversation you actually had, a psychological-safety norm you built and can describe) or the bottom of your experience. Philosophy with no mechanism underneath it is a slogan, not leadership.</p>
+<p>This guide compresses the evidence base from the University of Michigan &quot;Leading People and Teams&quot; specialization (DeRue, Sytch, and Alexander, across the Inspiring and Motivating Individuals, Influencing People, Leading Teams, and Managing Talent courses) into four repeatable moves, each with the catch that makes it defensible under probing, then gives you worked STAR templates, diagnosis drills, and a pre-interview audit so the frameworks are ready to deploy, not just recognized.</p>
+<hr>
+<h2>The four moves</h2>
+<p>Treat the specialization's four courses as four moves you make as a leader, each tested by a different slice of the interview loop.</p>
+<table>
+<thead>
+<tr>
+<th>Move</th>
+<th>Source course</th>
+<th>What it looks like day to day</th>
+<th>Where the interview tests it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inspire and motivate individuals</td>
+<td>Inspiring and Motivating Individuals (DeRue, Sytch)</td>
+<td>Vision, goal-setting, rewards, feedback, 1:1s</td>
+<td>&quot;Tell me about a time you motivated a disengaged report&quot;</td>
+</tr>
+<tr>
+<td>Influence without authority</td>
+<td>Influencing People (DeRue, Sytch)</td>
+<td>Landing a cross-team ask, building support for a decision you cannot mandate</td>
+<td>&quot;How do you get another team to prioritize your work?&quot;</td>
+</tr>
+<tr>
+<td>Build and run a team</td>
+<td>Leading Teams (DeRue, Sytch)</td>
+<td>Composition, structure, norms, conflict, sustaining performance</td>
+<td>&quot;How do you design a team?&quot; / &quot;Tell me about a team that struggled&quot;</td>
+</tr>
+<tr>
+<td>Grow and manage talent</td>
+<td>Managing Talent (Alexander, Sytch, DeRue)</td>
+<td>Hiring, performance management, coaching, succession</td>
+<td>&quot;How do you develop your strongest and your weakest performer differently?&quot;</td>
+</tr>
+</tbody>
+</table>
+<p>Each move maps onto something you already recognize from being managed, which is the fastest way to make the frameworks stick: vision and goals are the annual planning conversation, influence is the Tuesday you needed another team's roadmap slot, team design is the org chart and the norms nobody wrote down, and talent management is the 1:1 cadence and the promotion packet. The frameworks below are not new ideas, they are names for patterns you have already lived through, which is exactly what makes them fast to deploy under interview pressure: you are not learning a new skill, you are learning the vocabulary and the mechanism for a skill you already have some of.</p>
+<hr>
+<h2>Move 1: Inspiring and motivating individuals</h2>
+<p><strong>Vision: substance and style.</strong> A vision that moves people has two independent parts, and interviewers can tell when a candidate only has one. Substance is what you say: answer three questions (why do we do what we do, what does success look like, how must we act to ensure success) and anchor the answer in something concrete, not an abstraction. Style is how you say it: repetition, inclusive language (&quot;we,&quot; &quot;our&quot;), a story or metaphor instead of a bullet list, and a rhetorical question instead of a flat statement. The mechanism behind style mattering as much as substance is that up to 60% of the socio-emotional content of a message is carried non-verbally, so a technically correct vision delivered flatly reads as unconvincing regardless of the words.</p>
+<p>The catch: substance without style is forgettable, and style without substance is manipulation. A vision statement that is all inclusive language and repeated refrains but never names what success actually looks like is charisma with nothing underneath it, and a sharp interviewer will ask &quot;what did success actually look like&quot; and find there is no answer. Practice stating your own team's &quot;why,&quot; &quot;what does success look like,&quot; and &quot;how must we act&quot; in one sentence each before the interview; if you cannot, you do not have a vision to describe, you have a task list.</p>
+<pre><code class="hljs" data-lang="text">Vision substance, worked example (a platform migration):
+Why:      &quot;manual deploys were the reason releases slipped every quarter&quot;
+Success:  &quot;any engineer ships to prod in under 10 minutes without a ticket&quot;
+How:      &quot;we build the golden path once, we do not each solve it alone&quot;
+
+Style overlay:
+- repetition: &quot;no tickets, no waiting, no surprises&quot; repeated across three updates
+- inclusive language: &quot;our pipeline,&quot; not &quot;the pipeline I built&quot;
+- concrete beneficiary named: the on-call engineer who no longer pages at 2am
+</code></pre>
+<p><strong>Goal-setting: the acceptance mechanism.</strong> The single most load-bearing fact from this unit is that goal difficulty and performance are linked, but only in one direction depending on acceptance: for goals the person has accepted, performance rises roughly linearly with difficulty. For goals they have rejected (assigned without buy-in), performance falls as difficulty rises. This is why &quot;I set an aggressive goal&quot; is not, by itself, a leadership move; it is a coin flip that depends entirely on whether the other person actually took it on. SMART (specific, measurable, agreed-upon, reasonable, time-bound) exists to force the acceptance conversation, not just to make the goal precise.</p>
+<p>The catch, and it is the one interviewers probe hardest: specific, aggressive goals raise the odds of unethical behavior by roughly 4x compared to vague ones (&quot;do your best&quot;), because a hard number with no room for judgment pushes people toward gaming the metric instead of the underlying outcome. The countermeasure is not softer goals, it is naming the metric's failure mode out loud when you set it (&quot;if this number goes up because support tickets get closed without being solved, that is not a win&quot;) and checking in on the leading indicators, not just the lagging one.</p>
+<p><strong>Making work meaningful.</strong> Effort and accuracy both rise sharply when people see who benefits from their work, not just what the work is. The evidence is concrete: university fundraisers who met a scholarship recipient in person raised their call output 142 to 400% depending on the study; radiologists shown a patient's photo alongside the X-ray improved diagnostic accuracy meaningfully over radiologists who saw the film alone. The mechanism is that abstract beneficiaries (&quot;the company,&quot; &quot;our users&quot;) do not activate the same effort response as a specific, visible person. As a leader this is a lever you pull deliberately: put the actual user in the room, forward the support ticket with a name attached, not just the roadmap ticket.</p>
+<p><strong>Rewards and reinforcement.</strong> Equity theory says people do not evaluate pay in absolute terms, they compare their reward-to-effort ratio against a peer's, and a mismatch (even one that looks generous from the outside) produces burnout and disengagement. The clearest cautionary case is Gravity Payments' $70k minimum wage: raising the floor demotivated some of the highest performers, because their reward-to-effort ratio against newly-equal peers dropped even though their absolute pay did not change. The lesson for a manager is that a reward decision has to be evaluated against the peer comparison it creates, not just against the number in isolation.</p>
+<p>The second load-bearing idea here is Kerr's &quot;folly of rewarding A while hoping for B&quot;: organizations routinely design incentives that reward the opposite of the stated goal, expecting candor and risk-taking while actually promoting whoever brings the fewest problems to the surface. The fix is a direct audit: write down the behavior you actually reward (what gets someone promoted, praised, staffed on the good project) and compare it line by line against the behavior you claim to want. Where they diverge, the reward structure is the real policy and the stated values are decoration.</p>
+<p><strong>Feedback and appraisal: separate evaluation from development.</strong> The single principle that survives every follow-up question here is to separate the &quot;how am I rated&quot; conversation from the &quot;how do I grow&quot; conversation. Mixing them means the person spends the growth conversation defending the rating instead of absorbing the coaching. Three biases make appraisal harder than it looks: the fundamental attribution error (we attribute our own success to skill and our own failure to circumstance, and read others exactly in reverse), the illusion of transparency (in the classic tapping experiment, tappers thought listeners would guess the song 50% of the time; only 2.5% actually did, meaning your intent is far less visible to your report than it feels to you), and the self-fulfilling prophecy (Rosenthal and Jacobson's IQ-gains study showed that a teacher's private, unstated expectation of a student measurably changed that student's outcome). The practical implication of all three together: never assume your feedback landed the way you meant it, and never assume your private read of someone's potential stays private, because your behavior toward them leaks it either way.</p>
+<pre><code class="hljs" data-lang="text">Collapses vs holds: &quot;I motivated a disengaged report&quot;
+
+Collapses:
+  &quot;They seemed checked out, so I had a motivating conversation with them
+   and their energy came back.&quot;
+
+Holds:
+  &quot;Their 1:1s had gone from proactive updates to one-word answers over
+   three weeks. I checked whether their current goal was one they had
+   actually accepted or one that had been assigned during a reorg without
+   a real conversation; it was the latter, so difficulty was working
+   against us, not for us. We re-set it together against the acceptance
+   test (their input on scope, not just the deadline), and I made the
+   beneficiary of the work visible: I looped in the customer whose
+   complaint had started the project so it stopped being an abstract
+   ticket. PR throughput on their queue went from 1.2/week to 3/week
+   over the following month, and they re-initiated proactive updates in
+   1:1s without being prompted.&quot;
+</code></pre>
+<hr>
+<h2>Move 2: Influencing without authority</h2>
+<p><strong>The bases of power.</strong> French and Raven's six bases split into three categories, and naming the category, not just the base, is what makes this framework useful in the room. Personal bases (expert, referent) come from who you are and are portable across jobs. Cognitive bases (information, and priming/framing effects more broadly) come from what you control access to. Structural bases (legitimate, reward, coercive) come from your position and disappear the day you change teams. The reason this taxonomy matters for an EM interview specifically: a manager who has only structural power (their title) has nothing left the day they move to a peer role or a cross-functional initiative, while a manager who has built personal and cognitive power keeps influence regardless of the org chart. When asked &quot;how do you get things done without authority,&quot; naming which base you are drawing on, and why you chose it, is the answer that reads as deliberate rather than lucky.</p>
+<p>The catch on power itself: holding power measurably increases overconfidence and measurably decreases how much advice you take (people with power discount others' input more, not less, which is backwards from what effective decision-making requires). The corrective is structural, not willpower: build a standing practice of soliciting a dissenting view before a decision, because power will quietly erode your instinct to ask for one.</p>
+<p><strong>Influence tactics and their evidence.</strong> Several tactics recur constantly in the literature and are worth having sharp, not vague: social proof (Asch's conformity experiment found 76% of people conformed to an obviously wrong group answer at least once; the lever is showing that similar others have already taken the action you are asking for), authority (Milgram's obedience experiment is the extreme case, 100% of subjects administered 300V and 62% went all the way to 450V under a lab-coated authority figure's instruction; the lever is credible signals of expertise, not the credential itself), reciprocity (giving something concrete upfront measurably raises compliance later, this is why &quot;let me send you our findings before I ask for your team's time&quot; outperforms asking cold), and scarcity (framing an offer or a slot as limited raises urgency, and it works even when you are the one creating the scarcity).</p>
+<p>The catch that separates influence from manipulation, and it is worth stating explicitly because interviewers listen for the distinction: influence affects someone's decision through information and legitimate appeal; manipulation controls the outcome through artful use of their biases for your own advantage, independent of whether the outcome is actually good for them. The same tactic (scarcity, reciprocity, social proof) can be either, depending on whether the underlying claim is true and whether you would be comfortable if the other person could see exactly what lever you were pulling. If you would not want them to see it, you are on the manipulation side of the line.</p>
+<p><strong>Networks and dependence.</strong> Power in a relationship is set by relative dependence, not by title: whoever needs the relationship less holds more power inside it (Emerson's dependence theory). A practical exercise, and one you can describe having actually run, is a power audit: for each important working relationship, score your dependence on them and their dependence on you, each 0 to 10. A wide gap in either direction predicts where an ask will land easily and where it will not.</p>
+<pre><code class="hljs" data-lang="text">Power audit, worked example (getting a security review prioritized
+by a team you do not manage):
+
+Relationship          My dependence   Their dependence   Read
+Security team lead         8                3            I need them more
+                                                            than they need me;
+                                                            lead with reciprocity
+                                                            (share the finding
+                                                            before asking), not
+                                                            with authority.
+Their skip-level           4                6            They need my roadmap
+                                                            input more than I
+                                                            need their approval;
+                                                            a direct ask lands
+                                                            fine here.
+</code></pre>
+<p><strong>Building a reputation and being an energizer.</strong> Self-promotion reads as bias or arrogance in a way that third-party endorsement does not; the more reliable path to reputation is arranging for your work to be visible to the people who matter, and letting your manager, peers, or the affected team describe the impact, rather than describing it yourself. Separately, &quot;energizers,&quot; people whose interactions leave others with more discretionary effort rather than less, gain disproportionate influence over time because people route work and trust toward them voluntarily. The mechanism is not charisma, it is a specific set of behaviors: showing genuine concern, staying cognitively present in meetings instead of visibly multitasking, and connecting with people beyond their immediate task.</p>
+<pre><code class="hljs" data-lang="text">Collapses vs holds: &quot;I got another team to prioritize our request&quot;
+
+Collapses:
+  &quot;I explained why it mattered and they agreed to help.&quot;
+
+Holds:
+  &quot;Their backlog was already full and I had no authority to reprioritize
+   it. I ran a quick power audit: they needed our API&#x27;s latency data more
+   than I needed their sprint slot right then, so I led with reciprocity,
+   I sent them the latency breakdown they had been asking analytics for
+   with no ask attached. Two weeks later when I raised our request, I
+   framed it with social proof: two other teams had already adopted the
+   same pattern and their p95 had dropped 30%. They slotted us in the
+   next sprint without an escalation to either of our managers.&quot;
+</code></pre>
+<hr>
+<h2>Move 3: Building and running a team</h2>
+<p><strong>Composition: size and diversity.</strong> Bigger teams bring more capability and more ideas; smaller teams decide faster and report higher satisfaction, and Hackman's research puts the satisfaction-maximizing size at 4 to 5 people, which is not the same as the effectiveness-maximizing size (larger, task-dependent). Bezos's two-pizza rule is the popular version of the same finding. Diversity splits into surface-level (observable: age, gender, tenure) and deep-level (non-observable: values, working style, risk tolerance), and the evidence shows deep-level diversity's effect on team outcomes grows stronger over time as people actually learn each other's working styles, while surface-level diversity's effect is front-loaded and fades. The catch is demographic faultlines: when several attributes align to split a team into two visible camps (all the senior engineers are also all on one time zone, say), conflict rises and cohesion drops, and the effect is worse without a shared, explicit team objective to hold the group together across the fault line.</p>
+<p><strong>Goals and reward structure at the team level.</strong> The accepted-goal mechanism from Move 1 applies at the team level too, with one addition: goal commitment matters most exactly when interdependence is high, because a low-commitment member on a tightly coupled team blocks everyone downstream, while the same low commitment on a loosely coupled team only costs their own output. Reward structure has to match the coordination you want: competitive, individual rewards optimize for speed and volume, cooperative, shared rewards optimize for quality and mutual help, and switching direction later is expensive because the norms the first structure created (who helps whom, who hoards information) persist well past the policy change.</p>
+<p><strong>Formal and informal structure.</strong> Specialist structures excel in stable, predictable environments; generalist structures excel when the work itself keeps changing, and the empirical asymmetry to remember is that moving a team from specialist to generalist outperforms moving the other way, so if you are unsure, generalize. The same asymmetry holds for centralization: decentralized decision rights suit creative, high-complexity, high-interdependence work, centralized rights suit execution-focused, low-complexity work, and switching from decentralized to centralized is the more costly direction because it removes autonomy people have already gotten used to having. Informally, Belbin's team roles (nine of them, spanning task-focused, people-focused, and thinking-focused types) are a useful diagnostic for &quot;why does this team feel unbalanced&quot; even without formally assessing anyone, and a written team charter (goals, roles, communication norms, decision rights) measurably improves communication and cohesion versus leaving the same expectations unstated.</p>
+<p><strong>Team dynamics.</strong> Interdependence comes in three flavors with rising coordination cost: pooled (each person's output is independent, just summed), sequential (my output is your input, a relay), and reciprocal (we pass work back and forth continuously). Match your coordination mechanism to the flavor: pooled work barely needs meetings, reciprocal work needs tight, frequent sync or it stalls. Two failure patterns recur constantly and are worth naming precisely because they are easy to misdiagnose as personality problems: the common-information effect (groups spend most of their discussion time on information everyone already shared, and systematically under-discuss the unique information any one person holds, because unshared information has no one else in the room to corroborate it) and social loafing, also called the Ringelmann effect (individual effort measurably drops as group size grows, because individual contribution becomes harder to trace). Both have specific countermeasures rather than a general &quot;communicate better&quot;: the common-information effect responds to explicitly assigning someone the role of surfacing unique expertise and rank-ordering options instead of open discussion; social loafing responds to making individual contributions identifiable and assigning meaningful, distinguishable pieces of the work rather than shared, interchangeable ones.</p>
+<p><strong>Conflict.</strong> Task conflict (disagreement about the work itself) and relationship conflict (interpersonal friction) are not the same thing and do not have the same effect: task conflict, kept vigorous but civil, breaks groupthink and improves decisions; relationship conflict is close to uniformly destructive. High-performing teams are not conflict-free, they are teams that keep relationship conflict low while actively managing task conflict throughout the project rather than avoiding it. The practical move when conflict starts sliding from task to relationship is to convert it back explicitly: restate the disagreement as a question about the work (&quot;what does the data say about approach A versus B&quot;) rather than letting it stay a statement about a person.</p>
+<p><strong>Sustaining performance.</strong> Psychological safety, the shared belief that the team is safe for interpersonal risk-taking, is built through specific leader behaviors, not a values statement: being accessible, explicitly inviting input rather than waiting for volunteers, and modeling your own fallibility out loud. Transactive memory, the team's shared awareness of who knows what, reduces both the common-information effect and redundant search, and it is built by training together and preserved specifically by keeping teams intact rather than reshuffling them, which is why churn quietly costs more than headcount alone. The brainstorming paradox is the sharpest counterintuitive fact in this section: individuals generating ideas alone reliably outperform the same number of people brainstorming together, in both quantity and quality, because of production blocking (only one person talks at a time), evaluation apprehension, and the same social loafing pattern from above. The fix, Nominal Group Technique, sequences it correctly: generate individually first, share round-robin so everyone's ideas surface once, discuss only for clarification, then rank by secret ballot. Running an &quot;open brainstorm&quot; when you know this is, itself, a leadership mistake worth being able to name if asked.</p>
+<pre><code class="hljs" data-lang="text">Collapses vs holds: &quot;I fixed a team that wasn&#x27;t performing&quot;
+
+Collapses:
+  &quot;There was tension on the team, so I had everyone talk it out and
+   things got better.&quot;
+
+Holds:
+  &quot;Two people who used to pair constantly had stopped talking, and
+   standup had gone from genuine updates to status theater. I diagnosed
+   it as relationship conflict bleeding out of an unresolved task
+   disagreement about the caching approach, not a personality clash, so
+   I restated the original disagreement as a question (&#x27;what does the
+   latency data actually show for each approach&#x27;) and ran it as a
+   30-minute working session with data on the table instead of opinions.
+   I also noticed one engineer&#x27;s contributions were getting folded into
+   &#x27;the pairing group&#x27;s&#x27; output with no individual credit, a social-
+   loafing setup even though effort wasn&#x27;t actually dropping, so I split
+   the next sprint&#x27;s work into named, individually owned pieces. Standup
+   updates went back to specifics within two weeks, and the caching
+   decision shipped with both engineers&#x27; names on the design doc.&quot;
+</code></pre>
+<hr>
+<h2>Move 4: Growing and managing talent</h2>
+<p><strong>Strategy first.</strong> The talent pipeline (planning, recruiting, selection, onboarding, performance management, development, engagement, succession) only works end to end if it starts from strategy: what roles will matter in twelve months, not just what is open today. A pipeline built reactively, filling today's req without a forward plan, is why &quot;we can never find good people&quot; is usually a planning failure dressed up as a hiring-market complaint.</p>
+<p><strong>Selection science.</strong> Schmidt and Hunter's meta-analysis is the single most useful fact to have memorized here: general mental ability tests, integrity tests, and structured (behavioral) interviews are the strongest predictors of job performance, far ahead of years of education, unstructured interviews, or graphology. The practical implication for how you interview is specific: structure beats improvisation. A behavioral question (&quot;tell me about a time you...&quot;) with a consistent rubric across candidates outperforms a freeform conversation, because the freeform version measures rapport more than it measures the thing you actually want to predict. The onboarding numbers back this up on the other end of the funnel: 4% of new hires quit after a badly run first day, 22% of all first-year turnover happens in the first 45 days, and 83% of high-performing organizations start onboarding before day one. Onboarding is not orientation, it is where the hiring decision either pays off or gets thrown away.</p>
+<p><strong>Performance management.</strong> Forced distribution (GE's &quot;vitality curve&quot; under Jack Welch: bottom 10%, middle 70%, top 20%) produced a real, measured 8% productivity gain on adoption, but with a documented sharp decline afterward and well-known downsides: sabotage, gaming the ranking, and zero-sum internal politics once people realize a colleague's good year makes their own year statistically worse. The catch is not &quot;forced distribution is bad,&quot; it is that any rating system that pits people against each other for a fixed pool of &quot;good&quot; outcomes will eventually be gamed, and the fix is not abandoning structured comparison but pairing it with concrete behavioral evidence (what did this person actually do) rather than a bare number. 360-degree feedback is the tool for surfacing blind spots specifically (things others see that you do not), and its failure mode is a set of rater errors worth naming precisely: leniency (rating everyone high to avoid conflict), central tendency (clustering everyone in the middle to avoid a hard conversation), and halo error (one strong trait inflating the rating on unrelated dimensions). Frame-of-reference training, where raters practice against calibrated example cases until their ratings converge, measurably outperforms generic rater-bias training, because it fixes the actual mechanism (miscalibrated judgment) rather than just raising awareness that bias exists.</p>
+<p><strong>Developing and coaching: the ACS model.</strong> Assessment, Challenge, Support is the backbone. Assessment means using tools like the Big Five or MBTI-style instruments as one input into a conversation, never as a verdict; Gallup's finding that only 20% of employees use their strengths daily, despite doing so measurably cutting turnover and raising both productivity and customer satisfaction, is the argument for spending assessment time on strengths, not just gaps. Challenge means the developmental experience has to be genuinely novel, carry real stakes, and cross a boundary the person has not crossed before; a growth mindset (effort improves ability) correlates with learning and confidence under that kind of stretch, while a performance mindset (ability is fixed, so a stretch assignment is a test you might fail) correlates with anxiety under the identical assignment, which is why how you frame a stretch assignment matters as much as the assignment itself. Support means building the person's &quot;personal board of directors&quot;: a sponsor who champions them in rooms they are not in, a mentor who gives them real feedback, someone who provides emotional support, and someone who pushes back and challenges them, four distinct roles that are rarely the same person.</p>
+<p><strong>Structured reflection.</strong> After a developmental experience, structured reflection (a defined process run close to the event: what happened, what would you do differently, what does that imply for next time, said out loud to someone else for accountability) measurably outperforms unstructured reflection: 9% more job offers and 10% higher salary in the studies behind this finding. The mechanism is that unstructured reflection (&quot;that was a good project&quot;) does not force the extraction of a transferable lesson the way a structured &quot;if I had done X instead, then Y&quot; does.</p>
+<p><strong>Engagement and retention.</strong> Engagement is usefully modeled as commitment times performance equals discretionary effort, the extra effort a person gives beyond the minimum required to keep their job, and Gallup's global data shows over 80% of employees are disengaged by this measure, which makes discretionary effort a genuinely scarce resource a manager either earns or does not. The 70-20-10 development formula (70% stretch assignments, 20% coaching and mentoring, 10% formal courses) is often quoted as if the 70% &quot;just happens&quot;; it does not, deliberately designed stretch assignments (sometimes called assignmentology) require the same planning as the other two-thirds, or the 70% collapses into &quot;figure it out while also doing your regular job,&quot; which is not development, it is just more work. The retention number worth having ready: turnover under a bottom-decile-effectiveness manager runs roughly 19%, versus roughly 9% under a top-decile manager (Zenger and Folkman), the empirical version of &quot;people join companies and leave managers.&quot;</p>
+<pre><code class="hljs" data-lang="text">Collapses vs holds: &quot;I developed a stalled senior engineer&quot;
+
+Collapses:
+  &quot;They had plateaued, so I gave them more responsibility and they grew
+   into it.&quot;
+
+Holds:
+  &quot;Their 1:1s had become status updates with no growth conversation in
+   six months. I ran assessment first, not with a personality test but
+   by asking directly what they thought they were good at versus what
+   they thought I saw in them; the gap was that they saw themselves as
+   an implementer, I saw staff-level system design judgment they weren&#x27;t
+   using. For challenge, I handed them ownership of a cross-team
+   migration with real stakes (a hard deadline tied to a deprecation)
+   rather than a safe internal-only project, and framed it explicitly as
+   a growth bet, not a test, to keep it a growth-mindset frame rather
+   than a performance-mindset one. For support, I made sure their skip-
+   level saw the design doc directly rather than through me, so they had
+   a sponsor beyond just their manager. We ran structured reflection
+   after the migration shipped: what worked, what they&#x27;d change, what it
+   implied for the next one. They led the next cross-team initiative
+   without being asked, and the promotion packet wrote itself off real
+   artifacts instead of a narrative I had to construct.&quot;
+</code></pre>
+<hr>
+<h2>Diagnosis drills</h2>
+<p>Interviewers sometimes skip the &quot;tell me about a time&quot; framing and just hand you a symptom, to see whether you route it to the right mechanism instead of a generic &quot;I'd have a conversation with them.&quot; Practice routing these before the interview, out loud, in one sentence naming the construct and one sentence naming the move.</p>
+<p><strong>Your strongest engineer went quiet in meetings over the last month.</strong> Before assuming disengagement, check whether this is social loafing (their individual contribution has become untraceable inside a larger group, so effort is dropping because it is invisible, not because motivation is gone) or a psychological-safety problem (something made speaking up feel costly recently, a public correction, a decision overridden without explanation). The two look identical from the outside and need opposite fixes: loafing needs individually identifiable, distinguishable work; safety needs you to model fallibility and explicitly invite the specific kind of input that got shut down.</p>
+<p><strong>Two sub-teams that used to collaborate closely have stopped talking.</strong> This is the demographic-faultline pattern: check whether several attributes (tenure, physical location, which project each subgroup shipped last) have quietly aligned into a dividing line. The fix is not a team-building exercise, it is re-establishing a shared, explicit objective that cuts across the fault line rather than reinforcing it.</p>
+<p><strong>The team keeps re-litigating decisions everyone already agrees on, while a domain expert's dissenting input from three weeks ago never came up again.</strong> This is the common-information effect: the group is over-discussing shared information because it is easy to corroborate in the room, and under-discussing the one person's unique expertise because no one else can confirm it. The fix is structural, assign someone the explicit role of surfacing unshared information, or rank-order options by secret input before the open discussion starts, not &quot;remind people to listen better.&quot;</p>
+<p><strong>A stretch assignment you gave someone is producing visible anxiety instead of growth.</strong> Check whether you framed it as a test of their fixed ability (performance mindset, which produces anxiety under stakes) instead of as a bet on their growth (growth mindset, which produces engagement under the same stakes). The fix is often a five-minute reframing conversation, not a smaller assignment.</p>
+<p><strong>A cross-functional ask keeps stalling even though the other team agrees it matters.</strong> Run the dependence read: if their dependence on you is low and yours on them is high, a direct ask will keep stalling regardless of how good your reasoning is. Lead with reciprocity or social proof instead of restating the case, because the blocker is not the argument, it is the power asymmetry.</p>
+<hr>
+<h2>STAR stories: adaptable templates</h2>
+<p>Each story below is a template, not a script to memorize verbatim. Fill in your own specifics. The shape, the named mechanism, and the quantified result are what the interviewer is actually listening for; the &quot;make it yours&quot; line tells you what to swap.</p>
+<h3>Story 1: Re-engaging a disengaged high performer</h3>
+<p><strong>Situation:</strong> a senior engineer who had shipped consistently for two years slowed to roughly half their prior output over six weeks, with 1:1s shifting from proactive updates to one-word answers.</p>
+<p><strong>Task:</strong> understand whether this was a motivation problem, a goal-acceptance problem, or something structural, and address the actual cause rather than the symptom.</p>
+<p><strong>Action:</strong> I checked their current goal against the acceptance test first: it had been set during a reorg with no real input from them, which explained why difficulty was working against performance instead of for it (the accepted-versus-rejected mechanism from goal-setting research). I re-set the goal together, giving them real input on scope, and made the beneficiary visible by looping in the specific customer whose escalation had originally driven the project, replacing an abstract &quot;the roadmap needs this&quot; with a named person and a named problem. I also checked our reward structure for a Kerr's-folly mismatch, we had been praising speed in standup while claiming to want quality, and adjusted what I highlighted publicly to match what we actually wanted.</p>
+<p><strong>Result:</strong> PR throughput on their queue went from 1.2 per week to 3 per week over the following month, and they resumed proactive updates in 1:1s without prompting. Two quarters later they were the one flagging goal-acceptance problems on other projects before I noticed them.</p>
+<p>Make it yours: the underlying mechanism (check acceptance, make the beneficiary visible, audit the reward-behavior mismatch) transfers to any re-engagement story. Swap the specific goal and the specific customer for your own.</p>
+<h3>Story 2: Landing a cross-team initiative with no formal authority</h3>
+<p><strong>Situation:</strong> our team needed another team to adopt a new latency-monitoring standard, but that team's backlog was full and I had no authority to reprioritize it.</p>
+<p><strong>Task:</strong> get the standard adopted without an escalation to either manager.</p>
+<p><strong>Action:</strong> I ran a quick power audit and found the dependence was asymmetric: they needed our latency data more than I needed their sprint slot right then. I led with reciprocity, sending them a full latency breakdown they had already been asking analytics for, with no ask attached. Two weeks later, when I raised the actual request, I used social proof rather than restating the technical case: two other teams had already adopted the pattern and their p95 had dropped 30%, which I could show, not just claim.</p>
+<p><strong>Result:</strong> they slotted the adoption into the next sprint without escalation. The pattern spread to two more teams over the following quarter, each citing the same data point rather than a mandate from above.</p>
+<p>Make it yours: the specific data and the specific ask are yours to substitute. The shape is: read the dependence asymmetry honestly, lead with the tactic the asymmetry calls for (reciprocity when they need something from you, social proof when they need to see it is not just your opinion), and let the ask land second.</p>
+<h3>Story 3: Converting relationship conflict back into task conflict</h3>
+<p><strong>Situation:</strong> two engineers who used to pair constantly stopped talking, and standup had become status theater instead of real updates.</p>
+<p><strong>Task:</strong> restore the team's ability to work together without pretending the underlying disagreement did not exist.</p>
+<p><strong>Action:</strong> I diagnosed it as task conflict (an unresolved disagreement about a caching approach) that had curdled into relationship conflict because it never got resolved with data. I restated the original disagreement as an explicit question, what does the latency data actually show for each approach, and ran a 30-minute working session with the data on the table instead of opinions in the room. Separately, I noticed one engineer's individual contributions had been getting folded into &quot;the pairing group's&quot; output with no distinguishable credit, a social-loafing setup even though their actual effort had not dropped, so I split the next sprint into named, individually owned pieces of work.</p>
+<p><strong>Result:</strong> standup updates returned to specifics within two weeks. The caching decision shipped with both engineers' names on the design doc, and the two resumed pairing on the next project without a formal reconciliation conversation being needed.</p>
+<p>Make it yours: the technical disagreement is a stand-in for whatever your team's version was. The mechanism is: convert the person-level conflict back into a work-level question with evidence, and separately check whether a social-loafing setup is masking individual effort.</p>
+<h3>Story 4: Coaching a stalled senior engineer through the ACS model</h3>
+<p><strong>Situation:</strong> a senior engineer's 1:1s had become status updates with no growth conversation for roughly six months, and I suspected they had plateaued below their actual ceiling.</p>
+<p><strong>Task:</strong> re-open a real development conversation and give them a path to grow rather than just more of the same work.</p>
+<p><strong>Action:</strong> for assessment, I asked directly what they thought they were good at versus what they thought I saw in them, which surfaced a real gap, they saw themselves as an implementer, I saw staff-level system-design judgment they were not using. For challenge, I handed them ownership of a cross-team migration with genuine stakes, a hard deprecation deadline, rather than a safe internal project, and explicitly framed it as a growth bet rather than a test, to keep it a growth-mindset frame instead of a performance-mindset one. For support, I made sure their skip-level saw the design doc directly rather than filtered through me, building a sponsor relationship beyond their immediate manager. After the migration shipped, we ran structured reflection together: what worked, what they would change, what it implied for the next one.</p>
+<p><strong>Result:</strong> they led the next cross-team initiative unprompted. The promotion packet that followed was built from real artifacts (the design doc, the skip-level's direct visibility into it) rather than a narrative I had to construct after the fact.</p>
+<p>Make it yours: the specific assignment and the specific gap are yours to substitute. The shape is ACS in order, assessment surfaces the real gap, challenge is genuinely novel and framed as growth not a test, support builds a sponsor beyond you, and structured reflection closes the loop.</p>
+<h3>Story 5: Fixing onboarding to stop early attrition</h3>
+<p><strong>Situation:</strong> two of the last five hires left within their first two months, both citing feeling lost in their first few weeks, against an industry pattern where a large share of first-year turnover concentrates in the first 45 days.</p>
+<p><strong>Task:</strong> redesign onboarding so a new hire's first month builds momentum instead of confusion.</p>
+<p><strong>Action:</strong> I moved onboarding to start before day one, sending a concrete first-week plan and pairing assignment ahead of the start date rather than assembling it on the fly. I replaced a generic reading-list-and-shadow week with a small, real, shippable task in week one, chosen deliberately to be low-risk but genuinely useful, so the new hire's first contribution was real rather than a toy exercise. I set a structured 30/60/90 check-in cadence with explicit, named goals for each milestone instead of an open-ended &quot;let me know if you have questions.&quot;</p>
+<p><strong>Result:</strong> the next four hires all shipped a real change in week one, and none left in their first 90 days over the following two quarters, against the prior baseline of two departures in five hires within two months.</p>
+<p>Make it yours: the specific artifacts (the pairing plan, the first-week task) are yours to substitute. The mechanism that must survive is: start before day one, give a real task early rather than passive orientation, and check in on a fixed, explicit cadence rather than reactively.</p>
+<h3>Story 6: A difficult feedback conversation that changed behavior</h3>
+<p><strong>Situation:</strong> a report's code reviews had become a source of team friction, blunt to the point of discouraging junior engineers from asking for their review, but their technical judgment was consistently right.</p>
+<p><strong>Task:</strong> address the delivery without losing the technical rigor, and do it before it became a retention problem for the juniors they were reviewing.</p>
+<p><strong>Action:</strong> I gave the feedback close to a specific recent instance rather than saving it for a formal cycle, and anchored it entirely to behavior, not personality, describing the specific comment and its effect rather than saying they were &quot;harsh.&quot; I did not sandwich it between compliments, I stated it directly, then confirmed understanding by asking them to restate what they heard before we moved to solutions together. We agreed on a concrete behavioral change: lead every review comment with the reasoning before the correction, and I asked to see their next three reviews so I could reinforce the change while it was still forming rather than checking in only after the next incident.</p>
+<p><strong>Result:</strong> two junior engineers who had started avoiding requesting their review resumed doing so within a month. Their technical judgment, which had never been the actual problem, stayed exactly as sharp; only the delivery changed.</p>
+<p>Make it yours: the specific behavior is yours to substitute. The mechanism that must survive is: close to the event, behavior not personality, no sandwich, confirmed understanding, and a concrete reinforcement step rather than a one-time conversation.</p>
+<hr>
+<h2>In the room</h2>
+<p>The behavioral leadership round runs on a small set of recurring prompts. The table below names what each is actually testing and the shape of an answer that survives a follow-up question, not a script.</p>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>What they are actually testing</th>
+<th>The shape that lands</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&quot;What is your leadership philosophy?&quot;</td>
+<td>Whether you have a repeatable model or a collection of adjectives</td>
+<td>Name one or two of the four moves concretely, with a mechanism, not &quot;I lead by example&quot;</td>
+</tr>
+<tr>
+<td>&quot;Tell me about a time you failed as a leader&quot;</td>
+<td>Whether you can name a real mechanism failure, not a humble-brag disguised as a flaw</td>
+<td>Name the specific misdiagnosis (e.g. treated a goal-acceptance problem as a motivation problem) and the concrete fix that followed</td>
+</tr>
+<tr>
+<td>&quot;How do you motivate a low performer?&quot;</td>
+<td>Whether you separate a genuine skill gap from a goal-acceptance or reward-mismatch problem</td>
+<td>Diagnose which one it actually is before naming the intervention</td>
+</tr>
+<tr>
+<td>&quot;How do you resolve conflict between two people who don't report to each other?&quot;</td>
+<td>Whether you distinguish task from relationship conflict and have a mechanism for converting one into the other</td>
+<td>Restate the disagreement as a question about the work, with evidence, not a mediation session about feelings</td>
+</tr>
+<tr>
+<td>&quot;How do you give feedback that's hard to hear?&quot;</td>
+<td>Whether you have a repeatable structure, not just good intentions in the moment</td>
+<td>Close to the event, behavior not personality, confirmed understanding, a concrete follow-up</td>
+</tr>
+<tr>
+<td>&quot;Tell me about a hiring decision you got wrong&quot;</td>
+<td>Whether you learned a structural lesson (a selection-process gap) rather than just regretting the outcome</td>
+<td>Name what the interview process missed and the specific structural change you made afterward</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Deploy the evidence, do not cite it.</strong> A number lands as credibility; a citation lands as name-dropping. &quot;Structured, behavioral interviews are the strongest predictor of performance we have good evidence for, so I moved our loop from a freeform conversation to a fixed rubric&quot; is the right amount of research; &quot;Schmidt and Hunter (1998) found...&quot; in the middle of a behavioral answer reads as reciting a slide, not applying a lesson. Lead every answer with the concrete decision and result, and let the framework surface as the reasoning behind it, not the headline.</p>
+<p><strong>Scope honestly.</strong> If a story is really about coordination (you ran the meetings, you wrote the doc, everyone agreed) rather than a structural change (a reward system you redesigned, a norm you actually built), say so, and describe what you would build next time rather than inflating coordination into a mechanism it was not. A grounded &quot;here is what I actually changed and here is the gap I'd close next&quot; beats an overclaimed story that collapses on the second follow-up.</p>
+<pre><code class="hljs" data-lang="text">Pre-interview audit: leadership edition
+
+For each story you plan to tell:
+[ ] Can I name the specific construct at work (accepted vs rejected goal,
+    task vs relationship conflict, social loafing vs psychological safety,
+    a specific base of power)?
+[ ] Can I name the mechanism I built or the decision I made, not just the
+    outcome I hoped for?
+[ ] Do I have a number or a concrete signal that it worked?
+[ ] Does this read as a structural change (a reward system, a norm, a
+    process) or only as one good conversation that will not repeat itself
+    on a different team?
+[ ] If pushed on &quot;why did that work,&quot; do I have an answer beyond
+    &quot;they responded well to it&quot;?
+
+Across the board:
+[ ] For every story, does &quot;how&quot; get a more specific answer each time it
+    is asked, rather than a repeat of the headline?
+[ ] Have I checked at least one story against each of the four moves
+    (inspire, influence, build a team, grow talent), so I am not leaning
+    on one move for every answer?
+</code></pre>
+<p>The leadership version of the staff-engineer trap is the same shape: claiming you &quot;built a strong team culture&quot; or &quot;developed my people&quot; without naming the mechanism. Culture held because the norm was built and reinforced deliberately, not because people got along. Someone grew because you ran assessment, challenge, and support in order and closed the loop with structured reflection, not because you &quot;believed in them.&quot; The mechanism is the answer; the outcome only confirms the mechanism worked.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

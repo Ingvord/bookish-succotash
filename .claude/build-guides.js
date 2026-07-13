@@ -184,6 +184,14 @@ const GUIDES = [
     subtitle: 'What the loop actually tests: competency map, depth on IaC, observability, security, and data pipelines, plus six STAR story templates with quantified results and visible mechanisms.',
     accent:   '#5c6b1f',  // moss
   },
+  {
+    src:      '.claude/level-md/leadership-prep.md',
+    out:      'level/leadership-prep.html',
+    kicker:   'Interview Preparation · Engineering Leadership',
+    title:    'The Engineering Leadership Interview',
+    subtitle: 'The behavioral leadership round decoded through the Michigan leadership model: how to inspire, influence without authority, build teams that hold, and grow people, with the frameworks, evidence, and STAR templates that make each claim land.',
+    accent:   '#3d4552',  // graphite
+  },
 
   // ---- Practice -----------------------------------------------
   {
@@ -285,6 +293,7 @@ const GUIDES = [
 //  emerald     #0b6e4f   vector-db-prep               -- AA on white (6.3:1)
 //  rust        #a8431c   python-data-libs-prep        -- AA on white (6.0:1)
 //  sapphire    #1c4fa0   python-language-prep         -- AA on white (~8:1)
+//  graphite    #3d4552   leadership-prep               -- AA on white (~9:1)
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------
