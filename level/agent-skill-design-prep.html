@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Designing a Claude Code Agent Skill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #5c4033;
+  --accent-soft:  #5c403314;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- callouts ---------- */
+.callout {
+  margin: 1.6rem 0;
+  padding: 1.1rem 1.4rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+}
+.callout-label {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout-warning { border-left-color: #a3372b; background: #a3372b14; }
+.callout-warning .callout-label { color: #a3372b; }
+.callout-insight { border-left-color: #2d6a44; background: #2d6a4414; }
+.callout-insight .callout-label { color: #2d6a44; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · AI-Native Engineering</div>
+    <h1>Designing an Agent Skill, and Taking It Cloud Native</h1>
+    <div class="sub">A complete guide to the SKILL.md artifact and its frontmatter, the skills/subagents/plugins/MCP/hooks taxonomy, and the two escalations that tend to follow a design walkthrough: cloud-native deployment and MCP/A2A multi-agent integration.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>The shape of the round</h2>
+<p>Rounds built around agent-skill design tend to follow the same two-part shape, whichever company runs them. The first part is a scoped, familiar design walkthrough: you are handed a concrete problem (a skill that helps engineers write better pull request descriptions is a common one) and asked to walk through the file layout, the file contents, and the core prompt, out loud, often in a shared editor with no code execution. That constraint matters more than it looks: with no working demo to fall back on, structure and precision carry the entire signal.</p>
+<p>The first part is a fluency check. You either know the artifact cold or you do not, and at senior level and above that knowledge is assumed rather than nice to have. The second part changes the game: once the design walkthrough lands, the interviewer typically escalates, &quot;now make it cloud native,&quot; then &quot;now integrate it with a third party, MCP, A2A, greenfield.&quot; This is not a knowledge check anymore, it is an architecture-improvisation check, scored on how fast the right shape appears in your head rather than on whether you eventually get there after being walked to it.</p>
+<p>The reason this shape of round exists at all is that &quot;familiarity with AI coding assistants and experience extending them through custom plugins, skills, or hooks&quot; has become a routine line in job descriptions at AI-native companies, and a line in a JD tends to produce a corresponding line in the loop. This guide covers exactly that surface: the artifact, the taxonomy around it, and the two escalations an interviewer is most likely to reach for once the artifact question is answered.</p>
+<hr>
+<h2>The skill artifact</h2>
+<p><strong>What a skill is.</strong> A skill is a directory containing, at minimum, a <code>SKILL.md</code> file with YAML frontmatter and a Markdown body. The frontmatter is machine-readable metadata; the body is the instructions the agent follows once the skill activates. Everything else in the directory is optional.</p>
+<pre><code class="hljs" data-lang="text">pr-description/
+├── SKILL.md          # required: frontmatter + instructions
+├── scripts/           # optional: executable helpers
+├── references/         # optional: docs the agent loads on demand
+└── assets/             # optional: templates, static resources
+</code></pre>
+<p><strong>Where skills live, and why the location matters.</strong> Three install locations exist, and they resolve in a fixed precedence order when names collide.</p>
+<table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Path</th>
+<th>Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Personal</td>
+<td><code>~/.claude/skills/&lt;name&gt;/SKILL.md</code></td>
+<td>Every project you work in</td>
+</tr>
+<tr>
+<td>Project</td>
+<td><code>.claude/skills/&lt;name&gt;/SKILL.md</code></td>
+<td>This repository only</td>
+</tr>
+<tr>
+<td>Plugin</td>
+<td><code>&lt;plugin&gt;/skills/&lt;name&gt;/SKILL.md</code></td>
+<td>Wherever the plugin is enabled</td>
+</tr>
+</tbody>
+</table>
+<p>When the same name exists at more than one level, personal overrides project, and a skill at any level overrides a bundled skill of the same name. Plugin skills are namespaced as <code>plugin-name:skill-name</code>, so they never collide with the other two. This is worth stating explicitly in an interview, because &quot;where does it live&quot; is really &quot;who is this for&quot;: a personal skill is your own workflow shortcut, a project skill is a team convention checked into version control, and a plugin skill is a distributable capability with its own bundled agents, hooks, and MCP servers.</p>
+<p><strong>When to add supporting files versus stay self-contained.</strong> A skill that only produces a description from context that is already in front of the model, like drafting PR text from a diff the agent can read directly, has no reason to carry a <code>scripts/</code> directory: every dependency it needs is already available through the agent's normal tools. Reach for <code>scripts/</code> when the task involves a deterministic transformation that is cheaper and more reliable to run than to have the model reproduce token by token (parsing a binary format, hitting a rate-limited API with pagination, running a fixed compliance check). Reach for <code>references/</code> when the instructions need detail that most invocations will not touch (an edge-case table, a full API reference), because the whole point of progressive disclosure is that this material only enters context when the skill actually needs it, not on every activation. Keeping a skill dependency-free by default and only reaching for bundled code when the model genuinely cannot do the step reliably is a good default to state as a deliberate design principle.</p>
+<p><strong>Discovery and progressive disclosure.</strong> Skills load in three stages. At startup, the agent loads only <code>name</code> and <code>description</code> for every available skill, roughly a hundred tokens each, just enough to recognize when a skill might apply. When a task matches, the full <code>SKILL.md</code> body loads into context, capped by convention at under 5,000 tokens, with 500 lines as the practical ceiling before you should be splitting content into <code>references/</code>. Files inside <code>scripts/</code>, <code>references/</code>, and <code>assets/</code> load only when the instructions in the body point to them. This is why the description field is not throwaway metadata: it is the only thing standing between the agent and the decision to activate your skill at all, and a vague description is a skill that silently never fires.</p>
+<hr>
+<h2>Frontmatter, field by field</h2>
+<p>Two frontmatter fields trip up more candidates than any other: <code>allowed-tools</code> and <code>argument-hint</code>. Most answers stop at <code>name</code> and <code>description</code> and never get further, which is a shame because the other two are exactly where the interesting judgment calls live. Here is the complete surface, split the way it actually splits.</p>
+<p><strong>The portable six.</strong> These are the only fields the open <a href="https://agentskills.io">Agent Skills</a> specification defines, and they are the only fields that survive outside Claude Code: <a href="http://claude.ai">claude.ai</a> skill uploads, the Skills API, and the <code>package_skill.py</code> packaging tool all validate against exactly this set.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Constraint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>Yes</td>
+<td>Max 64 chars, lowercase letters/digits/hyphens only, no leading, trailing, or doubled hyphen, must match the parent directory name</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>Yes</td>
+<td>Max 1,024 chars, non-empty, should state what the skill does and when to use it</td>
+</tr>
+<tr>
+<td><code>license</code></td>
+<td>No</td>
+<td>License name, or a pointer to a bundled license file</td>
+</tr>
+<tr>
+<td><code>compatibility</code></td>
+<td>No</td>
+<td>Max 500 chars, environment requirements (intended product, system packages, network access)</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td>No</td>
+<td>Free-form string-to-string map for your own tooling</td>
+</tr>
+<tr>
+<td><code>allowed-tools</code></td>
+<td>No</td>
+<td>Space-separated list of tools pre-approved to run; marked experimental in the spec</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>allowed-tools</code>, and the trap in how people describe it.</strong></p>
+<div class="callout callout-warning">
+<span class="callout-label">The allowed-tools trap</span>
+<p><code>allowed-tools</code> does not restrict a skill. It <strong>pre-approves</strong> the listed tools for the turn that invokes the skill, so Claude runs them without a permission prompt. Every other tool stays fully callable; the field removes nothing from the available pool. The grant also clears the moment you send your next message, so it is a single-turn convenience, not a standing policy.</p>
+<p>Restriction is a different field: <code>disallowed-tools</code> removes tools from the pool while the skill is active. Saying "I scope the skill with <code>allowed-tools</code>" in the room is the wrong answer, and it is exactly the kind of nuance an interviewer who reads the docs weekly will catch on the follow-up.</p>
+</div>
+<p>The correct framing is a permissions story with two halves: <code>allowed-tools</code> buys you a frictionless run for the specific commands a skill needs, and <code>disallowed-tools</code> (or ordinary deny rules in <code>settings.json</code> for anything session-wide) is where actual scoping happens. For a skill that touches version control and an issue tracker, the honest answer is that <code>allowed-tools</code> should list the narrow, specific commands the skill legitimately needs (<code>Bash(git log:*)</code>, <code>Bash(gh pr view:*)</code>), not a blanket grant, because a broad <code>allowed-tools</code> line is itself an over-permissioned skill, just one that looks tidy on the page.</p>
+<p><strong><code>argument-hint</code>, and why it is Claude Code-only.</strong> <code>argument-hint</code> shows an autocomplete hint for expected arguments, e.g. <code>[issue-number]</code>. It is real and useful inside Claude Code, but it is not part of the portable spec. Package or upload a skill carrying it and the tool hard-errors:</p>
+<pre><code class="hljs" data-lang="text">Unexpected key(s) in SKILL.md frontmatter: argument-hint.
+Allowed properties are: allowed-tools, compatibility,
+description, license, metadata, name
+</code></pre>
+<p>The practical takeaway, and a clean thing to say out loud in a greenfield-portability discussion: if a skill needs to survive outside Claude Code (an upload to <a href="http://claude.ai">claude.ai</a>, distribution through the Skills API), keep its frontmatter to the portable six. If it only ever runs inside Claude Code, the extended fields below are fair game.</p>
+<p><strong>The Claude Code superset.</strong> Claude Code accepts every field above plus a set of platform-specific extensions. The ones worth knowing by name: <code>when_to_use</code> (extra invocation guidance, appended to <code>description</code>, both capped together at 1,536 characters in the skill listing), <code>arguments</code> (named positional arguments for <code>$name</code> substitution in the body), <code>disable-model-invocation</code> and <code>user-invocable</code> (invocation control, covered next section), <code>disallowed-tools</code> (the actual restriction mechanism), <code>model</code> and <code>effort</code> (override for the turn), <code>context: fork</code> with <code>agent</code> and <code>background</code> (run the skill in a subagent), <code>hooks</code> (lifecycle automation scoped to the skill, also covered next section), and <code>paths</code> (glob patterns that gate automatic activation to matching files). None of these validate outside Claude Code.</p>
+<hr>
+<h2>The taxonomy</h2>
+<p>Interviewers use this distinction as a fluency check because candidates genuinely blur these together under pressure. Six mechanisms, one row each.</p>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>What it is</th>
+<th>Right tool when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Skill</td>
+<td>A <code>SKILL.md</code> folder: metadata plus instructions, optionally with scripts and references</td>
+<td>You are packaging a repeatable procedure or domain knowledge for an agent to load on demand</td>
+</tr>
+<tr>
+<td>Slash command</td>
+<td>As of the current Claude Code generation, merged into skills; <code>.claude/commands/x.md</code> and <code>.claude/skills/x/SKILL.md</code> both produce <code>/x</code></td>
+<td>Historical name for what a user-invocable skill does; new work should just be a skill</td>
+</tr>
+<tr>
+<td>Subagent</td>
+<td>A specialized agent, invoked via <code>context: fork</code> from a skill or spawned directly, with its own context window</td>
+<td>The task needs isolated context or a different tool/model profile than the main conversation</td>
+</tr>
+<tr>
+<td>Plugin</td>
+<td>A bundle of skills, agents, hooks, and MCP servers, loaded by local path or marketplace, namespaced as <code>plugin:skill</code></td>
+<td>You are distributing a capability set as a unit rather than a single procedure</td>
+</tr>
+<tr>
+<td>MCP server</td>
+<td>An external process exposing tools, resources, and prompts over the Model Context Protocol</td>
+<td>You are connecting the agent to a system that lives outside the agent's own process: a database, a SaaS API, a filesystem</td>
+</tr>
+<tr>
+<td>Hook</td>
+<td>A script bound to a lifecycle event (<code>PreToolUse</code>, <code>SessionStart</code>, and roughly thirty others), scoped globally or to a skill</td>
+<td>Something must happen automatically on a system event, with no human or model decision in the loop</td>
+</tr>
+</tbody>
+</table>
+<p>One sentence to hold the whole table: skills package what the agent knows how to do, subagents and plugins package how much of it runs where, and MCP servers and hooks are the two ways the agent's own process reaches outside itself, one for data and tools, one for automatic reaction to events.</p>
+<hr>
+<h2>Invocation control: who fires the skill, and how</h2>
+<p>This distinction is easy to skim past in a design walkthrough, but it matters more than it looks, because it is the direct conceptual setup for the cloud-native escalation that tends to follow it.</p>
+<p><strong>Three invocation modes, not two.</strong> A skill can be invoked by a human typing <code>/skill-name</code>, by the model deciding on its own that the skill's description matches the current task, or by a system event firing a hook with no decision step at all. The frontmatter controls which of the first two are open:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Model can invoke</th>
+<th>User can invoke</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>default</td>
+<td>yes</td>
+<td>yes</td>
+<td>Description always in context; full skill loads when either triggers it</td>
+</tr>
+<tr>
+<td><code>disable-model-invocation: true</code></td>
+<td>no</td>
+<td>yes</td>
+<td>Description not in context at all; only a typed <code>/name</code> loads it</td>
+</tr>
+<tr>
+<td><code>user-invocable: false</code></td>
+<td>yes</td>
+<td>no</td>
+<td>Description always in context; hidden from the <code>/</code> menu, Claude-only</td>
+</tr>
+</tbody>
+</table>
+<p>Reach for <code>disable-model-invocation: true</code> on anything with a side effect you want to time yourself: <code>/commit</code>, <code>/deploy</code>, a skill that posts to Slack. You do not want the model deciding to deploy because the code looks ready. Reach for <code>user-invocable: false</code> on pure background knowledge that is not itself an action, a skill that just explains how a legacy subsystem works, where <code>/legacy-system-context</code> is not something a user would ever type.</p>
+<p><strong>Hook-triggered is the third mode, and it is the bridge.</strong> A skill's frontmatter can carry its own <code>hooks</code> block, scoped to that skill's lifecycle:</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-meta">---</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">secure-operations</span>
+<span class="hljs-attr">description:</span> <span class="hljs-string">Perform</span> <span class="hljs-string">operations</span> <span class="hljs-string">with</span> <span class="hljs-string">security</span> <span class="hljs-string">checks</span>
+<span class="hljs-attr">hooks:</span>
+  <span class="hljs-attr">PreToolUse:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">matcher:</span> <span class="hljs-string">&quot;Bash&quot;</span>
+      <span class="hljs-attr">hooks:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">type:</span> <span class="hljs-string">command</span>
+          <span class="hljs-attr">command:</span> <span class="hljs-string">&quot;./scripts/security-check.sh&quot;</span>
+<span class="hljs-meta">---
+</span></code></pre>
+<p>This runs <code>security-check.sh</code> before every Bash call the skill makes, automatically, with no human typing a command and no model deciding to check first. Claude Code exposes roughly thirty hook events beyond <code>PreToolUse</code>: <code>SessionStart</code>, <code>PostToolUse</code>, <code>UserPromptSubmit</code>, <code>FileChanged</code>, <code>SubagentStop</code>, and more, each firing when a specific system event occurs rather than when a person or the model chooses to act.</p>
+<div class="callout callout-insight">
+<span class="callout-label">Why this is the bridge, not a side note</span>
+<p>A hook is a trigger that is a system event, not a human command, running in the same process as the agent it's scoped to. A cloud-native agent triggered by a webhook is the identical shape at a different layer: the trigger is still a system event, not a human command, it has just moved outside the process boundary. If you can articulate hook-triggered invocation cleanly, you already have the first half of the "make it cloud native" answer before the interviewer asks for it.</p>
+</div>
+<div class="callout callout-script">
+<span class="callout-label">Sample answer</span>
+<p>"There are three ways a skill fires: I type `/name`, the model decides the description matches, or a hook fires it off a lifecycle event with nobody deciding in the moment at all. That third one is worth dwelling on, because it's structurally the same shape as an event-driven system outside Claude Code: a `PreToolUse` hook reacting to a tool call and a webhook reacting to a PR-opened event are both 'system event triggers action, no human in the loop at invocation time.' Everything about designing a hook-triggered skill, the idempotency, the scoping, the failure handling, carries over almost unchanged when that trigger becomes an external event instead of an internal one."</p>
+</div>
+<hr>
+<h2>Writing the core prompt</h2>
+<p>The core prompt is the body of <code>SKILL.md</code> below the frontmatter: what you actually tell the model to do. Three things make one good.</p>
+<p><strong>Structure first.</strong> State the task in one sentence, then break the procedure into ordered steps, then state the output format explicitly and unambiguously. An agent following an unstructured wall of instructions will improvise where you needed determinism; an agent following numbered steps with a stated output contract will not.</p>
+<p><strong>Constraints as guardrails, not suggestions.</strong> If the skill must never touch certain files, must always ask before an irreversible action, or must produce output within a length bound, say so as an explicit constraint near the top of the body, not buried in step six. Ambiguous instructions are the most common failure mode in a skill that &quot;mostly works&quot;: the model fills gaps with its best guess, and best guesses vary run to run.</p>
+<p><strong>Output format as a contract.</strong> If the consuming system is a PR template, an issue tracker field, or another agent downstream, the format needs to be specified precisely enough that a second party (human or agent) can rely on it without re-parsing prose. This is the same discipline as designing a wire format for an API: you would not ship an endpoint whose response shape depends on the phase of the moon, and you should not ship a skill whose output shape does either.</p>
+<p>This discipline shows up anywhere LLM output feeds a downstream system, not just in skills. A multi-stage agent pipeline is a clean illustration: an early planning stage does not just ask an LLM to &quot;figure out the integration,&quot; it constrains the output to a fixed schema the next stage can consume without further interpretation, and a later code-generation stage treats its own LLM output as untrusted until it clears a chain of deterministic gates, contract tests, then scenario tests, then a build step, before anything reaches production. That is prompt engineering discipline expressed as a pipeline: structure, constraint, and a verifiable output contract, the exact three properties a good <code>SKILL.md</code> body needs, just applied to a different artifact.</p>
+<div class="callout callout-script">
+<span class="callout-label">Sample answer</span>
+<p>"I write the core prompt the way I'd write any stage boundary in a pipeline: state the task in one line, give ordered steps, and then nail down the output format hard enough that whatever consumes it doesn't have to guess. For a PR-description skill specifically, that means the prompt tells the model to scan the branch's commits and diff, decide whether this is a short fix or a complex feature because that changes what 'good' looks like, estimate blast radius and review effort in developer hours so a reviewer can triage at a glance, and populate the issue tracker link if one exists in the branch name or commit trailers. Every one of those is a step with a defined output, not an open-ended 'write a good description.'"</p>
+</div>
+<hr>
+<h2>Worked example: the PR-description skill, complete</h2>
+<p>A full, valid <code>SKILL.md</code> for this exact prompt shape, with accurate frontmatter and a body that follows the structure above.</p>
+<pre><code class="hljs" data-lang="markdown">---
+name: pr-description
+description: Drafts a pull request description from the branch&#x27;s commit history and diff against the base branch, sized to the scope of the change. Use when opening a PR or when the user asks for a PR description, summary, or write-up of pending changes.
+allowed-tools: Bash(git log:<span class="hljs-emphasis">*) Bash(git diff:*</span>) Bash(gh pr view:<span class="hljs-emphasis">*) Bash(gh issue view:*</span>)
+<span class="hljs-section">argument-hint: [issue-number]
+---</span>
+
+<span class="hljs-section">## Task</span>
+
+Draft a pull request description for the current branch&#x27;s changes against its
+base branch. If an issue number is given as an argument, link it explicitly.
+
+<span class="hljs-section">## Steps</span>
+
+<span class="hljs-bullet">1.</span> Run <span class="hljs-code">`git log &lt;base&gt;..HEAD`</span> and <span class="hljs-code">`git diff &lt;base&gt;..HEAD --stat`</span> to see the
+   full set of commits and the shape of the change.
+<span class="hljs-bullet">2.</span> Classify the change as a short fix (single concern, low blast radius) or a
+   complex feature (multiple concerns, or touches a shared module). State
+   which one and why in one sentence.
+<span class="hljs-bullet">3.</span> Estimate blast radius: list the modules or services touched, and flag any
+   that are shared by more than one team.
+<span class="hljs-bullet">4.</span> Estimate review effort in developer hours, based on diff size and the
+   blast-radius list, not diff size alone.
+<span class="hljs-bullet">5.</span> If <span class="hljs-code">`$ARGUMENTS`</span> contains an issue number, fetch it with
+   <span class="hljs-code">`gh issue view &lt;number&gt;`</span> and link it under a &quot;Closes&quot; line.
+
+<span class="hljs-section">## Output format</span>
+
+<span class="hljs-bullet">-</span> Title: imperative mood, under 72 characters.
+<span class="hljs-bullet">-</span> Summary: two to four sentences, what changed and why, not how.
+<span class="hljs-bullet">-</span> Change classification: short fix or complex feature, with the one-sentence
+  reason from step 2.
+<span class="hljs-bullet">-</span> Blast radius: bullet list of touched modules/services.
+<span class="hljs-bullet">-</span> Review effort estimate: a single number in developer hours, with the basis
+  stated in parentheses.
+<span class="hljs-bullet">-</span> Closes line, if an issue number was resolved in step 5.
+
+<span class="hljs-section">## Constraints</span>
+
+<span class="hljs-bullet">-</span> Do not invent commit history or diff content; if <span class="hljs-code">`git log`</span> or <span class="hljs-code">`git diff`</span>
+  return nothing, say so and stop rather than fabricating a description.
+<span class="hljs-bullet">-</span> Keep the summary in prose. Do not restate the diff stat as the summary.
+</code></pre>
+<p>This is deliberately dependency-free: no <code>scripts/</code>, no <code>references/</code>, because every input the skill needs (commit log, diff, issue metadata) is already reachable through the pre-approved <code>git</code> and <code>gh</code> commands, and the transformation from that data to prose is exactly what the model is good at without help. <code>allowed-tools</code> lists four narrow, read-only command patterns, not a blanket grant, which is the version of the permission story the earlier callout argues for.</p>
+<hr>
+<h2>Cloud native: the three inversions</h2>
+<div class="callout callout-warning">
+<span class="callout-label">Why this trips people up</span>
+<p>The mapping from a local, developer-invoked skill to a hosted, event-triggered agent often does not surface unprompted, even for candidates who know every individual piece. The fix is not more knowledge, it is retrieval speed: turn the mapping into a four-part reflex you can produce in the first few seconds after the prompt lands, before you start reasoning from scratch.</p>
+</div>
+<p><strong>The mental model.</strong> Taking a skill cloud native is not a rewrite, it is three inversions of the same shape, plus one concern that has to be added because it did not exist before.</p>
+<ol>
+<li><strong>Trigger</strong> inverts from a human typing a command to a system event: a webhook, a repo event, a schedule, a queue message.</li>
+<li><strong>Runtime</strong> inverts from the developer's own machine to hosted compute running the Agent SDK: a container, a serverless function, or a managed agent runtime.</li>
+<li><strong>Identity</strong> inverts from the developer's own credentials to a scoped service principal with least-privilege access, because nobody is sitting at a terminal to authorize each action anymore.</li>
+<li><strong>Observability</strong>, the concern that has to be added: a developer watching the terminal was your logging, tracing, and alerting all at once. None of that exists by default in a hosted deployment; it has to be built.</li>
+</ol>
+<p><strong>The concrete shape.</strong> Take the PR-description skill above and make it cloud native: a PR-opened webhook from the source host hits an endpoint, which triggers a hosted agent running the Agent SDK (in Python or TypeScript; other languages drive the CLI as a subprocess with <code>-p --output-format json</code>) with a scoped token that can read the diff and write a comment but nothing broader, and the agent writes the description back through the platform's API. Every piece of the local skill's logic, the steps, the output contract, the constraints, survives unchanged; only the four things above moved.</p>
+<p>One distinction worth having precise, because it is the credible answer to &quot;how would you host this&quot;: the Agent SDK is a library that runs the agent loop in your own process, in your own infrastructure. Managed Agents is a separate, hosted product where Anthropic runs the agent and the sandbox for you. Naming both, and being clear about which one you would reach for and why, reads as someone who has actually looked at the deployment surface rather than someone reciting &quot;cloud native&quot; as a phrase.</p>
+<p><strong>The point worth landing.</strong> This exact shape is not exotic; production systems implement it routinely. A webhook or scheduled event fires a containerized task (ECS Fargate, Cloud Run, a Lambda), secrets live in a parameter store or secrets manager rather than developer credentials, and failures propagate through a queue to a notification service rather than back to a terminal someone is watching. If you have built anything with this shape before, even for an unrelated purpose, that recognition is the actual skill being tested here: the gap is rarely capability, it is noticing that a familiar pattern is being asked for in a different costume.</p>
+<div class="callout callout-script">
+<span class="callout-label">Sample answer</span>
+<p>"Taking a skill cloud native is three inversions of the same shape. The trigger moves from a person typing a command to a system event, a webhook, a schedule, a queue message. The runtime moves from a developer's machine to hosted compute running the Agent SDK, a container or a serverless function. And identity moves from the developer's own credentials to a scoped service principal, because nobody's there to authorize each action anymore. You also have to add observability from scratch, because a developer watching their own terminal was doing that job implicitly before. Concretely for this skill: a PR-opened webhook triggers a hosted agent with a scoped token that can read the diff and post a comment and nothing else, and it writes the description back through the API. If you've built anything with this shape before, this is the moment to name it: an event trigger firing a containerized task, secrets in a parameter store instead of your own credentials, failures routed through a queue to a notifier instead of surfacing in a terminal you're watching. Swap in your own system's real nouns here, it's the fastest way to turn a generic answer into a credible one."</p>
+</div>
+<p><strong>The drill.</strong> Given any &quot;make X cloud native&quot; prompt, state the four in this fixed order before you say anything else. It costs four sentences and it puts you back at peer level instantly:</p>
+<ol>
+<li>Trigger: what system event replaces the human command.</li>
+<li>Runtime: what hosted compute replaces the developer machine.</li>
+<li>Identity: what scoped credential replaces the developer's own.</li>
+<li>Observability: what replaces the terminal you're no longer watching.</li>
+</ol>
+<p>Then, and only then, get concrete about the specific service names for the platform in front of you.</p>
+<hr>
+<h2>MCP, the agent-to-tool layer</h2>
+<p>MCP fundamentals (the host/client/server model, the M-times-N to M-plus-N framing, tools/resources/prompts, stdio versus Streamable HTTP transports) are covered in depth in the companion <a href="../db/ai-agent-infra-prep.html">AI Agent Infrastructure guide</a>. This section adds what that one does not: the tool-surface design judgment an interviewer is actually probing for when they ask &quot;how would you expose this to an agent.&quot;</p>
+<p><strong>Narrow tools beat one generic tool, and it is both an API decision and a security decision.</strong> A <code>get_pr_diff</code> tool and a <code>post_pr_comment</code> tool, each with a tight input schema, is a better MCP surface than one <code>github_api</code> tool that accepts an arbitrary method and payload. The API-design argument is familiar: narrow tools are self-documenting, easier for the model to select correctly among, and easier to version. The security argument is the one worth stating unprompted, because it is the one an AI-native interviewer is listening for: a generic pass-through tool has the model's entire permission footprint riding on every single call, so a prompt-injected instruction that manipulates the model into calling it can do anything the underlying credential can do. A narrow tool bounds the blast radius of a single bad call to exactly what that tool does, nothing more.</p>
+<p><strong>Where the design breaks down in practice.</strong> Tool sprawl: connect enough MCP servers at once and the model has to choose correctly among dozens of similarly named tools, and selection quality degrades well before you exhaust the context window. Confused-deputy risk: a tool that legitimately needs broad access (a general-purpose database query tool, for instance) inherits the full trust of whoever granted it, so the narrow-tool principle sometimes runs into a genuine requirement for breadth, and the right answer there is scoping the credential behind the tool as tightly as the task allows, not widening the tool's own interface. And the spec itself is young: expect client and server support to lag the latest revision, and pin versions rather than assuming the newest spec feature is universally supported.</p>
+<hr>
+<h2>A2A, the agent-to-agent layer</h2>
+<p>This is the section worth over-investing in relative to how briefly it tends to come up. A2A is the kind of topic candidates raise unprompted because they know it exists, and then underplay because they haven't gone past the one-sentence description, which reads worse in the room than not raising it at all. The goal here is a two-minute answer that can be delivered without hedging, plus an honest line about where direct experience stops.</p>
+<p><strong>What it standardizes, and why it's a different problem than MCP.</strong> MCP connects one agent to tools and data it does not have natively. A2A connects two independent agents, possibly built by different teams on different frameworks and different model providers, so they can discover each other and delegate work without a person wiring up custom integration code. The standard framing, worth repeating because it is the fastest way to place A2A relative to MCP in one sentence: MCP is vertical, agent reaching down into tools; A2A is horizontal, agent reaching sideways to a peer with its own reasoning underneath, possibly including its own MCP tools. A single system frequently uses both at once, and they are complementary layers, not competing standards.</p>
+<p><strong>Capability discovery: the Agent Card.</strong> An agent publishes an Agent Card, a JSON document describing its identity, capabilities, endpoints, and authentication requirements, conventionally at the well-known path <code>/.well-known/agent-card.json</code> under RFC 8615. Two other discovery mechanisms exist alongside the well-known-URL convention: curated registries, a centralized catalog that clients query by skill, tag, or provider, suited to enterprise and marketplace settings; and direct configuration, where the client is pre-wired with Agent Card details for a known, tightly coupled peer. The well-known-URL path is the one to lead with, because it is the one that makes A2A a discovery protocol rather than just a message format.</p>
+<p><strong>Task lifecycle.</strong> A2A models work between agents as a task with defined states, not a synchronous function call. The task states, precisely: <code>SUBMITTED</code>, <code>WORKING</code>, <code>COMPLETED</code>, <code>FAILED</code>, <code>CANCELED</code>, <code>INPUT_REQUIRED</code>, <code>REJECTED</code>, and <code>AUTH_REQUIRED</code>. The first four are terminal; <code>INPUT_REQUIRED</code> and <code>AUTH_REQUIRED</code> are interrupted states where the remote agent needs something back from the caller before it can continue, which is the protocol's built-in way of expressing &quot;I can't finish this without more from you,&quot; structurally similar to a human coworker asking a clarifying question mid-task rather than failing silently.</p>
+<p><strong>The RPC surface.</strong> Core operations, defined consistently across all transport bindings: <code>SendMessage</code>, <code>SendStreamingMessage</code>, <code>GetTask</code>, <code>ListTasks</code>, <code>CancelTask</code>, <code>SubscribeToTask</code>, the four <code>TaskPushNotificationConfig</code> methods (<code>Create</code>, <code>Get</code>, <code>List</code>, <code>Delete</code>) for registering webhook callbacks on task state changes, and <code>GetExtendedAgentCard</code> for capabilities gated behind additional authentication. Three transport bindings carry these: JSON-RPC 2.0, gRPC, and HTTP+JSON/REST, chosen per integration rather than mandated. Streaming (<code>SendStreamingMessage</code>, <code>SubscribeToTask</code>) and push notifications are each gated behind a capability flag the Agent Card declares (<code>capabilities.streaming</code>, <code>capabilities.pushNotifications</code>), so a caller checks the card before assuming either is available.</p>
+<p><strong>Message, Part, Artifact.</strong> Communication between agents is a <code>Message</code> with a role (user or agent), built from one or more <code>Part</code>s, typed content containers holding text, bytes, a URL, or structured JSON. A task's output is an <code>Artifact</code>, also composed of <code>Part</code>s, kept distinct from <code>Message</code> specifically to separate the conversational exchange from the actual work product being delivered.</p>
+<p><strong>Governance and maturity, stated plainly.</strong> A2A originated at Google in 2025 and is now an open, vendor-neutral standard under the Linux Foundation, with a steering committee spanning AWS, Cisco, Google, IBM, Microsoft, Salesforce, SAP, and ServiceNow. Version 1.0 shipped in 2026. It is genuinely cross-vendor, which is the property that makes it different from a proprietary orchestration format, but it is young: verifying that an Agent Card actually belongs to who it claims (signed Agent Cards address this, adoption is uneven), tracing a failure across three or four hops of delegated agents, and deciding how much autonomy to hand a remote agent before a human needs to be in the loop are all still hardening. State that as fact, not apology, because a mature-sounding claim about a year-old standard is the bluff a security-minded interviewer is specifically listening for.</p>
+<div class="callout callout-script">
+<span class="callout-label">Sample answer: honest limits</span>
+<p>"I haven't run a production A2A integration. What I have built is the pattern A2A formalizes, by hand: a multi-stage pipeline where each stage is independently deployed with defined inputs, outputs, and failure states, coordinated through an orchestrator rather than through A2A's task-and-message model. If I were building this for real today, I'd expect the switch to be mostly conceptual, not architectural: the stages already have the shape of independent agents, I'd be trading a hand-rolled handoff for A2A's Agent Card discovery and its task lifecycle. What I don't have is hands-on experience with the trust and verification side, signed Agent Cards, cross-organization authentication, which is exactly the newest and least settled part of the standard anyway."</p>
+</div>
+<hr>
+<h2>Multi-agent worked example</h2>
+<p>Extend the PR-description agent into a small multi-agent system: a security-review agent and a test-generation agent, each independently capable, composed around the same PR event.</p>
+<p>One plausible shape: the PR-description agent, on receiving the webhook, opens A2A tasks with both peers in parallel rather than sequentially, since neither depends on the other's output. The security-review agent pulls the diff over its own MCP tool connection to a SAST scanner and returns findings as an <code>Artifact</code>; the test-generation agent inspects changed functions and proposes test cases, potentially entering <code>INPUT_REQUIRED</code> if it needs the PR author to confirm expected behavior for an ambiguous change. The PR-description agent waits on both tasks, then composes a single PR comment: description, security findings, suggested tests, one artifact instead of three separate bot comments competing for attention.</p>
+<p><strong>Two contested design questions, worth naming as contested rather than settled, because the field has not converged on either.</strong> Orchestrator-led versus peer-to-peer: should the PR-description agent explicitly coordinate the other two (an orchestrator pattern, easier to reason about, a single point of failure and a bottleneck), or should all three discover and negotiate independently (peer-to-peer, more resilient to any one agent's outage, harder to reason about and to debug)? And synchronous waiting versus fire-and-forget with a later reconciliation step: does the description agent block on both tasks before commenting, or post an initial description immediately and update the comment as each peer's task completes? Both are live design debates in multi-agent orchestration right now, not settled best practice, and saying so is more credible than picking one and presenting it as the obvious answer.</p>
+<hr>
+<h2>Security of agent skills and agentic systems</h2>
+<p><strong><code>allowed-tools</code> as a permission surface, done correctly.</strong> The earlier callout already corrected the misconception; the constructive version is that a skill touching version control and an issue tracker deserves an <code>allowed-tools</code> list scoped to the exact commands it needs (<code>Bash(git log:*)</code>, not <code>Bash(git:*)</code>), because the field's actual function, pre-approving specific commands, is only a security improvement if the list is narrow. A broad <code>allowed-tools</code> grant is not scoping, it's just a permission prompt you've pre-answered &quot;yes&quot; to for everything.</p>
+<p><strong>Prompt injection, and the honest answer about defenses.</strong> There is no parameterization primitive for LLM inputs equivalent to a prepared statement for SQL. A prepared statement separates code from data at the interpreter level, so injected data physically cannot become executable instructions. An LLM has no equivalent boundary: instructions and data share the same channel, natural language, and content retrieved from an untrusted source (a webpage, a PR description, an issue comment) can contain text that reads as an instruction to the model. This is why defenses are containment strategies, not elimination: narrow tool surfaces, human approval gates on high-impact actions, and treating retrieved content as data to reason about rather than instructions to follow, stated explicitly in the skill's own prompt.</p>
+<p><strong>Excessive agency, broken into its three root causes</strong>, per <a href="https://genai.owasp.org/llmrisk/llm062025-excessive-agency/">OWASP LLM06:2025</a>, with the mitigation matched to each:</p>
+<ul>
+<li><strong>Excessive functionality</strong>: the agent has access to capabilities beyond what the task needs (a &quot;GitHub API&quot; tool when the task only ever needs to comment on a PR). Mitigate by minimizing the tool surface to exactly what's required, the same narrow-tools argument from the MCP section.</li>
+<li><strong>Excessive permissions</strong>: the agent's credential can do more than its tools expose (a PR-comment tool riding on a token that also has repo-delete rights). Mitigate by scoping the underlying credential to the minimum access the tool actually needs, independent of what the tool's interface claims to expose.</li>
+<li><strong>Excessive autonomy</strong>: the agent takes high-impact or irreversible actions without a checkpoint (auto-merging, auto-deploying, auto-deleting). Mitigate with human-in-the-loop gates on anything irreversible or high-blast-radius, which is a design decision made once per action type, not something to reconsider under time pressure mid-incident.</li>
+</ul>
+<p><strong>The lethal trifecta, as a design constraint rather than a checklist item.</strong> <a href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/">Simon Willison's framing</a>, from mid-2025, names the combination that makes data exfiltration close to trivial: access to private data, exposure to untrusted content, and the ability to communicate externally. Any one or two of the three is manageable; all three together mean an attacker only needs to get malicious instructions into the untrusted-content leg (a webpage the agent summarizes, a PR description it reads) to have the agent retrieve private data and hand it to an attacker-controlled endpoint through the external-communication leg. The uncomfortable part is that removing any single leg breaks most useful agents, a PR-description skill needs to read repository content (private-ish data), read a diff that could contain adversarial text (untrusted content), and post a comment (external communication), all three, by design. The practical response is containment, not elimination: tighten what each leg can actually do (narrow tools, scoped credentials), and put a human or a deterministic check between the agent and anything irreversible.</p>
+<p><strong>Human-in-the-loop gating, as a mechanism rather than a theory.</strong> A workflow orchestrator (Step Functions, Temporal, Airflow) can define a wait-state or manual-approval gate at each stage boundary of a pipeline, left disabled by default and enabled selectively per stage. That is the lethal-trifecta response and the excessive-autonomy mitigation in one mechanism: the gate sits at the exact point where an action becomes hard to reverse, and it can be turned on tighter for a stage that pushes to production and looser for a stage that only produces a proposal a later stage will validate.</p>
+<hr>
+<h2>Evaluation and testing</h2>
+<p>Three questions define whether a skill works, and none of them are &quot;does it produce plausible-looking output.&quot;</p>
+<p><strong>Invocation accuracy.</strong> Does the skill fire when it should, and stay quiet when it shouldn't? A skill with a vague description either never activates on the tasks it was built for, or activates on unrelated tasks and pollutes context with irrelevant instructions. This is tested by running a set of prompts that should and should not trigger the skill, and checking the activation decision, not the output.</p>
+<p><strong>Output quality.</strong> Given the skill fires, does the output meet the contract stated in its own body? For the PR-description skill, that means checking the output actually contains a classification, a blast-radius list, and an effort estimate, not just prose that reads well.</p>
+<p><strong>Regression when prompts change.</strong> A skill's body is a prompt, and prompts are brittle to small edits in ways code is not: reordering two steps, or rewording a constraint, can change model behavior in ways that are not obvious from reading the diff. Treat prompt edits the way you'd treat a change to any other load-bearing artifact, with a fixed set of test invocations you re-run before and after, not just a read-through.</p>
+<p>The throughline worth stating explicitly: LLM output is untrusted until it clears a deterministic gate. A production code-generation pipeline is a clean model for the posture: generated code is not trusted because it came from an LLM, it passes through contract tests, then scenario tests, then a build step, and only a clean pass at every stage reaches deployment. A skill's output deserves the same posture in miniature: the model's first draft is a proposal, not a result, until something deterministic (a schema check, a required-field check, a human review) confirms it.</p>
+<hr>
+<h2>Delivery mechanics for a live design round</h2>
+<p><strong>Answer against the numbered prompt, visibly.</strong> When the prompt is &quot;walk us through (1) layout, (2) file contents, (3) core prompt,&quot; structure the answer as three labeled sections in that order, out loud. This sounds obvious and is exactly the thing that gets lost under interview pressure: the numbered structure is itself a signal the interviewer is scoring, independent of the content inside each number. Do this even when it feels redundant to say out loud: deliver the structure explicitly, get it implicitly accepted, then let the interviewer choose whether to escalate from there.</p>
+<p><strong>Close the asked question before offering more.</strong> Extension material, additional command families, ecosystem thinking beyond the literal ask, lands better as a deliberate offer than as an unlabeled continuation. One sentence does the whole job: &quot;That covers what was asked. If it's useful, I can also sketch how I'd extend this into a small command family, want me to go there?&quot; The content does not need to change; the framing turns a wandering answer into a demonstrated instinct for scope control, which is itself a signal at senior level and above.</p>
+<p><strong>Handle a mid-round frame change as a resumed structure, not a restart.</strong> &quot;Make it cloud native&quot; and &quot;now add MCP and A2A&quot; are not new questions, they are the same design conversation with the frame widened. Reuse the numbered-answer discipline from the opening walkthrough: state the frame explicitly (&quot;so now the question is how this same skill runs without a developer invoking it&quot;), give the reflex (the three inversions, or the MCP/A2A placement), then get concrete. Treating an escalation as a chance to restate structure, rather than a chance to panic into an unstructured answer, is the single highest-leverage habit across a round shaped like this, because it is the one move available at every frame change regardless of which specific fact gets asked next.</p>
+<hr>
+<h2>Verify before you rely on this</h2>
+<p>Everything above traces to the sources fetched for this guide: the Claude Code skills docs, the <a href="http://agentskills.io">agentskills.io</a> specification, the Agent SDK overview, ADK's overview page, the current MCP specification, the current A2A specification, and OWASP's Excessive Agency entry. A few things could not be confirmed to the same standard and are flagged rather than asserted:</p>
+<ul>
+<li><strong>The current A2A well-known path</strong> (<code>/.well-known/agent-card.json</code>) and the exact RPC method list were confirmed against the protocol's own site. Client-library specifics (which SDKs support which transport bindings today) move fast enough that they were not checked here; verify against the SDK you'd actually reach for if a specific one comes up.</li>
+<li><strong>OWASP's newer Top 10 for Agentic Applications (2026)</strong> exists and covers categories including tool misuse, identity and privilege abuse, memory poisoning, and insecure inter-agent communication, released by the OWASP GenAI Security Project in December 2025. The full ranked list and exact category names were not independently verified for this guide; read it directly if the conversation leans security-heavy, since it is newer and more specific to multi-agent systems than LLM06:2025.</li>
+<li><strong>MCP client-side primitives beyond elicitation</strong> (sampling, roots) were not covered in depth here; the guide focused on server primitives (tools, resources, prompts) since those are what a skill-design round is most likely to probe.</li>
+<li><strong>Managed Agents' exact deployment mechanics</strong> (how a session is provisioned, what the sandbox looks like) were confirmed to exist as a distinct hosted product from the Agent SDK, but the operational detail was not fetched. If you're asked whether you'd use Managed Agents or run the SDK yourself, the categorical distinction above is solid; the specifics of setting one up are not something this guide can vouch for.</li>
+<li><strong>Version-specific Claude Code behavior</strong> (exact version numbers gating features like <code>${CLAUDE_SKILL_DIR}</code> substitution in <code>allowed-tools</code>) changes release to release. The frontmatter fields and their semantics are current as of this guide's research date; a specific version number cited in the room is worth double-checking against the changelog rather than repeated from memory.</li>
+</ul>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

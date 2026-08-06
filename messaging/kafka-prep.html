@@ -230,6 +230,29 @@ h1 {
 .tip-jar-btn:hover { filter: brightness(1.08); }
 .tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
 
+/* ---------- callouts ---------- */
+.callout {
+  margin: 1.6rem 0;
+  padding: 1.1rem 1.4rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+}
+.callout-label {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout-warning { border-left-color: #a3372b; background: #a3372b14; }
+.callout-warning .callout-label { color: #a3372b; }
+.callout-insight { border-left-color: #2d6a44; background: #2d6a4414; }
+.callout-insight .callout-label { color: #2d6a44; }
+
 /* ---------- headings ---------- */
 h2 {
   font-family: "Fraunces", Georgia, serif;

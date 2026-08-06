@@ -192,6 +192,15 @@ const GUIDES = [
     subtitle: 'The behavioral leadership round decoded through the Michigan leadership model: how to inspire, influence without authority, build teams that hold, and grow people, with the frameworks, evidence, and STAR templates that make each claim land.',
     accent:   '#3d4552',  // graphite
   },
+  {
+    src:      '.claude/level-md/agent-skill-design-prep.md',
+    out:      'level/agent-skill-design-prep.html',
+    kicker:   'Interview Preparation · AI-Native Engineering',
+    title:    'Designing a Claude Code Agent Skill',
+    h1:       'Designing an Agent Skill, and Taking It Cloud Native',
+    subtitle: 'A complete guide to the SKILL.md artifact and its frontmatter, the skills/subagents/plugins/MCP/hooks taxonomy, and the two escalations that tend to follow a design walkthrough: cloud-native deployment and MCP/A2A multi-agent integration.',
+    accent:   '#5c4033',  // espresso
+  },
 
   // ---- Practice -----------------------------------------------
   {
@@ -294,6 +303,7 @@ const GUIDES = [
 //  rust        #a8431c   python-data-libs-prep        -- AA on white (6.0:1)
 //  sapphire    #1c4fa0   python-language-prep         -- AA on white (~8:1)
 //  graphite    #3d4552   leadership-prep               -- AA on white (~9:1)
+//  espresso    #5c4033   agent-skill-design-prep       -- AA on white (~8:1)
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------
@@ -432,6 +442,29 @@ h1 {
 }
 .tip-jar-btn:hover { filter: brightness(1.08); }
 .tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- callouts ---------- */
+.callout {
+  margin: 1.6rem 0;
+  padding: 1.1rem 1.4rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+}
+.callout-label {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout-warning { border-left-color: #a3372b; background: #a3372b14; }
+.callout-warning .callout-label { color: #a3372b; }
+.callout-insight { border-left-color: #2d6a44; background: #2d6a4414; }
+.callout-insight .callout-label { color: #2d6a44; }
 
 /* ---------- headings ---------- */
 h2 {

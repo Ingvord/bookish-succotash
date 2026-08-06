@@ -56,6 +56,7 @@ All colours pass WCAG AA contrast on white. The authoritative list is the palett
 | Emerald | `#0b6e4f` | vector-db-prep |
 | Sapphire | `#1c4fa0` | python-language-prep |
 | Graphite | `#3d4552` | leadership-prep |
+| Espresso | `#5c4033` | agent-skill-design-prep |
 
 ### Sanity-check after build
 
