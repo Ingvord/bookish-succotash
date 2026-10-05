@@ -156,6 +156,14 @@ const GUIDES = [
     subtitle: 'Driving the room, the 1K-to-1M-plus three-tier scaling ladder, the outbox/inbox patterns, availability mechanics, and the RAG and OLAP cases, with worked drives from real interviews.',
     accent:   '#1e5fa8',  // cobalt
   },
+  {
+    src:      '.claude/backend-md/system-design-component-cheatsheet.md',
+    out:      'system-design/component-cheatsheet.html',
+    kicker:   'Interview Preparation · System Design',
+    title:    'System Design Component Cheat Sheet',
+    subtitle: 'When each standard component earns its box, what it buys and what it costs, plus worked cases where the boring answer wins: Postgres search before Elasticsearch, a jobs table before Kafka, no cache before Redis.',
+    accent:   '#4b4aa8',  // iris
+  },
 
   // ---- DevOps --------------------------------------------------
   {
@@ -304,6 +312,7 @@ const GUIDES = [
 //  sapphire    #1c4fa0   python-language-prep         -- AA on white (~8:1)
 //  graphite    #3d4552   leadership-prep               -- AA on white (~9:1)
 //  espresso    #5c4033   agent-skill-design-prep       -- AA on white (~8:1)
+//  iris        #4b4aa8   system-design-component-cheatsheet -- AA on white (7.4:1)
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------

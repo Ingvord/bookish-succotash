@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>System Design Component Cheat Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #4b4aa8;
+  --accent-soft:  #4b4aa814;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- callouts ---------- */
+.callout {
+  margin: 1.6rem 0;
+  padding: 1.1rem 1.4rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+}
+.callout-label {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout-warning { border-left-color: #a3372b; background: #a3372b14; }
+.callout-warning .callout-label { color: #a3372b; }
+.callout-insight { border-left-color: #2d6a44; background: #2d6a4414; }
+.callout-insight .callout-label { color: #2d6a44; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · System Design</div>
+    <h1>System Design Component Cheat Sheet</h1>
+    <div class="sub">When each standard component earns its box, what it buys and what it costs, plus worked cases where the boring answer wins: Postgres search before Elasticsearch, a jobs table before Kafka, no cache before Redis.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>How to use this sheet</h2>
+<p>You are about to draw a box on a whiteboard: a cache, a queue, a search cluster. This sheet exists for the ten seconds before you do. The interviewer is not grading how many boxes you know. They are grading whether each box you draw has a reason, and the reason is almost never &quot;that is what everyone draws&quot;.</p>
+<p>The rule for the whole guide: <strong>every component beyond the boring baseline must name three things</strong>. The requirement that forces it, the number that crosses its threshold, and what it costs you. If you cannot say all three, the box does not go on the board yet. You can still mention it as the next step and name the trigger that would add it.</p>
+<p>Use the guide in three passes. Before the interview, read the mental model and the worked cases. During prep drills, cover the right-hand columns of the master tables and try to predict them. In the room, use the reverse index (requirement phrase to minimal answer) as a lookup. This is the decision layer: it tells you <em>whether</em> to add a component. The deep dives (<a href="../db/redis-prep.html">Redis</a>, <a href="../messaging/kafka-prep.html">Kafka</a>, <a href="../db/elasticsearch-prep.html">Elasticsearch</a>, <a href="../db/vector-db-prep.html">Vector DBs</a>) tell you <em>how</em> once the answer is yes, and the <a href="backend-system-design-guide.html">Backend System Design guide</a> covers the scaling ladder and the room-driving script.</p>
+<p>Facts here are checked as of October 2026: PostgreSQL 18 is the stable major (19 is in beta), Redis 8.x ships under a tri-license (AGPLv3, SSPLv1, RSALv2) while Valkey 9.x is the BSD fork, and Kafka 4.x is KRaft-only with Share Groups (queue semantics) generally available since 4.2. Versions and licenses move; the trade-offs underneath them mostly do not.</p>
+<hr>
+<h2>Mental model: every box buys one property and charges rent</h2>
+<p>Each component buys exactly one property you could not cheaply get without it: faster reads, decoupled writes, full-text relevance, replay, horizontal write scale. It also charges rent, and the rent is paid forever, not once.</p>
+<p>The rent has three parts:</p>
+<ul>
+<li><strong>Operational burden.</strong> Another thing to deploy, upgrade, monitor, back up, secure, and get paged for at 3am.</li>
+<li><strong>A new failure mode.</strong> Cache down, broker down, search cluster red. The system now has to behave sensibly when this box is unavailable, and you have to say how.</li>
+<li><strong>A new consistency boundary.</strong> The moment data lives in two places (database and cache, database and search index, database and broker), the copies can disagree. Stale cache, replication lag, dual writes that half-succeed. This is the rent that actually bites in production.</li>
+</ul>
+<p>So the question is never &quot;would a cache help?&quot; (it nearly always would, a little). The question is &quot;does the benefit exceed this rent at <em>this</em> scale?&quot; At 50 requests per second, the answer is almost always no.</p>
+<p><strong>The boring baseline</strong> is the default you start from and defend departures from: a load balancer, stateless app instances, one PostgreSQL primary (plus a replica when you need availability or read headroom), object storage for blobs, and a CDN for static assets. That stack serves a startling amount of traffic. A well-tuned single Postgres node handles on the order of tens of thousands of simple indexed reads per second and thousands to low tens of thousands of write transactions per second, which covers most interview prompts that say &quot;10 million users&quot; once you convert users to QPS.</p>
+<p><strong>Postgres-first</strong> is the corollary, and the theme of this whole guide. Postgres can be your job queue (<code>SELECT ... FOR UPDATE SKIP LOCKED</code>), your full-text search (<code>tsvector</code> with a GIN index), your fuzzy matcher (<code>pg_trgm</code>), your vector store (<code>pgvector</code>), your scheduler (a jobs table plus cron), and your pub/sub for small fan-out (<code>LISTEN/NOTIFY</code>). It will not win every benchmark against the specialist. It wins on one fewer system to run and no consistency boundary, and that trade is correct until a measured number says otherwise.</p>
+<p>The catch: &quot;Postgres-first&quot; is not &quot;Postgres-only&quot;. When the prompt genuinely has the numbers (a billion documents, a million events per second, multi-consumer replay), the specialist is the right answer. The skill being tested is telling the two situations apart out loud.</p>
+<hr>
+<h2>Master tables: what each component buys and costs</h2>
+<p>Read each row as: <em>add it when</em> (the trigger, ideally with a number), <em>what it buys</em>, <em>what it costs or where it bites</em>, and <em>what to try first</em> instead. The last column is the one that keeps you out of over-engineering.</p>
+<h3>Storage</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Add it when</th>
+<th>Buys you</th>
+<th>Costs you / the catch</th>
+<th>Try first</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PostgreSQL</strong> (primary)</td>
+<td>Default for any relational, transactional data</td>
+<td>ACID, joins, constraints, rich indexing (B-tree, GIN, GiST, BRIN), JSONB, mature tooling</td>
+<td>Single-writer ceiling; vertical scale only for writes; long transactions and bloat need care</td>
+<td>Nothing; this is the start</td>
+</tr>
+<tr>
+<td><strong>Read replica</strong></td>
+<td>Reads dominate and one node is CPU-bound, or you need failover</td>
+<td>Read scale-out, a warm standby, analytics isolation</td>
+<td>Replication lag: read-your-writes breaks unless you route those reads to the primary</td>
+<td>Add an index, fix the N+1 query</td>
+</tr>
+<tr>
+<td><strong>Partitioning</strong> (same node)</td>
+<td>One table passes roughly 100M to 1B rows or you drop data by time range</td>
+<td>Cheap retention (drop a partition), smaller indexes, partition pruning</td>
+<td>Partition key must appear in queries or you scan everything; unique constraints must include the key</td>
+<td>Better indexes, archive old rows</td>
+</tr>
+<tr>
+<td><strong>Sharding</strong></td>
+<td>A single primary cannot hold the write rate or the dataset (think multi-TB hot data, tens of thousands of sustained writes per second)</td>
+<td>Horizontal write and storage scale</td>
+<td>Cross-shard joins and transactions are gone; the shard key is nearly irreversible; resharding is a project</td>
+<td>Bigger instance, partitioning, move cold data out</td>
+</tr>
+<tr>
+<td><strong>DynamoDB / Cassandra</strong> (wide-column, key-value)</td>
+<td>Access pattern is known and key-based, you need single-digit-ms at huge scale, or writes are very high and multi-region</td>
+<td>Predictable latency at any scale, built-in sharding and replication</td>
+<td>You model around queries; ad-hoc queries and joins are painful; hot partitions; consistency is tunable and subtle</td>
+<td>Postgres with the right index</td>
+</tr>
+<tr>
+<td><strong>MongoDB</strong> (document)</td>
+<td>Genuinely schema-fluid documents read and written as a unit</td>
+<td>Flexible schema, document-shaped reads</td>
+<td>Cross-document transactions and joins are weaker; flexible schema becomes inconsistent data without discipline</td>
+<td>Postgres <code>jsonb</code> column</td>
+</tr>
+<tr>
+<td><strong>Object storage</strong> (S3)</td>
+<td>Any blob: images, video, exports, backups, large attachments</td>
+<td>Cheap, durable, effectively unlimited</td>
+<td>Not a filesystem: no append, higher latency, eventual-consistency history; serve through a CDN</td>
+<td>Never put blobs in the database</td>
+</tr>
+</tbody>
+</table>
+<h3>Caching and edge</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Add it when</th>
+<th>Buys you</th>
+<th>Costs you / the catch</th>
+<th>Try first</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>In-process cache</strong></td>
+<td>Small, read-mostly, tolerance for brief staleness (config, feature flags, reference data)</td>
+<td>Zero network hop, trivial to build</td>
+<td>Each instance caches separately: inconsistent across the fleet, memory duplicated</td>
+<td>A short TTL and a map</td>
+</tr>
+<tr>
+<td><strong>Redis / Valkey</strong> (as cache)</td>
+<td>Measured DB load from repeated identical reads, hot keys, and a hit rate you can reasonably expect above ~80%</td>
+<td>Sub-millisecond reads (~100K ops/s per node), shields the database</td>
+<td>Invalidation (the hard part), stampedes on expiry, a new outage mode, memory cost; cold cache can melt the DB behind it</td>
+<td>Index the query; add a read replica</td>
+</tr>
+<tr>
+<td><strong>CDN</strong></td>
+<td>Static assets, public media, cacheable GET responses, global users</td>
+<td>Latency by geography, offloads origin, absorbs spikes</td>
+<td>Purge and versioning discipline; useless for per-user dynamic responses</td>
+<td>Cache headers and fingerprinted filenames</td>
+</tr>
+</tbody>
+</table>
+<h3>Async and messaging</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Add it when</th>
+<th>Buys you</th>
+<th>Costs you / the catch</th>
+<th>Try first</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Postgres job table</strong> (<code>SKIP LOCKED</code>)</td>
+<td>Background work up to roughly a few thousand jobs per second, and the job is created in a DB transaction anyway</td>
+<td>Transactional enqueue (job exists iff the row committed), retries, visibility, no new system</td>
+<td>Polling load and table bloat at high rates; no fan-out to many consumers</td>
+<td>A plain <code>status</code> column and one worker</td>
+</tr>
+<tr>
+<td><strong>Redis lists / Streams</strong></td>
+<td>Lightweight queue with consumer groups, low latency, loss of a few messages on failover is tolerable</td>
+<td>Fast, simple, Streams give consumer groups and acks</td>
+<td>Durability depends on persistence config and failover; not a log you replay for days</td>
+<td>Postgres job table</td>
+</tr>
+<tr>
+<td><strong>SQS / RabbitMQ</strong></td>
+<td>Work queue semantics: one consumer per message, retries, dead-letter, rate smoothing</td>
+<td>Managed or mature, per-message ack, DLQ, no partition thinking</td>
+<td>No long-term replay; ordering is limited or costs throughput</td>
+<td>Postgres job table</td>
+</tr>
+<tr>
+<td><strong>Kafka</strong></td>
+<td>Many independent consumers of the same stream, replay, event rates in the hundreds of thousands per second, CDC pipelines, event sourcing</td>
+<td>Durable ordered log, replay, huge throughput, consumer independence</td>
+<td>Operationally heavy; ordering is per partition only; partition count is hard to change; consumer lag and rebalances; exactly-once is narrow</td>
+<td>Postgres table, Redis Streams, or SQS</td>
+</tr>
+<tr>
+<td><strong>Outbox pattern</strong></td>
+<td>You must update the DB <em>and</em> publish an event reliably</td>
+<td>Atomic &quot;state change plus event&quot;, no lost or phantom events</td>
+<td>Poller or CDC relay to run; consumers must be idempotent (at-least-once)</td>
+<td>Skip the event if nothing consumes it</td>
+</tr>
+<tr>
+<td><strong>Workflow engine</strong> (Temporal, Step Functions)</td>
+<td>Long-running, multi-step, compensating flows with human or time waits</td>
+<td>Durable state machine, retries, timers, visibility</td>
+<td>Learning curve, determinism rules, another cluster</td>
+<td>A jobs table with a <code>step</code> column</td>
+</tr>
+</tbody>
+</table>
+<h3>Search and retrieval</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Add it when</th>
+<th>Buys you</th>
+<th>Costs you / the catch</th>
+<th>Try first</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Postgres FTS</strong> (<code>tsvector</code> + GIN)</td>
+<td>Keyword search on data you already store, up to a few million documents, single or few languages</td>
+<td>Stemming, ranking (<code>ts_rank</code>), phrase search, transactional with your data, zero sync</td>
+<td>Weaker relevance tuning; no built-in typo tolerance; ranking over very large result sets gets slow; no native faceting</td>
+<td>This is the first try</td>
+</tr>
+<tr>
+<td><strong><code>pg_trgm</code></strong></td>
+<td>Typo tolerance, <code>ILIKE '%foo%'</code>, autocomplete-ish matching</td>
+<td>Fuzzy and substring search backed by a GIN or GiST index</td>
+<td>Index size; similarity thresholds need tuning; not semantic</td>
+<td>Prefix search with a B-tree</td>
+</tr>
+<tr>
+<td><strong>Elasticsearch / OpenSearch</strong></td>
+<td>Heavy relevance tuning, facets and aggregations at scale, many languages and analyzers, log or event search, tens of millions of documents and up</td>
+<td>Rich analyzers, scoring control, fast aggregations, horizontal scale</td>
+<td>A second copy of your data to keep in sync (index lag, reindexing); heavyweight cluster (shards, heap, mappings); no transactions</td>
+<td>Postgres FTS plus <code>pg_trgm</code></td>
+</tr>
+<tr>
+<td><strong>pgvector</strong></td>
+<td>Semantic search or RAG up to a few million vectors, filters that join to relational data</td>
+<td>Vectors beside your rows, metadata filters in plain SQL, one system</td>
+<td>Recall and latency degrade at large scale; index builds and memory heavy; fewer ANN tuning options</td>
+<td>This is the first try</td>
+</tr>
+<tr>
+<td><strong>Dedicated vector DB</strong></td>
+<td>Tens of millions to billions of vectors, strict latency at high QPS, heavy filtered ANN</td>
+<td>Purpose-built indexes, scale-out, quantization</td>
+<td>Another store to sync; filtered search and updates have their own quirks</td>
+<td>pgvector</td>
+</tr>
+</tbody>
+</table>
+<h3>Analytics and time series</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Add it when</th>
+<th>Buys you</th>
+<th>Costs you / the catch</th>
+<th>Try first</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Analytics on a replica</strong></td>
+<td>Reports and dashboards that hurt the primary</td>
+<td>Isolation with zero new tech</td>
+<td>Long queries on replicas can conflict with replication; still row-store speed</td>
+<td>Run it nightly or on a schedule</td>
+</tr>
+<tr>
+<td><strong>Materialized view / rollup table</strong></td>
+<td>Dashboards that repeat the same aggregation</td>
+<td>Pre-computed answers, instant reads</td>
+<td>Refresh cost and staleness; you maintain the definition</td>
+<td>Index plus <code>GROUP BY</code></td>
+</tr>
+<tr>
+<td><strong>TimescaleDB / partitioned time series</strong></td>
+<td>Append-heavy metrics or events with time-range queries</td>
+<td>Compression, time-bucketing, retention policies, still SQL</td>
+<td>Extension to operate; not for arbitrary OLAP</td>
+<td>Native partitioning by time</td>
+</tr>
+<tr>
+<td><strong>ClickHouse / warehouse</strong></td>
+<td>Scans and aggregations over hundreds of millions to billions of rows, many dimensions, sub-second dashboards</td>
+<td>Columnar speed, great compression</td>
+<td>A second system plus an ingestion pipeline (ETL or CDC); poor at point updates</td>
+<td>A replica with rollups</td>
+</tr>
+<tr>
+<td><strong>Stream processing</strong> (Flink, Kafka Streams)</td>
+<td>Continuous windowed computation with sub-second freshness</td>
+<td>Real-time aggregates, joins over streams</td>
+<td>State management, exactly-once subtleties, heavy ops</td>
+<td>A periodic batch job</td>
+</tr>
+</tbody>
+</table>
+<h3>Traffic and coordination</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Add it when</th>
+<th>Buys you</th>
+<th>Costs you / the catch</th>
+<th>Try first</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Load balancer</strong></td>
+<td>More than one app instance (so almost always)</td>
+<td>Distribution, health checks, zero-downtime deploys</td>
+<td>Must be redundant itself; sticky sessions undermine stateless scaling</td>
+<td>Required; no cheaper alternative</td>
+</tr>
+<tr>
+<td><strong>API gateway</strong></td>
+<td>Many services or external clients needing auth, throttling, routing in one place</td>
+<td>Central cross-cutting concerns</td>
+<td>A hop and a choke point; becomes a mini-monolith if loaded with logic</td>
+<td>Do it in the LB or app middleware</td>
+</tr>
+<tr>
+<td><strong>Rate limiter</strong></td>
+<td>Protecting an endpoint or a paid tier</td>
+<td>Fairness, abuse protection</td>
+<td>Needs shared counters (usually Redis); limits are approximate across nodes</td>
+<td>A per-instance limiter if one node fronts traffic</td>
+</tr>
+<tr>
+<td><strong>Distributed lock</strong></td>
+<td>Mutual exclusion across instances for a real side effect</td>
+<td>Prevents double-execution</td>
+<td>Locks expire and clients pause: needs fencing tokens; easy to get subtly wrong</td>
+<td>A DB row lock, a unique constraint, or an advisory lock</td>
+</tr>
+<tr>
+<td><strong>WebSocket / SSE gateway</strong></td>
+<td>Server push at scale (chat, live feeds, presence)</td>
+<td>Low-latency push</td>
+<td>Stateful connections: sticky routing, reconnect storms, fan-out layer</td>
+<td>Polling every few seconds, or SSE</td>
+</tr>
+<tr>
+<td><strong>Microservices split</strong></td>
+<td>Teams blocked on each other, parts with wildly different scaling or compliance needs</td>
+<td>Independent deploys and scale</td>
+<td>Network failures, distributed transactions, observability tax, org overhead</td>
+<td>A modular monolith</td>
+</tr>
+<tr>
+<td><strong>Service mesh</strong></td>
+<td>Dozens of services needing uniform mTLS, retries, and telemetry</td>
+<td>Policy without app code</td>
+<td>Operational complexity, latency, resource overhead</td>
+<td>A shared library or sidecar-free setup</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Reverse index: from the requirement to the minimal answer</h2>
+<p>This is the lookup table. The interviewer says a phrase; you reach for the left-most column and say the trigger that would upgrade it. The catch for every row is the same: the minimal answer is a starting point you defend with a number, not a claim that the big tool is wrong.</p>
+<table>
+<thead>
+<tr>
+<th>They say</th>
+<th>Minimal answer</th>
+<th>Upgrade trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&quot;Users search products / posts&quot;</td>
+<td>Postgres FTS plus <code>pg_trgm</code></td>
+<td>Facets over millions of docs, relevance tuning, many languages, or a search QPS the primary cannot spare</td>
+</tr>
+<tr>
+<td>&quot;Send emails / notifications&quot;</td>
+<td>Jobs table with <code>SKIP LOCKED</code>, or SQS</td>
+<td>Multiple independent consumers of the same event, or replay</td>
+</tr>
+<tr>
+<td>&quot;Real-time feed / timeline&quot;</td>
+<td>Fan-out on read from Postgres with an index; cache the hot head</td>
+<td>Celebrity fan-out writes too heavy: hybrid fan-out-on-write for normal users</td>
+</tr>
+<tr>
+<td>&quot;Leaderboard&quot;</td>
+<td>Sorted index in Postgres at small scale; Redis sorted set (<code>ZADD</code>) when ranks must be live</td>
+<td>Millions of updates per minute or sub-ms rank queries</td>
+</tr>
+<tr>
+<td>&quot;Analytics dashboard&quot;</td>
+<td>Replica plus materialized view or rollup table</td>
+<td>Scans over hundreds of millions of rows: ClickHouse or a warehouse</td>
+</tr>
+<tr>
+<td>&quot;File / image upload&quot;</td>
+<td>Presigned URL straight to object storage; row in Postgres with the key</td>
+<td>Transcoding or scanning: async job on the queue</td>
+</tr>
+<tr>
+<td>&quot;Exactly-once payments&quot;</td>
+<td>Idempotency key plus a unique constraint, DB transaction</td>
+<td>Cross-service flow: outbox plus idempotent consumers</td>
+</tr>
+<tr>
+<td>&quot;Global users, low latency&quot;</td>
+<td>CDN for static and cacheable reads; one region primary</td>
+<td>Write latency or data residency forces multi-region</td>
+</tr>
+<tr>
+<td>&quot;Rate limit the API&quot;</td>
+<td>Per-instance limiter, or Redis counter</td>
+<td>Many instances needing a shared budget: Redis token bucket</td>
+</tr>
+<tr>
+<td>&quot;Chat / presence&quot;</td>
+<td>WebSocket gateway plus Postgres for history; Redis pub/sub for cross-node fan-out</td>
+<td>Millions of concurrent connections: dedicated connection tier</td>
+</tr>
+<tr>
+<td>&quot;Recommendations / semantic search&quot;</td>
+<td>pgvector for embeddings</td>
+<td>Tens of millions of vectors with tight latency: dedicated vector DB</td>
+</tr>
+<tr>
+<td>&quot;Audit log / event history&quot;</td>
+<td>Append-only Postgres table, partitioned by time</td>
+<td>Multi-consumer streaming or replay: Kafka</td>
+</tr>
+<tr>
+<td>&quot;Schedule recurring work&quot;</td>
+<td>Cron plus a jobs table</td>
+<td>Long-running multi-step flows with timers: workflow engine</td>
+</tr>
+<tr>
+<td>&quot;Handle traffic spikes&quot;</td>
+<td>CDN, autoscaling stateless app, queue the slow work</td>
+<td>Sustained load that the DB cannot take: replicas, then caching</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Numbers that justify a box</h2>
+<p>A component earns its box when a number crosses a threshold. These are order-of-magnitude figures for sizing arguments, not benchmarks. Hardware, schema, and workload move them by 3x to 10x either way, so say &quot;on the order of&quot; in the room and show the arithmetic.</p>
+<table>
+<thead>
+<tr>
+<th>Fact</th>
+<th>Rough figure</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daily active users to average QPS</td>
+<td>DAU x actions per user / 86,400; peak is about 3x to 10x average</td>
+<td>10M DAU at 10 actions each is about 1,150 average QPS, roughly 5K to 10K peak: a single DB can serve this</td>
+</tr>
+<tr>
+<td>Single Postgres node, simple indexed reads</td>
+<td>Tens of thousands per second</td>
+<td>Most &quot;scale&quot; prompts do not exceed this</td>
+</tr>
+<tr>
+<td>Single Postgres node, write transactions</td>
+<td>Thousands to low tens of thousands per second</td>
+<td>Sharding is a last resort</td>
+</tr>
+<tr>
+<td>Redis / Valkey single node</td>
+<td>About 100K ops/s (more with pipelining)</td>
+<td>One cache node usually covers a whole product</td>
+</tr>
+<tr>
+<td>Kafka throughput</td>
+<td>Tens of MB/s per partition; clusters reach millions of messages per second</td>
+<td>You need Kafka for fan-out and replay, rarely for raw volume under about 10K messages/s</td>
+</tr>
+<tr>
+<td>Postgres FTS comfort zone</td>
+<td>A few million documents per index</td>
+<td>Beyond tens of millions, or with heavy faceting, Elasticsearch pulls ahead</td>
+</tr>
+<tr>
+<td>pgvector comfort zone</td>
+<td>A few million vectors</td>
+<td>Beyond tens of millions, a dedicated store pays</td>
+</tr>
+<tr>
+<td>Cache hit rate worth the rent</td>
+<td>Above roughly 80%</td>
+<td>Below that, the cache adds latency and a failure mode for little offload</td>
+</tr>
+<tr>
+<td>Read-to-write ratio</td>
+<td>10:1 to 100:1 for most products</td>
+<td>High ratios favor cache and replicas; write-heavy favors partitioning and queues</td>
+</tr>
+</tbody>
+</table>
+<p>The back-of-envelope habit is the real skill: <strong>convert the users to QPS and storage before choosing anything</strong>. Say the number, compare it to one node, and only then decide. If one node covers it with headroom, the correct design is the boring one plus a named upgrade path.</p>
+<p>Treat these figures as the least stable content in the guide. The structure (compare your number to the single-node ceiling) is evergreen; the exact ceilings drift with hardware and versions. Re-derive them when an interviewer pushes.</p>
+<hr>
+<h2>Worked cases: when the boring answer wins</h2>
+<p>Each case follows the same shape: the prompt, the diagram people draw by reflex, the right-sized design, the exact trigger that would flip the decision, and the sentence to say in the room.</p>
+<h3>Case 1: Postgres full-text search instead of Elasticsearch</h3>
+<p><strong>The prompt:</strong> &quot;Design product search for a store with 2 million products and about 20 searches per second at peak.&quot;</p>
+<p><strong>The reflex diagram:</strong> App writes to Postgres, a Kafka topic carries change events, a consumer indexes into an Elasticsearch cluster, the search API queries Elasticsearch. Four new moving parts, a sync pipeline, and an index that is always slightly behind the source of truth.</p>
+<p><strong>The right-sized design:</strong> Keep search inside Postgres. Add a generated <code>tsvector</code> column and a GIN index for keyword ranking, and <code>pg_trgm</code> for typo tolerance on the title. The search is transactional with the product row, so there is no sync lag and no reindex job.</p>
+<p>The schema and queries below show the whole thing. The prose that follows explains why each part is there.</p>
+<pre><code class="hljs" data-lang="sql"><span class="hljs-keyword">ALTER TABLE</span> products
+  <span class="hljs-keyword">ADD</span> <span class="hljs-keyword">COLUMN</span> <span class="hljs-keyword">search</span> tsvector
+  GENERATED ALWAYS <span class="hljs-keyword">AS</span> (
+    setweight(to_tsvector(<span class="hljs-string">&#x27;english&#x27;</span>, <span class="hljs-built_in">coalesce</span>(title, <span class="hljs-string">&#x27;&#x27;</span>)), <span class="hljs-string">&#x27;A&#x27;</span>) <span class="hljs-operator">||</span>
+    setweight(to_tsvector(<span class="hljs-string">&#x27;english&#x27;</span>, <span class="hljs-built_in">coalesce</span>(description, <span class="hljs-string">&#x27;&#x27;</span>)), <span class="hljs-string">&#x27;B&#x27;</span>)
+  ) STORED;
+
+<span class="hljs-keyword">CREATE</span> INDEX products_search_idx <span class="hljs-keyword">ON</span> products <span class="hljs-keyword">USING</span> GIN (<span class="hljs-keyword">search</span>);
+<span class="hljs-keyword">CREATE</span> EXTENSION IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> pg_trgm;
+<span class="hljs-keyword">CREATE</span> INDEX products_title_trgm_idx <span class="hljs-keyword">ON</span> products <span class="hljs-keyword">USING</span> GIN (title gin_trgm_ops);
+
+<span class="hljs-comment">-- ranked keyword search</span>
+<span class="hljs-keyword">SELECT</span> id, title, ts_rank(<span class="hljs-keyword">search</span>, q) <span class="hljs-keyword">AS</span> rank
+<span class="hljs-keyword">FROM</span> products, websearch_to_tsquery(<span class="hljs-string">&#x27;english&#x27;</span>, <span class="hljs-string">&#x27;wireless headphones&#x27;</span>) <span class="hljs-keyword">AS</span> q
+<span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">search</span> @@ q
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> rank <span class="hljs-keyword">DESC</span>
+LIMIT <span class="hljs-number">20</span>;
+
+<span class="hljs-comment">-- typo-tolerant fallback on the title</span>
+<span class="hljs-keyword">SELECT</span> id, title, similarity(title, <span class="hljs-string">&#x27;wirless headfones&#x27;</span>) <span class="hljs-keyword">AS</span> sim
+<span class="hljs-keyword">FROM</span> products
+<span class="hljs-keyword">WHERE</span> title <span class="hljs-operator">%</span> <span class="hljs-string">&#x27;wirless headfones&#x27;</span>
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> sim <span class="hljs-keyword">DESC</span>
+LIMIT <span class="hljs-number">20</span>;
+</code></pre>
+<p>The weights (<code>A</code> for title, <code>B</code> for description) make title matches outrank body matches, which covers the relevance most catalogs need. The generated column keeps the vector in step with the row automatically, so there is no application code to forget. The trigram query handles the misspelling that the stemmer cannot.</p>
+<p>The numbers: 2M rows with a GIN index answers in tens of milliseconds, and 20 QPS is a rounding error for a Postgres node. The catch to name out loud: <code>ts_rank</code> has to score every matching row before the sort, so very broad queries (a one-letter term matching a million rows) get slow, and you cap that with a result limit and minimum query length.</p>
+<p><strong>The flip trigger:</strong> add Elasticsearch or OpenSearch when you need rich faceted navigation with live counts across many attributes, heavy relevance tuning (synonyms, per-field boosting, learning to rank), many languages with per-language analyzers, tens of millions of documents, or a search QPS that would steal capacity from the transactional workload. At that point the sync pipeline is worth its rent.</p>
+<p><strong>Say in the room:</strong> &quot;At 2M products and 20 QPS, Postgres FTS with a GIN index is enough and keeps search transactionally consistent with the catalog. I would add Elasticsearch when we need faceting at scale or relevance tuning that Postgres cannot express, and I would feed it through an outbox so the index is rebuildable.&quot;</p>
+<h3>Case 2: Redis without Kafka</h3>
+<p><strong>The prompt:</strong> &quot;Design a notification system: users get an email or push when something happens. About 5 million notifications a day.&quot;</p>
+<p><strong>The reflex diagram:</strong> Service emits an event to Kafka, a notification consumer group reads it, fans out to email, SMS, and push topics, each with its own consumers and a dead-letter topic.</p>
+<p><strong>The right-sized design:</strong> 5M a day is about 58 per second on average, maybe 500 per second at peak. That is far below what any queue struggles with. Write the notification as a row in a <code>notification_jobs</code> table in the same transaction as the business change, and run a few workers that claim rows with <code>SKIP LOCKED</code>.</p>
+<pre><code class="hljs" data-lang="sql"><span class="hljs-comment">-- claim a batch safely across many workers</span>
+<span class="hljs-keyword">WITH</span> next <span class="hljs-keyword">AS</span> (
+  <span class="hljs-keyword">SELECT</span> id
+  <span class="hljs-keyword">FROM</span> notification_jobs
+  <span class="hljs-keyword">WHERE</span> status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;pending&#x27;</span> <span class="hljs-keyword">AND</span> run_at <span class="hljs-operator">&lt;=</span> now()
+  <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> run_at
+  LIMIT <span class="hljs-number">50</span>
+  <span class="hljs-keyword">FOR</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">SKIP</span> LOCKED
+)
+<span class="hljs-keyword">UPDATE</span> notification_jobs j
+<span class="hljs-keyword">SET</span> status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;processing&#x27;</span>, locked_at <span class="hljs-operator">=</span> now(), attempts <span class="hljs-operator">=</span> attempts <span class="hljs-operator">+</span> <span class="hljs-number">1</span>
+<span class="hljs-keyword">FROM</span> next
+<span class="hljs-keyword">WHERE</span> j.id <span class="hljs-operator">=</span> next.id
+RETURNING j.<span class="hljs-operator">*</span>;
+</code></pre>
+<p><code>SKIP LOCKED</code> lets many workers pull from the same table without blocking each other or double-claiming a row. The job exists if and only if the business transaction committed, which a separate broker cannot give you without an outbox. If you want lower latency or no polling, Redis Streams or SQS is the next step up, not Kafka.</p>
+<p>The catch: at-least-once delivery means a worker crash after sending but before marking done will resend, so make the send idempotent (a dedup key per notification). A stuck <code>processing</code> row needs a reaper that resets rows whose <code>locked_at</code> is too old.</p>
+<p><strong>The flip trigger:</strong> adopt Kafka when several independent systems must consume the same event (notifications, analytics, search indexing, fraud), when you need to replay history to rebuild a downstream, when sustained rates reach the hundreds of thousands per second, or when you do change-data-capture into other stores. Kafka's value is the retained, replayable log with many readers, not just &quot;async&quot;.</p>
+<p><strong>Say in the room:</strong> &quot;A few hundred notifications a second is well within a transactional jobs table with SKIP LOCKED, and it removes the dual-write problem. The moment a second team needs the same events, or we need replay, that is when the log earns its operational cost and I would introduce Kafka via an outbox.&quot;</p>
+<h3>Case 3: No cache at all</h3>
+<p><strong>The prompt:</strong> &quot;Design a profile service for 1 million users. Profile pages are read far more than written.&quot;</p>
+<p><strong>The reflex diagram:</strong> App, Redis cache with cache-aside logic, invalidation on update, and Postgres behind it.</p>
+<p><strong>The right-sized design:</strong> 1M users with each viewing a few profiles a day is a few hundred reads per second at peak. A primary-key lookup in Postgres takes well under a millisecond when the row is in memory, and the working set (1M rows at about 1 KB is 1 GB) fits in the buffer cache already. Postgres <em>is</em> your cache for this workload. Add a CDN in front for the avatar images and the public, cacheable parts of the page.</p>
+<p>The catch that people forget: a cache is not free correctness-wise. Cache-aside has a race (a reader repopulates stale data just after a writer invalidates), TTLs are a guess, and a cold or flushed cache sends the full load at the database at once. You trade a latency win you do not need for a staleness bug you will have.</p>
+<p><strong>The flip trigger:</strong> add Redis once metrics show it. Concretely: database CPU is high because of repeated identical reads, the p99 read latency misses its target, or you have a few extremely hot keys (a celebrity profile). Then cache those keys specifically, with a short TTL and a stampede guard, and state the staleness you accept.</p>
+<p><strong>Say in the room:</strong> &quot;I would not add a cache until the numbers ask for it. The whole working set fits in Postgres memory, so the database is already serving this from RAM. If we see hot keys or DB CPU pressure, I would cache those specifically and tell you the staleness window.&quot;</p>
+<h3>Case 4: Outbox table instead of dual writes</h3>
+<p><strong>The prompt:</strong> &quot;When an order is placed, update the database and tell other services.&quot;</p>
+<p><strong>The reflex diagram:</strong> The handler writes to Postgres and then publishes to Kafka in the same function. It looks atomic. It is not.</p>
+<p><strong>The failure:</strong> If the process crashes between the commit and the publish, the order exists and nobody hears about it. If you publish first and the commit fails, downstream sees an order that never existed. There is no transaction spanning both systems.</p>
+<p><strong>The right-sized design:</strong> In the same transaction that writes the order, insert a row into an <code>outbox</code> table. A small relay (a poller, or CDC via logical replication) reads unsent rows and publishes them, then marks them sent.</p>
+<pre><code class="hljs" data-lang="sql"><span class="hljs-keyword">BEGIN</span>;
+<span class="hljs-keyword">INSERT INTO</span> orders (id, customer_id, total) <span class="hljs-keyword">VALUES</span> (<span class="hljs-number">42</span>, <span class="hljs-number">7</span>, <span class="hljs-number">99.00</span>);
+<span class="hljs-keyword">INSERT INTO</span> outbox (aggregate_id, type, payload)
+<span class="hljs-keyword">VALUES</span> (<span class="hljs-number">42</span>, <span class="hljs-string">&#x27;OrderPlaced&#x27;</span>, <span class="hljs-string">&#x27;{&quot;orderId&quot;:42,&quot;total&quot;:99.00}&#x27;</span>);
+<span class="hljs-keyword">COMMIT</span>;
+</code></pre>
+<p>Because both inserts share one transaction, either both exist or neither does. The relay gives you at-least-once delivery, so consumers must be idempotent (dedupe on an event id). The catch is the relay itself: it has to be monitored for lag, and a poller adds a little latency.</p>
+<p>The right-sizing insight: if nothing consumes the event yet, do not publish it at all. And if the only consumer is a worker in your own service, the jobs table from Case 2 <em>is</em> the outbox.</p>
+<p><strong>The flip trigger:</strong> adopt a CDC tool such as Debezium reading the write-ahead log when polling load or latency becomes a problem, or when many tables need event streams without touching application code.</p>
+<p><strong>Say in the room:</strong> &quot;I would not dual write, because there is no atomicity across the DB and the broker. I would insert an outbox row in the same transaction and relay it, with idempotent consumers.&quot;</p>
+<h3>Case 5: pgvector instead of a dedicated vector database</h3>
+<p><strong>The prompt:</strong> &quot;Add semantic search over our support articles for a RAG assistant. About 500,000 articles.&quot;</p>
+<p><strong>The reflex diagram:</strong> Embedding pipeline writes to a dedicated vector database, a separate metadata store holds the article text and permissions, and the app joins the two in code.</p>
+<p><strong>The right-sized design:</strong> 500K vectors is comfortably inside pgvector territory. Store the embedding in a <code>vector</code> column next to the article row, add an HNSW index, and filter by tenant or permissions in the same SQL statement.</p>
+<pre><code class="hljs" data-lang="sql"><span class="hljs-keyword">CREATE</span> EXTENSION IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> vector;
+
+<span class="hljs-keyword">ALTER TABLE</span> articles <span class="hljs-keyword">ADD</span> <span class="hljs-keyword">COLUMN</span> embedding vector(<span class="hljs-number">1536</span>);
+<span class="hljs-keyword">CREATE</span> INDEX articles_embedding_idx
+  <span class="hljs-keyword">ON</span> articles <span class="hljs-keyword">USING</span> hnsw (embedding vector_cosine_ops);
+
+<span class="hljs-keyword">SELECT</span> id, title
+<span class="hljs-keyword">FROM</span> articles
+<span class="hljs-keyword">WHERE</span> tenant_id <span class="hljs-operator">=</span> <span class="hljs-number">7</span> <span class="hljs-keyword">AND</span> published
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> embedding <span class="hljs-operator">&lt;=&gt;</span> $<span class="hljs-number">1</span>
+LIMIT <span class="hljs-number">8</span>;
+</code></pre>
+<p>The metadata filter and the nearest-neighbor search happen in one query against one store, so permissions can never drift from the vectors. The catch: HNSW indexes use real memory and slow bulk inserts, and filtering that removes most rows can reduce recall if the index is not tuned for it.</p>
+<p><strong>The flip trigger:</strong> move to a dedicated vector database when you reach tens of millions to billions of vectors, need strict latency at high QPS under heavy filtering, or need quantization and scale-out that pgvector's single-node model cannot give. See the <a href="../db/vector-db-prep.html">Vector DB guide</a> for that world.</p>
+<p><strong>Say in the room:</strong> &quot;Half a million vectors fit in pgvector, and keeping them next to the rows means permission filters are just a WHERE clause. I would move to a dedicated store when vector count or filtered latency forces it.&quot;</p>
+<h3>Case 6: Modular monolith instead of microservices</h3>
+<p><strong>The prompt:</strong> &quot;Design a food-delivery backend.&quot; The reflex is a box per noun: user service, restaurant service, order service, payment service, delivery service, notification service, each with its own database.</p>
+<p><strong>The right-sized design:</strong> One deployable with clear internal modules (<code>orders</code>, <code>restaurants</code>, <code>payments</code>, <code>delivery</code>), each owning its tables and exposing an interface to the others. You get the boundaries without the network.</p>
+<p>What the split costs: every call that used to be a function is now a network call that can fail, time out, or be slow. A transaction spanning orders and payments becomes a saga. Debugging needs distributed tracing. You need service discovery, per-service CI, and an on-call rotation for each.</p>
+<p>The honest reasons to split: independent teams blocked on a shared deploy, one component with very different scaling needs (video transcoding versus CRUD), or a hard compliance boundary (payment data). None of those is &quot;the prompt has many nouns&quot;.</p>
+<p><strong>The flip trigger:</strong> carve a service out at a seam that hurts, with a named reason, and start with the one that has a distinct scaling or ownership profile.</p>
+<p><strong>Say in the room:</strong> &quot;I would start as a modular monolith with enforced module boundaries, and extract a service when a specific module needs independent scaling or a separate team owns it. That gives me the seams without the distributed-systems tax up front.&quot;</p>
+<h3>Case 7: Vertical scale and replicas instead of sharding</h3>
+<p><strong>The prompt:</strong> &quot;The database is slow. We have 200 GB of data and 3,000 requests per second.&quot;</p>
+<p><strong>The reflex:</strong> shard the database.</p>
+<p><strong>The right-sized design:</strong> 200 GB and 3K QPS is small. Check the slow query log, add the missing index, fix the N+1 queries, move to a bigger instance (memory first, so the working set stays in RAM), and add a read replica for read-heavy endpoints. Partition the one giant append-only table by time if there is one.</p>
+<p>The catch with sharding that makes it a last resort: you lose cross-shard joins and transactions, the shard key choice is nearly irreversible, hot shards appear, and resharding is a multi-week migration. The symptom that justifies it is specific: the write rate or the hot dataset no longer fits one primary even after the cheaper moves.</p>
+<p><strong>The flip trigger:</strong> sustained write throughput beyond what the largest practical primary handles, or a hot dataset in the multi-terabyte range that cannot be archived or partitioned away.</p>
+<p><strong>Say in the room:</strong> &quot;At 200 GB and 3K QPS I would fix indexes and queries, scale up, add a replica, and partition by time. Sharding is where I go when writes outgrow a single primary, and I would pick the shard key from the dominant access pattern.&quot;</p>
+<h3>Case 8: Cron plus a jobs table instead of a workflow engine, and a replica instead of ClickHouse</h3>
+<p><strong>The prompt:</strong> &quot;Generate nightly reports and show an internal sales dashboard.&quot;</p>
+<p><strong>The reflex:</strong> Airflow or Temporal for the scheduling, ClickHouse for the reporting, Kafka to feed it.</p>
+<p><strong>The right-sized design:</strong> A cron entry (or the platform scheduler) inserts a row into the jobs table, a worker runs the report, and the result lands in a table or object storage. The dashboard reads a materialized view or a rollup table on a read replica, refreshed on a schedule. For tens of millions of rows this answers in seconds.</p>
+<p>The catch: a materialized view refresh locks or costs CPU, and the dashboard shows data as of the last refresh, which you state honestly (&quot;fresh within 15 minutes&quot;). Long analytical queries on a replica can be cancelled by replication conflicts, so tune the standby settings or run them on a dedicated replica.</p>
+<p><strong>The flip trigger:</strong> a workflow engine when flows run for days with timers, human approvals, and compensating steps. ClickHouse or a warehouse when scans cover hundreds of millions to billions of rows across many dimensions and the dashboard needs sub-second response.</p>
+<p><strong>Say in the room:</strong> &quot;For a nightly report and an internal dashboard, a jobs table plus a rollup on a replica is enough and gives me one system. The warehouse comes in when the scan size or the dimensionality outgrows row-store aggregation.&quot;</p>
+<hr>
+<h2>Practice drills</h2>
+<p>For each prompt, write down the components you would draw and the number that justifies each before reading the answer. The aim is to practice saying &quot;not yet&quot; with a reason.</p>
+<p><strong>Drill 1: URL shortener, 10K DAU.</strong> Answer: app, Postgres with a unique index on the short code, CDN or redirect caching headers. Generate codes from a sequence encoded in base62 or a random token with a unique constraint. Peak QPS is single digits to tens. No cache, no queue. Flip: a viral link with extreme hot-key read volume adds a cache for hot codes; click analytics at high volume adds an async pipeline.</p>
+<p><strong>Drill 2: Chat for 1M users.</strong> Answer: WebSocket gateway tier (stateful, sticky), message store in Postgres partitioned by conversation and time, presence in Redis with TTL keys, Redis pub/sub or a lightweight bus to route a message to the node holding the recipient's connection. The honest catch is connection count and fan-out, not the database. Flip: very large group chats or global scale push toward a dedicated messaging backbone and wide-column storage.</p>
+<p><strong>Drill 3: Rate limiter for a public API.</strong> Answer: token bucket in Redis keyed by client and window, with a Lua script or atomic command for the check-and-decrement. A per-instance limiter is acceptable if one node fronts traffic. The catch: Redis down means you choose fail-open or fail-closed deliberately.</p>
+<p><strong>Drill 4: Image sharing app, 500K DAU.</strong> Answer: presigned uploads to object storage, a thumbnail job on a jobs table or SQS, CDN for delivery, Postgres for metadata and a follower graph, fan-out on read for the feed. The numbers (roughly 6 to 60 requests per second) do not justify Kafka or sharding. Flip: celebrity accounts push toward fan-out hybrids.</p>
+<p><strong>Drill 5: E-commerce checkout with payments.</strong> Answer: Postgres transaction for the order, an idempotency key on the payment request with a unique constraint, an outbox row for downstream events, and idempotent consumers. No distributed transaction: use a saga only if payment is truly a separate service. The catch to name: the payment provider call can time out after succeeding, so you reconcile by idempotency key.</p>
+<p><strong>Drill 6: Real-time analytics dashboard for 50M events a day.</strong> Answer: 50M a day is about 580 per second average, which one Postgres or TimescaleDB handles with partitioning and rollups. Land events in a time-partitioned table, aggregate into rollup tables. Flip: billions of events or ad-hoc multi-dimensional slicing pushes you to ClickHouse, with Kafka only if several consumers need the stream.</p>
+<p><strong>Drill 7: Search-as-you-type for 5M items.</strong> Answer: start with <code>pg_trgm</code> and prefix indexes, and measure latency. The honest answer to &quot;does this scale&quot; is a number: if p95 latency or QPS misses the target, move to Elasticsearch with edge n-gram analyzers, fed by an outbox.</p>
+<p><strong>Drill 8: &quot;Design YouTube.&quot;</strong> Answer: say the real constraint first (video bytes dominate, not metadata). Object storage plus a transcoding job pipeline plus CDN carries most of the design; metadata stays in Postgres. Here the big boxes are justified (queue for transcoding, CDN, object storage) because the numbers force them, and you say so.</p>
+<hr>
+<h2>Meta: framing it in the room</h2>
+<p>The whole technique compresses into one sentence you can reuse: <strong>&quot;I would start with X, and the metric that makes me add Y is Z.&quot;</strong> It shows you know the specialist exists, that you know what it costs, and that you add it on evidence. That is the senior signal, and it costs nothing to say.</p>
+<p><strong>When they say &quot;what if it grows 100x?&quot;</strong> Do not redraw the diagram. Name the first bottleneck the arithmetic predicts, name the move for it, and say what you would watch to know it is time. &quot;At 100x we are at about 100K QPS; reads go first, so replicas and then a cache; writes become the issue past about 20K per second, which is where partitioning and then sharding come in.&quot; Evolve one box at a time, in the order the metrics would force them.</p>
+<p><strong>When the prompt really is big.</strong> Sometimes the numbers are enormous: a billion events a day, hundreds of millions of vectors, global writes. Then the triggers fire and the big components are correct. The discipline is the same: say <em>which</em> number fired <em>which</em> trigger. A Kafka box drawn because the rate demands it is fine; a Kafka box drawn out of habit is the failure this guide is about.</p>
+<p><strong>Name the rent out loud.</strong> For every box you do add, spend one sentence on what it costs: the consistency boundary it creates and how you handle it (outbox, TTL, idempotent consumers). This is what separates a design from a diagram.</p>
+<p><strong>Be honest about uncertainty.</strong> If you do not know a figure, say it is an estimate and show how you would measure it. A confident, labeled estimate beats a precise-sounding number you cannot defend.</p>
+<p>For depth once a component earns its box, go to the specialist guides: <a href="../db/redis-prep.html">Redis</a>, <a href="../messaging/kafka-prep.html">Kafka</a>, <a href="../db/elasticsearch-prep.html">Elasticsearch</a>, <a href="../db/vector-db-prep.html">Vector DBs</a>, <a href="../db/relational-db-prep.html">Relational DB</a>, <a href="../backend/scaling-foundations-prep.html">Scaling Foundations</a>, and the <a href="backend-system-design-guide.html">Backend System Design guide</a> for the room-driving script and scaling ladder.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>
