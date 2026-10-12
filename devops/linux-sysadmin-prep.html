@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Linux Under the Pods</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #245e6a;
+  --accent-soft:  #245e6a14;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- callouts ---------- */
+.callout {
+  margin: 1.6rem 0;
+  padding: 1.1rem 1.4rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+}
+.callout-label {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout-warning { border-left-color: #a3372b; background: #a3372b14; }
+.callout-warning .callout-label { color: #a3372b; }
+.callout-insight { border-left-color: #2d6a44; background: #2d6a4414; }
+.callout-insight .callout-label { color: #2d6a44; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · DevOps · Linux</div>
+    <h1>Linux Under the Pods</h1>
+    <div class="sub">The host-level layer a Kubernetes platform engineer gets probed on: processes, memory, cgroups, storage, networking, and the commands to diagnose each live.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>When the abstraction leaks</h2>
+<p>The interviewer is a seasoned lab sysadmin, and he has said the conversation will be &quot;mostly Kubernetes and system administration&quot;. That second half is not trivia. He wants to know whether you can go below <code>kubectl</code>: when a pod is slow, a node is NotReady, or a volume hangs, can you reason at the kernel and host level instead of re-running <code>kubectl describe</code> and hoping.</p>
+<p>The skill is the same narrated loop as the <a href="kubernetes-troubleshooting.html">Kubernetes troubleshooting guide</a>, applied one layer down. State a hypothesis (&quot;load is high but CPU is idle, so I suspect processes stuck in uninterruptible I/O&quot;), run the command that tests it, read the output, update out loud. The commands in this guide are the vocabulary; the loop is the answer.</p>
+<p>Facts tied to a Kubernetes version are marked &quot;as of 1.37&quot;. Where I could not verify a claim against current documentation, the text says so.</p>
+<hr>
+<h2>★ A container is a process with three wrappers</h2>
+<p><strong>What it is.</strong> There is no &quot;container&quot; object in the Linux kernel. A container is an ordinary process (or a tree of them) started with three wrappers: <strong>namespaces</strong> limit what it can see (its own PID tree, network stack, mounts, hostname, users), <strong>cgroups</strong> limit what it can use (CPU time, memory, PIDs, I/O), and a <strong>root filesystem plus capabilities and seccomp</strong> limit what it can touch (an image's layers, a reduced set of root powers, a filter on system calls).</p>
+<p><strong>Why it matters.</strong> Every Kubernetes concept maps onto one of those primitives, and once you see the mapping, a &quot;Kubernetes problem&quot; becomes a kernel question you already know how to ask.</p>
+<table>
+<thead>
+<tr>
+<th>Kubernetes concept</th>
+<th>Kernel primitive</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pod (shared network and IPC)</td>
+<td>Containers joined to one network and IPC namespace, held open by the <code>pause</code> container</td>
+</tr>
+<tr>
+<td><code>resources.requests.cpu</code></td>
+<td>cgroup <code>cpu.weight</code> (relative share under contention)</td>
+</tr>
+<tr>
+<td><code>resources.limits.cpu</code></td>
+<td>cgroup <code>cpu.max</code> (CFS quota per period)</td>
+</tr>
+<tr>
+<td><code>resources.limits.memory</code></td>
+<td>cgroup <code>memory.max</code> (hard ceiling)</td>
+</tr>
+<tr>
+<td>OOMKilled, exit code 137</td>
+<td>Kernel OOM killer firing inside that cgroup, SIGKILL</td>
+</tr>
+<tr>
+<td><code>securityContext</code></td>
+<td>Linux capabilities, seccomp profile, user and group IDs</td>
+</tr>
+<tr>
+<td><code>emptyDir</code></td>
+<td>A directory on the node's disk (or tmpfs), deleted with the pod</td>
+</tr>
+<tr>
+<td><code>hostPath</code></td>
+<td>A bind mount of a node directory into the container's mount namespace</td>
+</tr>
+<tr>
+<td>Liveness restart</td>
+<td>The kubelet killing and recreating the container process via the runtime</td>
+</tr>
+</tbody>
+</table>
+<p>The pod is the interesting one. Containers in a pod share a network namespace because the <code>pause</code> container creates it and the others join it. That is why two containers in a pod talk over <code>localhost</code> and why they cannot bind the same port.</p>
+<p>To get from a pod name to the kernel objects, start on the node with the runtime's own tool, since <code>kubectl</code> may not even be reachable:</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Find the container, then its host PID</span>
+crictl ps --name myapp
+<span class="hljs-comment"># CONTAINER      IMAGE          CREATED        STATE    NAME    POD ID</span>
+<span class="hljs-comment"># 3f9a1c2d7e10   reg/app:1.4    2 hours ago    Running  myapp   8b21aa04c9f3</span>
+
+crictl inspect 3f9a1c2d7e10 | grep -m1 <span class="hljs-string">&#x27;&quot;pid&quot;&#x27;</span>
+<span class="hljs-comment">#     &quot;pid&quot;: 48213,</span>
+
+<span class="hljs-comment"># Which cgroup is it in, and which namespaces does it have?</span>
+<span class="hljs-built_in">cat</span> /proc/48213/cgroup
+<span class="hljs-comment"># 0::/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod5c2.slice/cri-containerd-3f9a1c2d7e10.scope</span>
+<span class="hljs-built_in">ls</span> -l /proc/48213/ns/
+
+<span class="hljs-comment"># Run a host tool inside the container&#x27;s network namespace</span>
+nsenter -t 48213 -n ss -tulpn
+</code></pre>
+<p>Read the cgroup path from the right. It names the container's scope, inside its pod's slice, inside the QoS slice (<code>burstable</code> here), inside <code>kubepods</code>. The QoS class is literally a directory in the cgroup tree, which is how the kernel and kubelet can rank pods under pressure.</p>
+<p>The catch: <code>nsenter -n</code> enters only the network namespace, so <code>ps</code> and the filesystem you see are still the host's. That is exactly what you want to debug a container that has no shell, but it also means a command you run is not constrained by the container's limits. As of 1.37, cgroup v1 is deprecated and the kubelet does not start on a v1 node unless <code>failCgroupV1: false</code> is set. Check which you have with <code>stat -fc %T /sys/fs/cgroup</code>, which prints <code>cgroup2fs</code> on v2. The paths in this guide are v2.</p>
+<hr>
+<h2>★ CPU and load</h2>
+<p><strong>What it is.</strong> Load average is the number of tasks that are runnable or in uninterruptible sleep, averaged over 1, 5 and 15 minutes. On Linux that includes tasks in <strong>D state</strong> (blocked in the kernel, usually waiting on I/O), not just tasks wanting CPU.</p>
+<p><strong>Why it matters.</strong> A load of 200 does not mean the CPUs are busy. A hung NFS mount parks hundreds of processes in D state, load climbs, and every CPU is idle. Reading load as &quot;CPU saturation&quot; sends you to the wrong layer.</p>
+<pre><code class="hljs" data-lang="bash">top -bn1 | <span class="hljs-built_in">head</span> -5
+<span class="hljs-comment"># %Cpu(s):  1.2 us,  0.8 sy,  0.0 ni, 21.0 id, 76.5 wa,  0.0 hi,  0.2 si,  0.3 st</span>
+<span class="hljs-comment"># load average: 187.42, 160.10, 95.33</span>
+
+vmstat 1 5          <span class="hljs-comment"># r = runnable, b = blocked (D state), wa = iowait, si/so = swap</span>
+mpstat -P ALL 1 3   <span class="hljs-comment"># one line per core: is one core pegged while the rest are idle?</span>
+pidstat -u -p ALL 1 3
+</code></pre>
+<p>The <code>top</code> fields to read aloud: <code>us</code> user code, <code>sy</code> kernel (system calls, networking), <code>wa</code> waiting on I/O, <code>st</code> stolen by the hypervisor (a noisy neighbour on a VM), <code>si</code> soft interrupts (often network packet processing). High <code>wa</code> plus high load plus low <code>us</code> says &quot;storage or network filesystem&quot;. High <code>st</code> says the problem is outside your VM entirely.</p>
+<h3>CFS throttling: the silent latency source</h3>
+<p><code>limits.cpu</code> becomes <code>cpu.max</code>, a quota of CPU time per 100 ms period. A container limited to 500m gets 50 ms of CPU per period; once it spends that, every thread is <strong>throttled</strong> until the next period, even if the node is idle. A multi-threaded service can burn its quota in the first few milliseconds of a period and then sit frozen for 80 ms.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">cat</span> /sys/fs/cgroup/kubepods.slice/.../cri-containerd-&lt;<span class="hljs-built_in">id</span>&gt;.scope/cpu.stat
+<span class="hljs-comment"># usage_usec 91823345</span>
+<span class="hljs-comment"># nr_periods 120344</span>
+<span class="hljs-comment"># nr_throttled 38812       &lt;- throttled in 32% of periods</span>
+<span class="hljs-comment"># throttled_usec 4412009123</span>
+</code></pre>
+<p>The symptom is p99 latency spikes with CPU usage that looks low on a dashboard, because average usage is under the limit. The catch is why many platforms run with requests but no CPU limits: requests give fair share under contention via <code>cpu.weight</code>, and without a limit nothing throttles. The tradeoff is a runaway pod can use idle capacity freely, so it needs a good request and monitoring, and it is a policy choice rather than a universal rule.</p>
+<h3>NUMA and CPU pinning</h3>
+<p>On multi-socket HPC and GPU nodes, memory is closer to some cores than others. A process migrating between sockets pays remote-memory latency. The kubelet's <strong>CPU manager</strong> with <code>policy: static</code> gives Guaranteed pods with integer CPU requests exclusive cores, which removes migration and noisy neighbours for latency-sensitive jobs. The catch: exclusive cores are removed from the shared pool, so pinning too many Guaranteed pods starves everything else on the node. The policy options (<code>CPUManagerPolicyOptions</code>) are GA as of 1.33.</p>
+<hr>
+<h2>★ Memory</h2>
+<p><strong>What it is.</strong> Memory on Linux has more kinds than &quot;used&quot; and &quot;free&quot;. <strong>Anonymous</strong> memory is heap and stack, with no file behind it. <strong>Page cache</strong> is file data the kernel keeps in RAM to speed up reads, and it is reclaimable. <strong>RSS</strong> is what a process has resident, including shared pages.</p>
+<p><strong>Why it matters.</strong> The kernel uses all spare RAM for cache by design, so &quot;free&quot; looks tiny on a healthy node, and panicking about it wastes the interview.</p>
+<pre><code class="hljs" data-lang="bash">free -m
+<span class="hljs-comment">#                total   used   free   shared  buff/cache   available</span>
+<span class="hljs-comment"># Mem:           128000  41200   1900     210       84900      85600</span>
+</code></pre>
+<p>Read <code>available</code>, not <code>free</code>. It estimates how much a new workload could use without swapping, counting reclaimable cache. Here <code>free</code> is 1.9 GB and the node is fine.</p>
+<h3>Who kills what</h3>
+<p>Three different mechanisms get conflated, and the interviewer will test whether you separate them.</p>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Trigger</th>
+<th>Who acts</th>
+<th>What you see</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Container OOM</td>
+<td>Process exceeds its cgroup <code>memory.max</code></td>
+<td>Kernel OOM killer, scoped to that cgroup</td>
+<td>Pod <code>OOMKilled</code>, exit 137, a line in <code>journalctl -k</code></td>
+</tr>
+<tr>
+<td>Node OOM</td>
+<td>Whole machine out of reclaimable memory</td>
+<td>Kernel OOM killer, host-wide, ranked by <code>oom_score</code></td>
+<td>Random processes die, possibly the kubelet or runtime</td>
+</tr>
+<tr>
+<td>Kubelet eviction</td>
+<td><code>memory.available</code> falls below a threshold</td>
+<td>Kubelet, gracefully evicts pods</td>
+<td>Pods <code>Evicted</code>, node condition <code>MemoryPressure</code></td>
+</tr>
+</tbody>
+</table>
+<p>Kubelet eviction is meant to act before the kernel does. The kubelet also biases the kernel OOM killer through <code>oom_score_adj</code>: Guaranteed pods get a strongly negative value (about -997, &quot;almost never kill&quot;), BestEffort get 1000 (&quot;kill first&quot;), and Burstable fall in between scaled by their request. These values are as the kubelet implements them historically; verify on a live node with <code>cat /proc/&lt;pid&gt;/oom_score_adj</code>.</p>
+<pre><code class="hljs" data-lang="bash">journalctl -k | grep -i -E <span class="hljs-string">&quot;out of memory|oom-kill|killed process&quot;</span>
+<span class="hljs-comment"># Memory cgroup out of memory: Killed process 48213 (java) total-vm:9201344kB,</span>
+<span class="hljs-comment">#   anon-rss:2095612kB, file-rss:1204kB ... oom_memcg=/kubepods.slice/...</span>
+</code></pre>
+<p>The <code>oom_memcg=</code> field tells you which cgroup hit its ceiling. If it names a pod's scope, it was a container OOM; if the message has no memcg, the whole node ran out.</p>
+<h3>The page cache catch</h3>
+<p>Page cache is charged to the cgroup that read the file. A pod that streams a 200 GB dataset fills cache inside its own <code>memory.max</code>. Clean cache is reclaimable, so usually the kernel evicts it instead of OOM-killing, but it matters in three ways: dirty pages waiting for writeback cannot be dropped instantly, a write-heavy data mover can fill the cgroup with dirty cache faster than storage drains it, and kubelet's eviction signal (the <strong>working set</strong>, usage minus inactive file cache) still counts the active file cache. The symptom, familiar in data-heavy science workloads, is &quot;my pod only has a small heap but gets OOMKilled or evicted&quot;. Check <code>memory.stat</code>:</p>
+<pre><code class="hljs" data-lang="bash">grep -E <span class="hljs-string">&quot;^(anon|file|active_file|inactive_file|shmem) &quot;</span> memory.stat
+<span class="hljs-comment"># anon 812000000</span>
+<span class="hljs-comment"># file 6900000000        &lt;- 6.9 GB of page cache charged to this pod</span>
+<span class="hljs-comment"># active_file 5100000000</span>
+</code></pre>
+<p>Fix by sizing <code>memory</code> for working set plus cache, using <code>O_DIRECT</code> or <code>fadvise(DONTNEED)</code> in the data mover, or limiting dirty ratios. Off-heap memory (JVM metaspace and direct buffers, memory-mapped files, native libraries) is counted the same way, which is why heap size alone never tells you the container size.</p>
+<h3>Swap and PSI</h3>
+<p>Swap on nodes was off by default for years. As of 1.37, NodeSwap is GA (since 1.34): <code>memorySwap.swapBehavior</code> is <code>NoSwap</code> by default and <code>LimitedSwap</code> lets pods use swap, and the kubelet still refuses to start on a node with swap enabled unless <code>failSwapOn: false</code>. I could not verify from the pages I read exactly which QoS classes <code>LimitedSwap</code> covers, so check the swap behaviour reference before claiming it. MemoryQoS, which sets <code>memory.high</code> to throttle before the hard limit, is beta and on by default as of 1.37.</p>
+<p><strong>PSI</strong> (pressure stall information) is the modern signal: <code>/proc/pressure/{cpu,memory,io}</code> reports the share of time tasks were stalled waiting for a resource.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">cat</span> /proc/pressure/memory
+<span class="hljs-comment"># some avg10=4.20 avg60=2.10 avg300=0.80 total=84021334</span>
+<span class="hljs-comment"># full avg10=1.10 avg60=0.40 avg300=0.10 total=21003492</span>
+</code></pre>
+<p><code>some</code> means at least one task stalled; <code>full</code> means all non-idle tasks stalled, which is real thrash. PSI beats utilisation graphs because it measures harm, not use. The kubelet exposes PSI metrics (KubeletPSI is GA as of 1.36). The catch is that PSI needs kernel 4.20+ built with <code>CONFIG_PSI</code>, and some distro kernels ship it disabled by default and need <code>psi=1</code> on the boot line. I did not verify the default for RHEL 9, so check <code>/proc/pressure</code> exists on your nodes.</p>
+<hr>
+<h2>★ Storage and filesystems</h2>
+<p><strong>What it is.</strong> A disk can be &quot;full&quot; in three different ways: out of blocks, out of inodes, or full of files you deleted but a process still holds open.</p>
+<p><strong>Why it matters.</strong> Scientific data produces all three: huge files, millions of small files, and long-running writers with big log files.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">df</span> -h /var            <span class="hljs-comment"># blocks</span>
+<span class="hljs-built_in">df</span> -i /var            <span class="hljs-comment"># inodes</span>
+<span class="hljs-comment"># Filesystem      Inodes   IUsed   IFree IUse% Mounted on</span>
+<span class="hljs-comment"># /dev/sda3     19660800 19660800       0  100% /var</span>
+</code></pre>
+<p><code>df -h</code> shows free space while <code>df -i</code> shows 100%, and writes fail with &quot;No space left on device&quot; anyway. The catch: you cannot grow inodes on ext4 after creation, and XFS allocates them dynamically, which is one reason XFS is common for data volumes.</p>
+<p>When <code>df</code> says full but <code>du</code> cannot find the space, a process has a deleted file open:</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">du</span> -sh /var/* | <span class="hljs-built_in">sort</span> -h | <span class="hljs-built_in">tail</span> -3     <span class="hljs-comment"># accounts for 12G of a 100G volume</span>
+lsof +L1 | grep deleted
+<span class="hljs-comment"># fluentd  2210  root  7w  REG  8,3  86000000000  0  412 /var/log/app/big.log (deleted)</span>
+</code></pre>
+<p>The file is unlinked (link count 0) but the process keeps the inode alive, so blocks stay allocated until it closes the file. Restart the process, or truncate through <code>/proc/2210/fd/7</code> (<code>: &gt; /proc/2210/fd/7</code>). Deleting a huge log with <code>rm</code> while the writer runs never frees the space.</p>
+<h3>Reading iostat</h3>
+<pre><code class="hljs" data-lang="bash">iostat -x 1 3
+<span class="hljs-comment"># Device   r/s    w/s   rkB/s   wkB/s  await  aqu-sz  %util</span>
+<span class="hljs-comment"># nvme0n1  8200  3100   410000  190000   0.9    8.1    100.0</span>
+</code></pre>
+<p><code>await</code> is average time per request including queue, in ms: a few ms is healthy on SSD, hundreds means trouble. The catch is <code>%util</code>: it is the share of time at least one request was in flight, so a device that handles many requests in parallel (SSD, NVMe) shows 100% while having plenty of headroom. Judge by <code>await</code> and queue depth (<code>aqu-sz</code>), not <code>%util</code>.</p>
+<h3>Mounts, NFS, and parallel filesystems</h3>
+<p><code>findmnt</code> shows what is mounted where and with which options, <code>/etc/fstab</code> makes it persistent. For network filesystems the option that matters is <strong>hard vs soft</strong>. A <code>hard</code> mount retries forever when the server is unreachable, so any process touching it blocks in D state, cannot be killed, and survives even <code>kill -9</code>. A <code>soft</code> mount returns an I/O error after retries, which can silently corrupt a writer that does not check errors. Scientific data mounts are usually hard on purpose, which is why a stuck storage server produces a high-load node with idle CPUs and pods that will not terminate.</p>
+<pre><code class="hljs" data-lang="bash">nfsstat -c            <span class="hljs-comment"># retransmissions climbing = server or network trouble</span>
+findmnt -t nfs4
+mount | grep -E <span class="hljs-string">&quot;hard|soft&quot;</span>
+</code></pre>
+<h3>What the kubelet and runtime store</h3>
+<p><code>/var/lib/kubelet</code> holds pod volumes, <code>emptyDir</code> data and logs; <code>/var/lib/containerd</code> holds image layers and writable container layers. When disk usage on either crosses the kubelet's thresholds (by default <code>nodefs.available&lt;10%</code> and <code>imagefs.available&lt;15%</code>, which are the long-standing defaults), the kubelet sets <code>DiskPressure</code>, garbage collects unused images, and then evicts pods. That chain is the link from a full <code>/var</code> to the scheduling taints you met in the troubleshooting section.</p>
+<h3>LVM and XFS in brief</h3>
+<p>To grow a filesystem online: <code>lvextend -r -L +50G /dev/vg0/var</code> extends the logical volume and resizes the filesystem in one step, or <code>lvextend</code> then <code>xfs_growfs /var</code> for XFS (<code>resize2fs</code> for ext4). XFS can grow but never shrink, which is the catch to remember before provisioning.</p>
+<hr>
+<h2>★ Networking on the host</h2>
+<p><strong>What it is.</strong> Below the CNI, a node's networking is ordinary Linux: interfaces, routes, a neighbour table, netfilter rules, and the connection-tracking table.</p>
+<pre><code class="hljs" data-lang="bash">ip addr; ip route; ip neigh        <span class="hljs-comment"># addresses, routes, ARP table</span>
+ss -tulpn                          <span class="hljs-comment"># listening sockets with owning process</span>
+ss -s                              <span class="hljs-comment"># socket summary: established, timewait counts</span>
+</code></pre>
+<h3>Conntrack: the classic node-level failure</h3>
+<p>Netfilter tracks every connection in a fixed-size table so NAT and Service translation work. When it fills, new connections are dropped, and the kernel says so:</p>
+<pre><code class="hljs" data-lang="bash">dmesg | grep conntrack
+<span class="hljs-comment"># nf_conntrack: table full, dropping packet</span>
+conntrack -S | <span class="hljs-built_in">head</span> -2             <span class="hljs-comment"># look for rising insert_failed and drop</span>
+sysctl net.netfilter.nf_conntrack_count net.netfilter.nf_conntrack_max
+</code></pre>
+<p>The symptom is intermittent connection timeouts at high fan-out, while most requests succeed and nothing is wrong with the apps. Cause: the node proxies many short-lived connections (a service calling thousands of backends, DNS over UDP, a load test). Fix by raising <code>nf_conntrack_max</code> (it costs kernel memory), shortening timeouts, or reducing connection churn with keep-alives. kube-proxy relies on conntrack for Service NAT, so this hits Kubernetes nodes disproportionately.</p>
+<h3>kube-proxy and the rule layer</h3>
+<p>kube-proxy programs Service virtual IPs as netfilter rules. As of 1.37 its default mode is <code>iptables</code>, <code>nftables</code> is GA since 1.33 and slated to become the default in a later release, and <code>ipvs</code> is deprecated. The tradeoff for scale: iptables rules are evaluated linearly, so thousands of Services slow rule updates and lookups; nftables and ipvs scale better. Set the mode explicitly so an upgrade cannot change it for you. Cilium can replace kube-proxy entirely with eBPF. For CNI internals see the <a href="kubernetes-troubleshooting.html">Kubernetes guide</a>.</p>
+<h3>Capturing traffic</h3>
+<p>A pod's traffic crosses a veth pair into the host. Find the host side and capture there:</p>
+<pre><code class="hljs" data-lang="bash">nsenter -t 48213 -n ip <span class="hljs-built_in">link</span> show eth0
+<span class="hljs-comment"># 7: eth0@if29: ...                    &lt;- peer interface index is 29</span>
+ip -o <span class="hljs-built_in">link</span> | awk -F<span class="hljs-string">&#x27;: &#x27;</span> <span class="hljs-string">&#x27;$1==29{print $2}&#x27;</span>     <span class="hljs-comment"># host-side veth name</span>
+tcpdump -ni veth3a1c9f -c 50 port 5432
+</code></pre>
+<h3>DNS and <code>ndots</code></h3>
+<p>Pods get a <code>resolv.conf</code> with <code>search</code> domains and <code>options ndots:5</code>. A name with fewer than five dots is tried against each search domain first, so one lookup of <code>api.example.org</code> (two dots) becomes up to four queries (<code>api.example.org.&lt;ns&gt;.svc.cluster.local</code>, <code>...svc.cluster.local</code>, <code>...cluster.local</code>, then the bare name), each also asked as A and AAAA. At high request rates this multiplies load on CoreDNS and is a common cause of latency and <code>conntrack</code> pressure. Fixes: use fully qualified names with a trailing dot, set <code>ndots:2</code> per pod, or run node-local DNS cache.</p>
+<h3>MTU mismatch</h3>
+<p>Overlay networks (VXLAN, Geneve, WireGuard) add a header, so the overlay interface MTU must be smaller than the underlay's. If it is not, small requests work (health checks, SYNs) and large ones hang, because full-size packets are silently dropped or need fragmentation that is blocked. The tell is &quot;TCP connects, TLS or large responses stall&quot;. Test with <code>ping -M do -s 1400 &lt;peer&gt;</code> and walk the size up.</p>
+<hr>
+<h2>systemd, journald, and the node services</h2>
+<p>systemd supervises everything. The commands to have ready: <code>systemctl status kubelet</code>, <code>systemctl restart kubelet</code>, <code>systemctl enable --now containerd</code>, and <code>systemctl edit kubelet</code> for a drop-in override that survives package upgrades (never edit the packaged unit directly).</p>
+<pre><code class="hljs" data-lang="bash">journalctl -u kubelet -f                      <span class="hljs-comment"># follow</span>
+journalctl -u kubelet --since <span class="hljs-string">&quot;15 min ago&quot;</span> -p err
+journalctl -k -b                              <span class="hljs-comment"># kernel messages this boot</span>
+</code></pre>
+<p>The node service stack is a chain, and what you see depends on where it breaks:</p>
+<table>
+<thead>
+<tr>
+<th>Down</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>systemd or kernel</td>
+<td>Node gone: reboot, hardware, or hypervisor</td>
+</tr>
+<tr>
+<td>containerd</td>
+<td>Kubelet cannot create or inspect containers: pods stuck <code>ContainerCreating</code>, the node goes NotReady</td>
+</tr>
+<tr>
+<td>kubelet</td>
+<td>Node goes NotReady after a grace period; containers already running keep running</td>
+</tr>
+<tr>
+<td>Static pods (control plane)</td>
+<td>The API server, scheduler or etcd on that node is missing</td>
+</tr>
+</tbody>
+</table>
+<p><code>crictl</code> is the &quot;kubectl on the node&quot;: <code>crictl ps</code>, <code>crictl logs &lt;id&gt;</code>, <code>crictl pods</code>, <code>crictl images</code> talk to containerd directly, so they work when the API server is unreachable, which is exactly when you need them.</p>
+<hr>
+<h2>Processes and tracing</h2>
+<p>Process states tell you where to look: <strong>R</strong> running or runnable, <strong>S</strong> sleeping (interruptible, the normal idle), <strong>D</strong> uninterruptible sleep (blocked in the kernel, cannot be signalled, the load-average inflator), <strong>Z</strong> zombie (exited, parent has not reaped). A few zombies are harmless; thousands are a PID leak.</p>
+<p><strong>PID 1 in a container.</strong> The first process in a PID namespace is expected to reap orphaned children and forward signals. Most app binaries do neither, so orphans become zombies and <code>SIGTERM</code> is ignored, which makes pods take the full <code>terminationGracePeriodSeconds</code> to die. <code>tini</code> (or <code>--init</code>) exists to be a correct PID 1. <code>shareProcessNamespace: true</code> puts all containers of a pod in one PID namespace so a debugging sidecar can see them.</p>
+<p><strong>Signals and termination.</strong> On pod deletion the kubelet sends SIGTERM, waits <code>terminationGracePeriodSeconds</code> (default 30), then SIGKILL, which cannot be caught. An app that ignores SIGTERM always costs the full grace period.</p>
+<pre><code class="hljs" data-lang="bash">strace -f -p 48213 -e trace=network,file -tt     <span class="hljs-comment"># what syscalls, with timestamps</span>
+lsof -p 48213 | <span class="hljs-built_in">head</span>                             <span class="hljs-comment"># open files and sockets</span>
+<span class="hljs-built_in">cat</span> /proc/48213/status | grep -E <span class="hljs-string">&quot;State|VmRSS|Threads&quot;</span>
+<span class="hljs-built_in">cat</span> /proc/48213/limits | grep -i <span class="hljs-string">&quot;open files&quot;</span>
+<span class="hljs-built_in">ls</span> /proc/48213/fd | <span class="hljs-built_in">wc</span> -l
+</code></pre>
+<p><code>strace</code> slows the target substantially, so use it briefly on production processes; <code>perf top</code> is the lower-overhead sampler for &quot;where is the CPU going&quot;. Limits: <code>ulimit -n</code> (open files) too low produces &quot;too many open files&quot; under load, and containers inherit the runtime's limit, so check the containerd unit. <strong>PID exhaustion</strong>: <code>kernel.pid_max</code> is node-wide, and the kubelet's <code>podPidsLimit</code> caps each pod, because one fork-bombing pod can otherwise take the node (<code>PIDPressure</code>, &quot;fork: retry: Resource temporarily unavailable&quot;).</p>
+<hr>
+<h2>Kernel tuning and node prep (brief)</h2>
+<p><code>sysctl</code> settings are either <strong>namespaced</strong> (can differ per pod, such as <code>net.ipv4.ip_local_port_range</code>) or <strong>node-level</strong> (shared by everyone, such as <code>vm.max_map_count</code>). Kubernetes lets pods set only a safe namespaced subset by default, and unsafe sysctls need the kubelet's <code>allowedUnsafeSysctls</code>, because a node-level setting from one pod affects every tenant.</p>
+<p>The kubeadm node prerequisites, with the symptom when missing:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Why</th>
+<th>Symptom if wrong</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>br_netfilter</code> loaded, <code>net.bridge.bridge-nf-call-iptables=1</code></td>
+<td>Bridged traffic must hit iptables for Services</td>
+<td>Service traffic between pods on one node fails</td>
+</tr>
+<tr>
+<td><code>net.ipv4.ip_forward=1</code></td>
+<td>Node must route between pod and external networks</td>
+<td>Pods cannot reach outside the node</td>
+</tr>
+<tr>
+<td>Swap off (or <code>failSwapOn: false</code>)</td>
+<td>Kubelet refuses to start otherwise</td>
+<td>Kubelet exits at start with a swap error</td>
+</tr>
+<tr>
+<td>cgroup driver <code>systemd</code> on <strong>both</strong> kubelet and containerd</td>
+<td>One cgroup manager must own the tree</td>
+<td>Pods flap or fail to start after a containerd upgrade; two managers fight</td>
+</tr>
+</tbody>
+</table>
+<p>Hugepages (<code>vm.nr_hugepages</code>) reserve large pages that cannot be swapped or used as normal memory. They help HPC and some GPU or database workloads by cutting TLB misses, and the catch is that reserved hugepages shrink what normal pods can use, so they show up as missing memory in <code>free</code>.</p>
+<hr>
+<h2>Security basics a sysadmin is asked about (brief)</h2>
+<p><strong>SSH:</strong> key-only (<code>PasswordAuthentication no</code>), no root login, restrict users and use a bastion. <strong>sudo:</strong> least privilege in <code>/etc/sudoers.d</code>, edited with <code>visudo</code>.</p>
+<p><strong>SELinux and AppArmor</strong> confine processes beyond file permissions. SELinux modes are <code>enforcing</code>, <code>permissive</code> (logs only) and <code>disabled</code>. The symptom of a policy block is an access failure with correct permissions, and the proof is in the audit log: <code>ausearch -m avc -ts recent</code> or <code>grep &quot;avc:  denied&quot; /var/log/audit/audit.log</code>. The sysadmin mistake to avoid is turning SELinux off instead of fixing the label (<code>restorecon</code>, <code>semanage fcontext</code>).</p>
+<p><strong>Permissions:</strong> the setuid bit (<code>chmod u+s</code>) makes a binary run as its owner, which is how <code>sudo</code> works and why a world-writable setuid root file is a privilege escalation. <strong>User namespaces</strong> map a container's root to an unprivileged host UID, so root in the container is nobody outside; Kubernetes support (<code>hostUsers: false</code>) is GA as of 1.36.</p>
+<p><strong>Patching:</strong> kernel live-patching (kpatch, Livepatch) fixes some CVEs without a reboot, but not all, and it is not a replacement for periodic reboots. The fleet pattern is drain, patch, reboot, uncordon, one node or batch at a time, with a tool such as kured automating the lock and drain. See the node maintenance section of the <a href="kubernetes-troubleshooting.html">Kubernetes guide</a>.</p>
+<hr>
+<h2>★ Practice: &quot;the node is unhealthy&quot; scenarios</h2>
+<h3>Scenario 1: Load average 150, CPU idle</h3>
+<p>Symptom: monitoring pages for load, but <code>top</code> shows 80% idle and the app on the node is slow. Causes, ranked: processes stuck in D state on a hung NFS or parallel-filesystem mount; a failing disk or controller; heavy swap (rare with swap off).</p>
+<pre><code class="hljs" data-lang="bash">ps -eo state,pid,wchan:30,cmd | awk <span class="hljs-string">&#x27;$1==&quot;D&quot;&#x27;</span> | <span class="hljs-built_in">head</span>
+<span class="hljs-comment"># D  2201  nfs_wait_bit_killable   python /opt/ingest.py</span>
+<span class="hljs-comment"># D  2207  nfs_wait_bit_killable   rsync -a /scratch/...</span>
+findmnt -t nfs4,nfs
+<span class="hljs-built_in">timeout</span> 5 <span class="hljs-built_in">ls</span> /mnt/scratch || <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;mount is hung&quot;</span>
+</code></pre>
+<p>Fix: repair the storage server or network path, not the node. The catch: <code>kill -9</code> does nothing to D-state tasks, and hard mounts retry forever, so pods using the volume sit <code>Terminating</code>. A lazy unmount (<code>umount -l</code>) detaches the mount point but does not free blocked tasks. Until the server returns, draining the node cannot finish, and rebooting is often the only way out.</p>
+<h3>Scenario 2: Node NotReady, kubelet will not stay up</h3>
+<pre><code class="hljs" data-lang="bash">systemctl status kubelet
+journalctl -u kubelet --since <span class="hljs-string">&quot;10 min ago&quot;</span> | <span class="hljs-built_in">tail</span> -30
+<span class="hljs-comment"># failed to run Kubelet: misconfiguration: kubelet cgroup driver: &quot;systemd&quot;</span>
+<span class="hljs-comment">#   is different from container runtime cgroup driver: &quot;cgroupfs&quot;</span>
+</code></pre>
+<p>Causes, ranked: a cgroup driver mismatch, often right after a containerd upgrade reset <code>SystemdCgroup</code>; an expired kubelet client certificate (<code>x509: certificate has expired</code> in the log, check <code>openssl x509 -noout -dates -in /var/lib/kubelet/pki/kubelet-client-current.pem</code>); swap turned on after a reboot; the runtime socket down. Fix the cause, then <code>systemctl restart kubelet</code>. The catch: a mismatch can leave pods half-created, so after fixing check for orphaned sandboxes with <code>crictl pods</code>.</p>
+<h3>Scenario 3: Disk full, but <code>du</code> finds nothing</h3>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">df</span> -h /var &amp;&amp; <span class="hljs-built_in">du</span> -xsh /var       <span class="hljs-comment"># df says 98G used, du says 14G</span>
+lsof +L1 | grep deleted          <span class="hljs-comment"># the deleted-but-open file</span>
+<span class="hljs-built_in">df</span> -i /var                       <span class="hljs-comment"># the inode variant: blocks free, inodes 100%</span>
+</code></pre>
+<p>A rotated or deleted log file still held open by a writer explains the gap. The inode variant shows plenty of free GB with <code>IUse% 100%</code>, caused by millions of small files such as per-frame detector outputs or cache shards. Fix: restart or truncate the holder, or remove the small-file tree and change the data layout (pack into archives, HDF5). The catch: growing the volume does not add inodes on ext4.</p>
+<h3>Scenario 4: Pod OOMKilled while the heap looks small</h3>
+<pre><code class="hljs" data-lang="bash">kubectl describe pod &lt;pod&gt; | grep -A3 <span class="hljs-string">&quot;Last State&quot;</span>
+<span class="hljs-comment"># Reason: OOMKilled  Exit Code: 137</span>
+<span class="hljs-built_in">cat</span> &lt;cgroup&gt;/memory.stat | grep -E <span class="hljs-string">&quot;^(anon|file|shmem) &quot;</span>
+<span class="hljs-built_in">cat</span> &lt;cgroup&gt;/memory.peak
+</code></pre>
+<p>The app reports a 2 GB heap, yet <code>memory.max</code> is 4 GB. <code>memory.stat</code> shows <code>file</code> at 3 GB: page cache from reading input data, plus off-heap buffers, thread stacks and <code>/dev/shm</code> counted in the same cgroup. Fix: size the limit for working set, not heap, reduce cache pressure in the data mover, and cap off-heap. The catch is that the total looks reasonable on any single metric; only the cgroup's own accounting adds them up.</p>
+<h3>Scenario 5: Intermittent timeouts at high fan-out</h3>
+<pre><code class="hljs" data-lang="bash">dmesg | grep -i conntrack         <span class="hljs-comment"># table full, dropping packet</span>
+conntrack -S | grep -E <span class="hljs-string">&quot;insert_failed|drop&quot;</span>
+kubectl <span class="hljs-built_in">exec</span> &lt;pod&gt; -- <span class="hljs-built_in">cat</span> /etc/resolv.conf     <span class="hljs-comment"># ndots:5</span>
+</code></pre>
+<p>Ranked causes: conntrack table full on the node; a DNS storm from <code>ndots:5</code> amplification overloading CoreDNS (look for CoreDNS CPU and timeouts); ephemeral port exhaustion from many outbound connections to one destination. Fix the layer you found: raise <code>nf_conntrack_max</code>, use FQDNs or node-local DNS cache, reuse connections. The catch: failures are partial, so the service looks healthy in a quick check.</p>
+<h3>Scenario 6: Latency spikes with low CPU usage</h3>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">cat</span> &lt;cgroup&gt;/cpu.stat            <span class="hljs-comment"># nr_throttled / nr_periods</span>
+<span class="hljs-built_in">cat</span> &lt;cgroup&gt;/cpu.max             <span class="hljs-comment"># e.g. 50000 100000  (500m)</span>
+</code></pre>
+<p>A high ratio of <code>nr_throttled</code> to <code>nr_periods</code> confirms CFS throttling. Fix: raise or remove the CPU limit, reduce thread count to match the quota, or move the workload to the static CPU manager. The catch: lowering CPU usage in the app does not help if the quota is exhausted by burst, so measure throttled time and not average CPU.</p>
+<h3>Scenario 7: A process you cannot kill (D state), and the drain</h3>
+<pre><code class="hljs" data-lang="bash">ps -o pid,state,wchan:32,cmd -p 2201
+<span class="hljs-comment">#  2201 D nfs_wait_bit_killable  python /opt/ingest.py</span>
+kubectl drain node-9 --ignore-daemonsets --<span class="hljs-built_in">timeout</span>=5m    <span class="hljs-comment"># times out: pod Terminating</span>
+</code></pre>
+<p>A D-state process is waiting for the kernel; signals are queued until the call returns. Drain evicts the pod, the kubelet sends SIGTERM then SIGKILL, and the container cannot exit, so the pod stays <code>Terminating</code> and drain blocks. What it means for the node: do not wait forever. Fix the storage path, or accept that the node needs a reboot, and for a Slurm-style hard mount that is the honest answer. The catch: force-deleting the pod object (<code>--force --grace-period=0</code>) removes it from the API but the process is still there holding the volume, so a new pod on another node can write the same data. For a ReadWriteOnce volume, confirm the old process is gone before force-deleting.</p>
+<hr>
+<h2>Question bank: host-level Linux</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>What they are testing</th>
+<th>Concise answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What is a container?</td>
+<td>Core model</td>
+<td>A process (tree) isolated by namespaces, limited by cgroups, and confined by a root filesystem, capabilities and seccomp. No kernel &quot;container&quot; object.</td>
+</tr>
+<tr>
+<td>What is a cgroup?</td>
+<td>Resource control</td>
+<td>A kernel hierarchy that groups processes and enforces limits and accounting for CPU, memory, I/O and PIDs. v2 is a single unified tree.</td>
+</tr>
+<tr>
+<td>What is a namespace?</td>
+<td>Isolation</td>
+<td>A kernel view partition: PID, network, mount, UTS, IPC, user, cgroup. A process sees only its namespace's instance.</td>
+</tr>
+<tr>
+<td>What does load average measure?</td>
+<td>Subtlety</td>
+<td>Runnable plus uninterruptible (D state) tasks averaged over 1, 5 and 15 minutes. Not CPU utilisation.</td>
+</tr>
+<tr>
+<td>Load is 200 and CPU is idle. Why?</td>
+<td>Diagnosis</td>
+<td>Many tasks in D state, usually blocked on a hung network filesystem or failing disk. Find them with <code>ps</code> state D and <code>wchan</code>.</td>
+</tr>
+<tr>
+<td>What does <code>free -m</code> &quot;available&quot; mean?</td>
+<td>Memory reading</td>
+<td>Estimate of memory usable without swapping, counting reclaimable cache. The number that matters, not <code>free</code>.</td>
+</tr>
+<tr>
+<td>What is the page cache?</td>
+<td>Memory model</td>
+<td>File data cached in RAM, reclaimable, and charged to the cgroup that read it.</td>
+</tr>
+<tr>
+<td>What does OOMKilled mean?</td>
+<td>K8s and kernel</td>
+<td>The kernel OOM killer SIGKILLed the process because its cgroup exceeded <code>memory.max</code>. Exit 137.</td>
+</tr>
+<tr>
+<td>Container OOM vs kubelet eviction?</td>
+<td>Mechanism</td>
+<td>OOM is the kernel killing inside a cgroup at its limit. Eviction is the kubelet gracefully removing pods when node <code>memory.available</code> falls below a threshold.</td>
+</tr>
+<tr>
+<td>What is <code>oom_score_adj</code>?</td>
+<td>OOM ranking</td>
+<td>A per-process bias to the OOM killer. The kubelet sets it by QoS: very negative for Guaranteed, 1000 for BestEffort.</td>
+</tr>
+<tr>
+<td>What is CPU throttling?</td>
+<td>Hidden latency</td>
+<td>CFS quota: once a cgroup uses <code>cpu.max</code> in a period, its threads stop until the next. Check <code>nr_throttled</code> in <code>cpu.stat</code>.</td>
+</tr>
+<tr>
+<td>Requests vs limits in kernel terms?</td>
+<td>Mapping</td>
+<td>Request becomes <code>cpu.weight</code> (share under contention) and scheduling accounting; limit becomes <code>cpu.max</code> or <code>memory.max</code> (hard ceiling).</td>
+</tr>
+<tr>
+<td>Hard link vs symbolic link?</td>
+<td>Fundamentals</td>
+<td>A hard link is another directory entry for the same inode (same filesystem, survives deleting the original name). A symlink is a file holding a path, can cross filesystems and dangle.</td>
+</tr>
+<tr>
+<td>What is an inode?</td>
+<td>Filesystems</td>
+<td>A record holding a file's metadata and block pointers; the directory entry maps a name to it. Running out of inodes fails writes with free blocks.</td>
+</tr>
+<tr>
+<td><code>df</code> says full, <code>du</code> disagrees. Why?</td>
+<td>Diagnosis</td>
+<td>A deleted file still open by a process keeps its blocks. Find it with <code>lsof +L1</code>.</td>
+</tr>
+<tr>
+<td>What does <code>%util</code> in iostat mean on NVMe?</td>
+<td>Tool literacy</td>
+<td>Time with at least one request in flight. It saturates at 100% with parallel devices, so use <code>await</code> and queue depth.</td>
+</tr>
+<tr>
+<td>Hard vs soft NFS mount?</td>
+<td>Failure behaviour</td>
+<td>Hard retries forever (processes block in D state); soft errors after retries (risks silent corruption).</td>
+</tr>
+<tr>
+<td>What happens when you type <code>ls</code> and press Enter?</td>
+<td>Fundamentals</td>
+<td>The shell parses, resolves <code>ls</code> via <code>PATH</code>, <code>fork</code>s, the child <code>execve</code>s the binary, the loader maps libraries, it calls <code>getdents</code>, writes to stdout, exits, and the parent <code>wait</code>s.</td>
+</tr>
+<tr>
+<td>What are process states?</td>
+<td>Basics</td>
+<td>R running, S sleeping, D uninterruptible, Z zombie, T stopped.</td>
+</tr>
+<tr>
+<td>What is a zombie and why does PID 1 matter?</td>
+<td>Containers</td>
+<td>An exited process whose parent has not reaped it. PID 1 must reap orphans and forward signals, which is why <code>tini</code> exists.</td>
+</tr>
+<tr>
+<td>How does DNS resolve inside a pod?</td>
+<td>K8s networking</td>
+<td><code>resolv.conf</code> points at CoreDNS; <code>search</code> domains and <code>ndots:5</code> expand short names into several queries before the bare name.</td>
+</tr>
+<tr>
+<td>What is conntrack and when does it fail?</td>
+<td>Netfilter</td>
+<td>A kernel table tracking connections for NAT. When full, new connections drop with &quot;table full&quot;.</td>
+</tr>
+<tr>
+<td>How does kube-proxy implement a Service?</td>
+<td>K8s plumbing</td>
+<td>It programs netfilter rules (iptables by default as of 1.37, or nftables or ipvs) that DNAT the Service IP to a backend pod IP.</td>
+</tr>
+<tr>
+<td>Why do large requests hang while small ones work?</td>
+<td>Networking</td>
+<td>MTU mismatch on an overlay: full-size packets are dropped. Test with <code>ping -M do -s</code>.</td>
+</tr>
+<tr>
+<td>What is the cgroup driver and why must it match?</td>
+<td>Node prep</td>
+<td>The cgroup manager (systemd or cgroupfs). Kubelet and runtime must use the same one or two managers fight over the tree.</td>
+</tr>
+<tr>
+<td>What is PSI?</td>
+<td>Modern signals</td>
+<td><code>/proc/pressure/*</code>: the fraction of time tasks stalled on CPU, memory or I/O. Measures harm, not utilisation.</td>
+</tr>
+<tr>
+<td>How do you find what is filling <code>/var</code>?</td>
+<td>Operations</td>
+<td><code>df -h</code> and <code>df -i</code>, then <code>du -xsh /var/*</code> sorted by size, then <code>lsof +L1</code> for deleted-open files; on a node also check <code>/var/lib/containerd</code> and <code>/var/log</code>.</td>
+</tr>
+<tr>
+<td>How do you patch 200 nodes without downtime?</td>
+<td>Operations</td>
+<td>Canary first, then batches: cordon, drain (respecting PDBs), patch, reboot, uncordon, verify, with kured or similar to serialise. Live-patch only for kernel CVEs it covers.</td>
+</tr>
+<tr>
+<td>A pod is stuck Terminating. What now?</td>
+<td>Diagnosis</td>
+<td>Find the process on the node. If it is in D state on a hung mount, fix the storage path; force-deleting the object leaves the process running.</td>
+</tr>
+<tr>
+<td>Where do you look when the API server is down?</td>
+<td>Node-level</td>
+<td><code>journalctl -u kubelet</code>, <code>crictl ps</code> and <code>crictl logs</code> for the static pods under <code>/etc/kubernetes/manifests</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>How to say it in the room</h2>
+<p>Narrate the loop out loud: the symptom, the hypothesis, the command that tests it, the reading, the next move. &quot;Load is high but CPU is idle, so I want to know what is in D state&quot; says more than any recited command list, and it lets the interviewer steer you toward the edge of what you know, which is where he is going anyway.</p>
+<p>When a question goes past your production experience, say so plainly and then reason. &quot;I have not tuned NUMA topology for a GPU node in production. I would start from <code>numactl --hardware</code> to see the layout, check whether the device and the job's CPUs sit on the same node, and use the static CPU manager for exclusive cores.&quot; That is a stronger answer than bluffing, because the follow-up always finds the edge.</p>
+<p>Three bridges from your own experience to personalise, not recite:</p>
+<ul>
+<li><strong>MicroK8s at RCSB.</strong> You ran nodes where a snap managed the binaries and dqlite held the state. That is a real answer to &quot;what does a node consist of&quot;: the same kubelet, runtime and CNI, packaged differently. Bridge it to what you would look at on a kubeadm node (the systemd units and static pods).</li>
+<li><strong>Data acquisition hosts at Hereon.</strong> Hosts held to 99.9% uptime make a credible case for how you think about maintenance windows, hardware failure, and not rebooting a machine mid-measurement. That is the cordon-and-wait mindset for long batch jobs.</li>
+<li><strong>DESY scientific infrastructure.</strong> Large parallel filesystems, big files and high I/O are the same patterns as the storage section: hard mounts, D-state hangs, inode pressure from small files. Use a real incident if you have one.</li>
+</ul>
+<p>Be straight about where the host-level work was done by tooling rather than by you, and say what you know about how the tool did it. The interview is a conversation, and a calibrated answer reads as seniority.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

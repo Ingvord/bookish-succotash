@@ -49,6 +49,7 @@ All colours pass WCAG AA contrast on white. The authoritative list is the palett
 | Steel | `#3f5566` | kafka-prep |
 | Deep Violet | `#5b3a8c` | coding-simulator-guide |
 | Ocean | `#0d5c8c` | kubernetes-troubleshooting |
+| Petrol | `#245e6a` | linux-sysadmin-prep |
 | Moss | `#5c6b1f` | platform-engineer-prep |
 | Cobalt | `#1e5fa8` | system-design-backend-prep |
 | Wine | `#8a2c5a` | elasticsearch-prep |

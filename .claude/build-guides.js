@@ -170,9 +170,17 @@ const GUIDES = [
     src:      '.claude/devops-md/kubernetes-troubleshooting.md',
     out:      'devops/kubernetes-troubleshooting.html',
     kicker:   'Interview Preparation · DevOps · Kubernetes',
-    title:    'Kubernetes: Diagnose It Live',
-    subtitle: 'Symptom-first troubleshooting for the live round: eight real failure scenarios from Pending to RBAC Forbidden, each as symptom, ranked causes, commands, fix, and the catch.',
+    title:    'Kubernetes: Diagnose It, Operate It',
+    subtitle: 'Two halves for the Kubernetes interview: eight symptom-first troubleshooting scenarios, then cluster operations on kubeadm (upgrades, drain and PDBs, scheduling, etcd and certs, tenancy) with drills and a question bank.',
     accent:   '#0d5c8c',  // ocean
+  },
+  {
+    src:      '.claude/devops-md/linux-sysadmin-prep.md',
+    out:      'devops/linux-sysadmin-prep.html',
+    kicker:   'Interview Preparation · DevOps · Linux',
+    title:    'Linux Under the Pods',
+    subtitle: 'The host-level layer a Kubernetes platform engineer gets probed on: processes, memory, cgroups, storage, networking, and the commands to diagnose each live.',
+    accent:   '#245e6a',  // petrol
   },
 
   // ---- Level ---------------------------------------------------
@@ -300,6 +308,7 @@ const GUIDES = [
 //  steel       #3f5566   kafka-prep                   -- AA on white
 //  deep violet #5b3a8c   coding-simulator-guide       -- AA on white
 //  ocean       #0d5c8c   kubernetes-troubleshooting   -- AA on white (6.5:1)
+//  petrol      #245e6a   linux-sysadmin-prep          -- AA on white (7.3:1)
 //  moss        #5c6b1f   platform-engineer-prep       -- AA on white (5.3:1)
 //  cobalt      #1e5fa8   system-design-backend-prep   -- AA on white (5.6:1)
 //  copper      #9a4a1f   java-concurrency-prep        -- AA on white (6.3:1)

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Kubernetes: Diagnose It Live</title>
+<title>Kubernetes: Diagnose It, Operate It</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -366,11 +366,15 @@ td code { font-size: .84em; }
 <div class="wrap">
   <header class="doc-header">
     <div class="kicker">Interview Preparation · DevOps · Kubernetes</div>
-    <h1>Kubernetes: Diagnose It Live</h1>
-    <div class="sub">Symptom-first troubleshooting for the live round: eight real failure scenarios from Pending to RBAC Forbidden, each as symptom, ranked causes, commands, fix, and the catch.</div>
+    <h1>Kubernetes: Diagnose It, Operate It</h1>
+    <div class="sub">Two halves for the Kubernetes interview: eight symptom-first troubleshooting scenarios, then cluster operations on kubeadm (upgrades, drain and PDBs, scheduling, etcd and certs, tenancy) with drills and a question bank.</div>
     <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
   </header>
   <main>
+<h2>Two halves: diagnose it, operate it</h2>
+<p>This guide has two parts because a Kubernetes interview has two moods. <strong>Part 1 (diagnose it live)</strong> is the symptom-first round: someone hands you a broken cluster and watches your loop. <strong>Part 2 (operate it)</strong> is the conversational round: &quot;how do you upgrade a node&quot;, &quot;what is a toleration&quot;, &quot;how do you pin a workload to GPU nodes&quot;, with follow-ups until you reach your limits. Part 1 runs from the diagnostic funnel through Scenario 8. Part 2 starts after Scenario 8 and covers how a kubeadm cluster is assembled, upgraded, drained, scheduled onto, backed up, and secured.</p>
+<p>If your hands-on experience is MicroK8s or a managed service, Part 2 is where the gap closes. Read the kubeadm mental model first, then upgrades, then scheduling. Facts tied to a version are marked &quot;as of 1.37&quot; (1.37.1 is the current stable release as of this writing).</p>
+<hr>
 <h2>When you're in the seat, you get a symptom</h2>
 <p>The interview drops you into a running cluster and says: &quot;Pods are not starting. Figure out what's wrong.&quot; Not &quot;explain liveness probes.&quot; Not &quot;describe the scheduler.&quot; A symptom. The win is a diagnostic loop you can narrate out loud as you work.</p>
 <p>One loop covers almost every failure: <code>kubectl get</code> to see the state, <code>kubectl describe</code> (read Events first) to find the cause, <code>kubectl logs</code> to see what the app said, and then fix. Knowing that loop cold, and being able to say what each command reveals and why you ran it next, is the answer to most Kubernetes live-coding rounds.</p>
@@ -449,6 +453,7 @@ kubectl describe pod &lt;name&gt; -n &lt;ns&gt;
 kubectl describe nodes | grep -A4 <span class="hljs-string">&quot;Allocated resources&quot;</span>
 </code></pre>
 <p>Fix: reduce the request to what the app actually needs (or add nodes). The catch: CPU requests reserve capacity even when the app is idle. A <code>requests.cpu: 2000m</code> on a node with 2 cores leaves zero room and nothing will schedule there. <code>requests</code> express the guaranteed floor; set them from measured usage, not from limits.</p>
+<p>For the full set of placement controls (taints, affinity, spread constraints, priority), see &quot;Scheduling controls: putting pods on the right nodes&quot; in Part 2.</p>
 <hr>
 <h2>Scenario 2: ImagePullBackOff / ErrImagePull</h2>
 <p>The scheduler placed the pod but the kubelet cannot pull the image. The pod shows <code>ErrImagePull</code> on the first failure, then <code>ImagePullBackOff</code> as the kubelet retries with backoff.</p>
@@ -569,6 +574,7 @@ kubectl top pod &lt;name&gt; -n &lt;ns&gt;
 kubectl describe pod &lt;name&gt; | grep -A6 Limits
 </code></pre>
 <p>The catch: setting no CPU limit avoids throttling but allows a runaway process to starve neighbours. The right approach is a limit, set from measured 99th-percentile usage, not a guess. <code>kubectl top</code> shows current; use your metrics store (Prometheus, Datadog) for the histogram. As a side note, the QoS class follows from how you set requests and limits: <code>Guaranteed</code> (requests equal limits on all containers) has the lowest eviction priority under memory pressure; <code>BestEffort</code> (no requests or limits) is evicted first.</p>
+<p>Part 2 refines this: node-pressure eviction ranks by usage over requests and priority, not by QoS label alone. See &quot;Requests, limits, and QoS&quot; under Scheduling controls.</p>
 <hr>
 <h2>Scenario 7: Node NotReady and evictions</h2>
 <p>Pods start disappearing from a node, or new pods will not schedule onto it.</p>
@@ -589,6 +595,7 @@ kubectl get node node-3 -o jsonpath=<span class="hljs-string">&#x27;{.spec.unsch
 </code></pre>
 <p><code>DiskPressure</code> is the most common in production, especially on nodes running many short-lived jobs that fill <code>/var/log</code> or the container image overlay. When the kubelet detects pressure it automatically adds a <code>node.kubernetes.io/disk-pressure:NoSchedule</code> taint. Pods with no matching toleration are not scheduled there; existing pods without <code>NoExecute</code> tolerance are eventually evicted starting with <code>BestEffort</code> and <code>Burstable</code> QoS.</p>
 <p>Free disk by pruning unused images (<code>crictl rmi --prune</code>), adjusting log rotation, or increasing volume size. The catch: once the taint goes on, the eviction sequence is determined by QoS class and pod priority, not by which pods are &quot;least important&quot; in your head. If you need a critical pod to survive node pressure, give it a <code>PriorityClass</code> with a high integer value and explicit tolerations for the pressure taints.</p>
+<p>A node that is cordoned on purpose is a maintenance topic, not an incident: see &quot;Node maintenance: cordon, drain, and PodDisruptionBudgets&quot; and the taint and toleration material in Part 2.</p>
 <hr>
 <h2>Scenario 8: Forbidden and won't-start-by-policy</h2>
 <p>Two causes that share a similar surface symptom but require different fixes.</p>
@@ -620,10 +627,736 @@ kubectl get ns production -o jsonpath=<span class="hljs-string">&#x27;{.metadata
     <span class="hljs-attr">pod-security.kubernetes.io/audit:</span> <span class="hljs-string">restricted</span>
     <span class="hljs-attr">pod-security.kubernetes.io/enforce:</span> <span class="hljs-string">baseline</span>
 </code></pre>
+<p>How RBAC, OIDC login, PSA, and multi-tenant isolation fit together at cluster scale is covered in &quot;Access, tenancy, and policy&quot; in Part 2.</p>
+<hr>
+<h2>Part 2: operating the cluster</h2>
+<p>Part 1 assumed the cluster exists and something in it is broken. Part 2 assumes you own the cluster: you built it, you upgrade it, you decide where pods land, and you are the one holding the etcd backup when it goes wrong. Questions in this half are conversational and escalate. Start with the plain answer, then be ready for &quot;and what happens if...&quot;.</p>
+<p>The sections marked ★ are the load-bearing ones. If time is short, read those and the question bank at the end.</p>
+<hr>
+<h2>★ How kubeadm assembles a cluster</h2>
+<p><strong>What it is.</strong> kubeadm is a bootstrapper, not a lifecycle manager. It generates certificates and kubeconfigs, writes static pod manifests for the control plane, starts etcd, and hands you a join command. It does not install the kubelet, a container runtime, or a CNI plugin, and it does not manage anything after the cluster is up except by being run again for upgrades and cert renewal. Everything else is your job or your automation's job.</p>
+<p><strong>Why it matters.</strong> Once you know where kubeadm puts things, every control-plane question becomes a file-system question. You can debug a dead apiserver with <code>crictl</code> and <code>journalctl</code> even when <code>kubectl</code> does not work.</p>
+<pre><code class="hljs" data-lang="text">/etc/kubernetes/manifests/     static pod manifests: kube-apiserver, kube-controller-manager,
+                               kube-scheduler, etcd (the kubelet watches this directory)
+/etc/kubernetes/pki/           CA and leaf certs; etcd/ subdirectory holds the etcd CA and certs
+/etc/kubernetes/admin.conf     cluster-admin kubeconfig (a client cert for group system:masters)
+/etc/kubernetes/kubelet.conf   the kubelet&#x27;s credentials to the apiserver
+/etc/kubernetes/controller-manager.conf, scheduler.conf    their client credentials
+/var/lib/kubelet/config.yaml   kubelet configuration (cgroupDriver, rotateCertificates, ...)
+/var/lib/etcd/                 etcd data directory (stacked topology)
+kube-system/kubeadm-config     ConfigMap holding the ClusterConfiguration used for upgrades
+</code></pre>
+<p>The kubelet is a systemd service, and it is the only control-plane-adjacent process that is not a pod. It watches <code>/etc/kubernetes/manifests</code> and runs whatever it finds there as <strong>static pods</strong>: containers the kubelet owns directly, with a read-only &quot;mirror pod&quot; published to the API so you can see them. That is how the control plane boots without a control plane. Edit a manifest and the kubelet restarts that component within seconds.</p>
+<p>The request path, end to end: <code>kubectl</code> talks to the kube-apiserver, which authenticates, authorizes, runs admission, and persists to etcd. The scheduler and the controllers hold watches on the apiserver and write back (a Pod gets its <code>nodeName</code>, a ReplicaSet creates Pods). The kubelet on each node watches for Pods bound to it and reconciles through the CRI to the container runtime. Only the apiserver talks to etcd. That one fact drives the failure table below.</p>
+<table>
+<thead>
+<tr>
+<th>Component down</th>
+<th>What stops</th>
+<th>What keeps running</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>etcd (quorum lost)</td>
+<td>All reads and writes through the API</td>
+<td>Running pods and their traffic (kubelets keep what they have)</td>
+</tr>
+<tr>
+<td>kube-apiserver</td>
+<td><code>kubectl</code>, all controllers, scheduling, kubelet status updates</td>
+<td>Running pods; Services still route via existing kube-proxy rules</td>
+</tr>
+<tr>
+<td>kube-scheduler</td>
+<td>New pods stay <code>Pending</code> forever</td>
+<td>Everything already scheduled</td>
+</tr>
+<tr>
+<td>kube-controller-manager</td>
+<td>No self-healing: dead pods are not replaced, Deployments do not roll, nodes are not marked NotReady-evicted</td>
+<td>Existing pods</td>
+</tr>
+<tr>
+<td>kubelet (one node)</td>
+<td>That node goes <code>NotReady</code>; its pods are evicted after the toleration window</td>
+<td>Containers on it keep running until evicted</td>
+</tr>
+<tr>
+<td>CNI plugin</td>
+<td>New pods stay <code>ContainerCreating</code>; pod networking breaks for new sandboxes</td>
+<td>Existing pod networking (mostly)</td>
+</tr>
+<tr>
+<td>CoreDNS</td>
+<td>Service-name lookups fail</td>
+<td>IP-to-IP traffic</td>
+</tr>
+</tbody>
+</table>
+<p>The catch: &quot;apiserver is down&quot; does not mean &quot;the application is down&quot;. Running workloads survive a dead control plane. What you lose is the ability to change or heal anything. In an interview, say that out loud: it separates people who have run clusters from people who have read about them.</p>
+<h3>MicroK8s vs kubeadm, mapped</h3>
+<p>You ran MicroK8s in production, so translate your experience precisely instead of claiming kubeadm fleet time you do not have.</p>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>MicroK8s</th>
+<th>kubeadm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Packaging</td>
+<td>One snap bundling every binary</td>
+<td>Distro packages (<code>kubeadm</code>, <code>kubelet</code>, <code>kubectl</code>) plus a runtime you install</td>
+</tr>
+<tr>
+<td>Control plane</td>
+<td>Daemons under snap-managed systemd units</td>
+<td>Static pods from <code>/etc/kubernetes/manifests</code></td>
+</tr>
+<tr>
+<td>Datastore</td>
+<td>dqlite (Raft on SQLite) by default in HA</td>
+<td>etcd, stacked or external</td>
+</tr>
+<tr>
+<td>Upgrade</td>
+<td><code>snap refresh --channel=1.N/stable</code> per node, snap handles the binaries</td>
+<td>Explicit sequence: <code>kubeadm upgrade</code>, drain, kubelet, uncordon</td>
+</tr>
+<tr>
+<td>Networking, DNS, storage</td>
+<td><code>microk8s enable dns</code>, Calico by default</td>
+<td>You install CNI, CoreDNS is bundled, CSI is yours</td>
+</tr>
+<tr>
+<td>Certs</td>
+<td>Managed by the snap, refreshed on refresh</td>
+<td>One-year leaf certs you must renew or upgrade through</td>
+</tr>
+<tr>
+<td>Node identity</td>
+<td><code>microk8s add-node</code> token</td>
+<td><code>kubeadm join</code> with bootstrap token and CA hash</td>
+</tr>
+</tbody>
+</table>
+<p>The honest framing for the room: &quot;MicroK8s hides the upgrade sequence inside the snap. I know what it is doing because the sequence is the same; kubeadm just makes me run each step.&quot; That is true and it lands well.</p>
+<hr>
+<h2>Bootstrapping and joining (brief)</h2>
+<p><code>kubeadm init --config kubeadm.yaml</code> is the repeatable form. The config file pins the Kubernetes version, the pod and service CIDRs, and, for HA, <code>controlPlaneEndpoint</code> pointing at a load balancer or VIP in front of all apiservers. Without <code>controlPlaneEndpoint</code> from day one you cannot add a second control-plane node cleanly, because every kubeconfig and certificate SAN bakes in the first node's address.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">kubeadm.k8s.io/v1beta4</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterConfiguration</span>
+<span class="hljs-attr">kubernetesVersion:</span> <span class="hljs-string">v1.37.1</span>
+<span class="hljs-attr">controlPlaneEndpoint:</span> <span class="hljs-string">&quot;k8s-api.example.org:6443&quot;</span>   <span class="hljs-comment"># LB or VIP, decided before init</span>
+<span class="hljs-attr">networking:</span>
+  <span class="hljs-attr">podSubnet:</span> <span class="hljs-number">10.244</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">/16</span>        <span class="hljs-comment"># must match what the CNI expects</span>
+  <span class="hljs-attr">serviceSubnet:</span> <span class="hljs-number">10.96</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-string">/12</span>
+</code></pre>
+<p>Etcd topology is the other early choice. <strong>Stacked</strong> puts an etcd member on each control-plane node: fewer machines, but losing a node loses an apiserver and an etcd member together. <strong>External</strong> etcd runs on its own hosts: more machines and more certs to manage, but failure domains are separate. Most clusters run stacked with three control-plane nodes and good backups.</p>
+<p>Joining uses a bootstrap token plus the CA public key hash. Tokens expire after 24 hours by default, so the usual surprise is a join command that worked yesterday and fails today. Generate a fresh one with <code>kubeadm token create --print-join-command</code>. Control-plane nodes also need <code>--control-plane</code> and a certificate key (<code>kubeadm init phase upload-certs --upload-certs</code>), which itself expires after two hours.</p>
+<p>kubeadm does not install a CNI. Until you apply one, nodes sit <code>NotReady</code> and CoreDNS stays <code>Pending</code>. That is expected, not a failure.</p>
+<p>Node prerequisites, one line each: swap off (the kubelet refuses to start by default), <code>br_netfilter</code> loaded and <code>net.bridge.bridge-nf-call-iptables=1</code>, <code>net.ipv4.ip_forward=1</code>, and the container runtime and kubelet agreeing on the <strong>systemd</strong> cgroup driver. A cgroup driver mismatch is the classic &quot;kubelet starts then pods flap&quot; cause.</p>
+<p>The host-level view of these prerequisites (what each one looks like when it is wrong, and the commands to prove it) is in the companion guide <a href="linux-sysadmin-prep.html">Linux Under the Pods</a>.</p>
+<hr>
+<h2>★ Upgrading the cluster</h2>
+<p><strong>What it is.</strong> A kubeadm upgrade moves the control plane one minor version, then the nodes, by running a fixed sequence on each machine. Nothing is automatic. You are the orchestrator.</p>
+<p><strong>Why it matters.</strong> &quot;How do you upgrade a node&quot; is the most likely first question in a kubeadm shop. The answer is a sequence with reasons, not a list of commands.</p>
+<p>The procedure, in order:</p>
+<ol>
+<li><strong>Prepare.</strong> Read the release notes and the deprecation guide for the target minor. Scan manifests and Helm releases for removed APIs (tools such as <code>kubent</code> or <code>pluto</code> do this). Take an etcd snapshot. Confirm the add-ons (CNI, CSI, ingress) support the target version.</li>
+<li><strong>One minor at a time.</strong> Skipping minors is unsupported. 1.35 to 1.37 means 1.35 to 1.36 to 1.37, finishing each hop fully.</li>
+<li><strong>First control-plane node.</strong> Switch the package repository to the target minor (<code>pkgs.k8s.io</code> has one repo per minor), upgrade the <code>kubeadm</code> package, then plan and apply.</li>
+<li><strong>Other control-plane nodes.</strong> Same package step, then <code>kubeadm upgrade node</code> instead of <code>apply</code>.</li>
+<li><strong>Per control-plane node:</strong> drain, upgrade <code>kubelet</code> and <code>kubectl</code>, restart the kubelet, uncordon.</li>
+<li><strong>Workers, one at a time or in batches:</strong> drain, <code>kubeadm upgrade node</code>, upgrade the kubelet, restart, uncordon.</li>
+<li><strong>Add-ons last,</strong> each against its own compatibility matrix.</li>
+</ol>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># On the first control-plane node (Debian/Ubuntu shown)</span>
+<span class="hljs-comment"># 0. Point /etc/apt/sources.list.d/kubernetes.list at .../core:/stable:/v1.37/deb/</span>
+<span class="hljs-built_in">sudo</span> apt-mark unhold kubeadm &amp;&amp; <span class="hljs-built_in">sudo</span> apt-get update \
+  &amp;&amp; <span class="hljs-built_in">sudo</span> apt-get install -y kubeadm=<span class="hljs-string">&#x27;1.37.1-*&#x27;</span> &amp;&amp; <span class="hljs-built_in">sudo</span> apt-mark hold kubeadm
+
+<span class="hljs-built_in">sudo</span> kubeadm upgrade plan                <span class="hljs-comment"># what is available, and what each component becomes</span>
+<span class="hljs-built_in">sudo</span> kubeadm upgrade apply v1.37.1       <span class="hljs-comment"># rewrites static pod manifests, renews certs</span>
+
+<span class="hljs-comment"># Then the kubelet on that same node</span>
+kubectl drain cp-1 --ignore-daemonsets
+<span class="hljs-built_in">sudo</span> apt-mark unhold kubelet kubectl &amp;&amp; <span class="hljs-built_in">sudo</span> apt-get install -y \
+  kubelet=<span class="hljs-string">&#x27;1.37.1-*&#x27;</span> kubectl=<span class="hljs-string">&#x27;1.37.1-*&#x27;</span> &amp;&amp; <span class="hljs-built_in">sudo</span> apt-mark hold kubelet kubectl
+<span class="hljs-built_in">sudo</span> systemctl daemon-reload &amp;&amp; <span class="hljs-built_in">sudo</span> systemctl restart kubelet
+kubectl uncordon cp-1
+</code></pre>
+<p>Why each step exists. <code>kubeadm upgrade apply</code> does not touch the kubelet: it rewrites the static pod manifests (so the kubelet restarts the apiserver, controller-manager, scheduler, and possibly etcd at the new version), updates the <code>kubeadm-config</code> ConfigMap, applies CoreDNS and kube-proxy changes, and renews the control-plane certificates (opt out with <code>--certificate-renewal=false</code>). <code>kubeadm upgrade node</code> does the node-local half only. The drain before the kubelet upgrade is required because an in-place minor kubelet upgrade is not supported: the container spec hash changes, so containers restart regardless, and you want that to happen on an empty node.</p>
+<p>After running the sequence, verify with <code>kubectl get nodes</code> (every node shows the new version and <code>Ready</code>) and <code>kubectl get pods -n kube-system</code>. The workers' kubelet version is what the VERSION column shows, so a node still on the old version means the kubelet step was skipped.</p>
+<h3>Version skew: the rules that order the upgrade</h3>
+<p>As of 1.37, verified against the version skew policy:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Allowed relative to kube-apiserver</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>kube-apiserver (HA)</td>
+<td>Newest and oldest instance within 1 minor</td>
+</tr>
+<tr>
+<td>kubelet</td>
+<td>Not newer; up to 3 minors older</td>
+</tr>
+<tr>
+<td>kube-proxy</td>
+<td>Not newer; up to 3 minors older</td>
+</tr>
+<tr>
+<td>controller-manager, scheduler, cloud-controller-manager</td>
+<td>Not newer; up to 1 minor older</td>
+</tr>
+<tr>
+<td>kubectl</td>
+<td>1 minor older or newer</td>
+</tr>
+</tbody>
+</table>
+<p>This is why the control plane goes first: nodes may lag, never lead. It is also why the three-minor kubelet allowance matters in practice: you can upgrade the control plane through two minors in a window and roll the workers later, as long as no kubelet falls more than three behind. A kubelet persistently three minors behind must be upgraded before the control plane moves again.</p>
+<h3>The catches</h3>
+<ul>
+<li><strong>PDBs block drains.</strong> A drain uses the Eviction API, which refuses to violate a PodDisruptionBudget. The drain does not fail; it retries and hangs. See the next section.</li>
+<li><strong>Unmanaged pods are deleted for good.</strong> A bare pod (no ReplicaSet, StatefulSet, Job, DaemonSet) has nothing to recreate it. Drain refuses without <code>--force</code>, and with <code>--force</code> the pod is gone.</li>
+<li><strong><code>emptyDir</code> data is lost.</strong> Drain refuses without <code>--delete-emptydir-data</code>, because the volume lives and dies with the pod on that node.</li>
+<li><strong>DaemonSet pods are ignored.</strong> The DaemonSet controller would recreate them immediately, so drain skips them with <code>--ignore-daemonsets</code>. They keep running on a cordoned node, which is usually what you want for node agents and not what you want for a GPU job.</li>
+<li><strong>Long-running batch and MPI jobs cannot be evicted mid-run.</strong> Draining a node under a 40-hour simulation kills it, and the job restarts from zero unless it checkpoints. The operational answer is a drain window: cordon the node now, let running jobs finish, drain when it is empty. This is the same pattern as a Slurm maintenance reservation: stop new work landing, wait for the queue to drain, then do the work. For scientific workloads, say so, because it shows you have thought about the actual users.</li>
+<li><strong>Rollback is a restore, not a downgrade.</strong> kubeadm does not support downgrading. Once <code>upgrade apply</code> has run, going back means restoring the etcd snapshot and the old manifests. That is why the snapshot comes first and why you upgrade a staging cluster before production.</li>
+</ul>
+<h3>Rolling vs blue/green, and in-place vs replace</h3>
+<p><strong>Rolling</strong> upgrades nodes in place in batches. It is cheap and it is the default. The risk is that a bad kubelet or runtime interaction hits the whole fleet one batch at a time, and you find out at batch one. <strong>Blue/green node pools</strong> bring up a new pool at the target version, cordon and drain the old pool, and delete it. It costs double capacity during the window, but you can stop at any point and the old pool is still there. For GPU nodes, double capacity is often not available, which is why rolling with a canary node is more common there.</p>
+<p><strong>In-place</strong> upgrade keeps the machine and mutates it. <strong>Replace-the-node</strong> (immutable nodes) builds a fresh machine from an image at the new version and joins it, which removes configuration drift but needs image tooling and automation. Control-plane nodes are often upgraded in place with kubeadm and workers replaced; both are defensible. Pick one and say why.</p>
+<hr>
+<h2>★ Node maintenance: cordon, drain, and PodDisruptionBudgets</h2>
+<p><strong>What it is.</strong> <code>cordon</code> marks a node unschedulable (it adds the <code>node.kubernetes.io/unschedulable:NoSchedule</code> taint) and touches nothing already running. <code>drain</code> is cordon plus an eviction request for every evictable pod on the node. <code>uncordon</code> reverses the cordon.</p>
+<p><strong>Why it matters.</strong> Every upgrade, kernel patch, and hardware swap goes through this. The difference between a clean maintenance window and an outage is usually a PodDisruptionBudget.</p>
+<p>Drain does not delete pods directly. It calls the <strong>Eviction API</strong>, which checks each pod against its PDB and either evicts it or returns 429 &quot;cannot evict&quot;. The controller then recreates the pod on another node. That is the entire mechanism: cordon first so replacements do not land back on the same node, then evict.</p>
+<pre><code class="hljs" data-lang="bash">kubectl drain node-7 --ignore-daemonsets --delete-emptydir-data --<span class="hljs-built_in">timeout</span>=10m
+</code></pre>
+<p>The flags, as of 1.37:</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>What it does</th>
+<th>The catch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--ignore-daemonsets</code></td>
+<td>Skip DaemonSet pods</td>
+<td>Required in practice; without it drain refuses on any node with a CNI or log agent</td>
+</tr>
+<tr>
+<td><code>--delete-emptydir-data</code></td>
+<td>Allow evicting pods with <code>emptyDir</code></td>
+<td>Data is gone</td>
+</tr>
+<tr>
+<td><code>--force</code></td>
+<td>Also delete pods with no controller</td>
+<td>Those pods never come back</td>
+</tr>
+<tr>
+<td><code>--grace-period</code></td>
+<td>Override each pod's termination grace</td>
+<td>Cutting it short skips clean shutdown</td>
+</tr>
+<tr>
+<td><code>--timeout</code></td>
+<td>Give up after a duration (default 0, wait forever)</td>
+<td>Without it, a blocked PDB hangs your pipeline silently</td>
+</tr>
+<tr>
+<td><code>--disable-eviction</code></td>
+<td>Use delete instead of eviction</td>
+<td><strong>Bypasses PDBs.</strong> Can take a quorum-based service below quorum</td>
+</tr>
+</tbody>
+</table>
+<p>A <strong>PodDisruptionBudget</strong> limits voluntary disruptions (drain, eviction), not involuntary ones (node crash). You set either <code>minAvailable</code> or <code>maxUnavailable</code>, never both. Use <code>maxUnavailable</code> for stateless Deployments since it scales with replica count, and <code>minAvailable</code> as an absolute floor for quorum systems.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">policy/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">PodDisruptionBudget</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">api-pdb</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">maxUnavailable:</span> <span class="hljs-number">1</span>
+  <span class="hljs-attr">selector:</span>
+    <span class="hljs-attr">matchLabels:</span>
+      <span class="hljs-attr">app:</span> <span class="hljs-string">api</span>
+</code></pre>
+<p>The catch that bites: <strong>a PDB with one replica and <code>minAvailable: 1</code> blocks every drain forever</strong>, because evicting the only pod would violate the budget. The symptom is <code>kubectl drain</code> printing &quot;Cannot evict pod ... would violate the pod's disruption budget&quot; in a loop. The fix is at the owner: run two replicas, or loosen the budget, or accept downtime for that workload deliberately. Using <code>--disable-eviction</code> to push through is the wrong fix; it just moves the outage to production traffic.</p>
+<p>Two more details. <code>terminationGracePeriodSeconds</code> (default 30) is how long the kubelet waits after SIGTERM before SIGKILL; a <code>preStop</code> hook runs first and counts against that budget, so a slow drain-then-exit needs both tuned. And when a node is being replaced rather than repaired, delete the Node object after the machine is gone (<code>kubectl delete node</code>); a stale Node object keeps its taints and confuses node-lifecycle controllers.</p>
+<p>For fleet-wide kernel patching, <strong>kured</strong> (the Kubernetes reboot daemon) is the common pattern: a DaemonSet that watches for <code>/var/run/reboot-required</code>, takes a cluster-wide lock so only one node reboots at a time, and cordons and drains before the reboot. It inherits every drain catch above, so PDBs must be right first.</p>
+<hr>
+<h2>★ Scheduling controls: putting pods on the right nodes</h2>
+<p>This is the section the &quot;basic questions&quot; will hit. The scheduler runs two phases for every pending pod: <strong>filter</strong> (drop nodes that cannot run it: insufficient requests, untolerated taints, unmatched selectors) then <strong>score</strong> (rank the survivors and pick the best). Every mechanism below acts on one of those two phases. Hard rules filter; soft preferences score.</p>
+<h3>nodeSelector</h3>
+<p><strong>What.</strong> A map of labels the node must have. <strong>Why.</strong> The simplest, most readable way to say &quot;this pod runs on nodes labelled X&quot;. <strong>The catch.</strong> It is a hard requirement with no expressiveness: no OR, no NOT, no preferences. A typo in the label leaves the pod <code>Pending</code> with &quot;0/N nodes available: N node(s) didn't match Pod's node affinity/selector&quot;.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">nodeSelector:</span>
+    <span class="hljs-attr">disktype:</span> <span class="hljs-string">nvme</span>
+</code></pre>
+<h3>Node affinity</h3>
+<p><strong>What.</strong> A richer node selector. <code>requiredDuringSchedulingIgnoredDuringExecution</code> is a hard filter; <code>preferredDuringSchedulingIgnoredDuringExecution</code> is a soft score with a <code>weight</code> from 1 to 100. Operators are <code>In</code>, <code>NotIn</code>, <code>Exists</code>, <code>DoesNotExist</code>, <code>Gt</code>, <code>Lt</code>. <strong>Why.</strong> Expresses &quot;A100 or H100, prefer the one in rack 3&quot;. <strong>The catch.</strong> <code>IgnoredDuringExecution</code> means the rule is evaluated only at scheduling time. Relabel the node afterwards and running pods are not evicted. People assume affinity keeps pods in place; it does not.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">affinity:</span>
+    <span class="hljs-attr">nodeAffinity:</span>
+      <span class="hljs-attr">requiredDuringSchedulingIgnoredDuringExecution:</span>
+        <span class="hljs-attr">nodeSelectorTerms:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-attr">matchExpressions:</span>
+              <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">gpu.model</span>
+                <span class="hljs-attr">operator:</span> <span class="hljs-string">In</span>
+                <span class="hljs-attr">values:</span> [<span class="hljs-string">&quot;a100&quot;</span>, <span class="hljs-string">&quot;h100&quot;</span>]
+      <span class="hljs-attr">preferredDuringSchedulingIgnoredDuringExecution:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">weight:</span> <span class="hljs-number">50</span>
+          <span class="hljs-attr">preference:</span>
+            <span class="hljs-attr">matchExpressions:</span>
+              <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">rack</span>
+                <span class="hljs-attr">operator:</span> <span class="hljs-string">In</span>
+                <span class="hljs-attr">values:</span> [<span class="hljs-string">&quot;r3&quot;</span>]
+</code></pre>
+<h3>Taints and tolerations</h3>
+<p><strong>What.</strong> A taint on a node repels pods. A toleration on a pod permits it to land on a tainted node. <strong>Why.</strong> Dedicate nodes (GPU, control-plane, a team's pool) and keep everything else off them. <strong>The catch, and the question they will ask:</strong> a toleration permits, it does not attract. A pod with a toleration for the GPU taint can still be scheduled onto any untainted node. To dedicate nodes you need the pair: <strong>taint to repel others, selector or affinity to attract yours</strong>.</p>
+<p>Taint effects:</p>
+<table>
+<thead>
+<tr>
+<th>Effect</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NoSchedule</code></td>
+<td>New pods without a toleration are not scheduled; existing pods stay</td>
+</tr>
+<tr>
+<td><code>PreferNoSchedule</code></td>
+<td>Soft version: the scheduler avoids it if it can</td>
+</tr>
+<tr>
+<td><code>NoExecute</code></td>
+<td>Also evicts running pods that do not tolerate it</td>
+</tr>
+</tbody>
+</table>
+<p><code>tolerationSeconds</code> on a <code>NoExecute</code> toleration says how long the pod may stay after the taint appears, which is the lever for graceful drains.</p>
+<pre><code class="hljs" data-lang="bash">kubectl taint nodes gpu-1 nvidia.com/gpu=present:NoSchedule
+kubectl taint nodes gpu-1 nvidia.com/gpu=present:NoSchedule-   <span class="hljs-comment"># trailing dash removes it</span>
+</code></pre>
+<p>Built-in taints the control plane applies for you: <code>node.kubernetes.io/not-ready</code>, <code>unreachable</code>, <code>memory-pressure</code>, <code>disk-pressure</code>, <code>pid-pressure</code>, <code>network-unavailable</code>, and <code>unschedulable</code> (from cordon). Kubeadm also taints control-plane nodes with <code>node-role.kubernetes.io/control-plane:NoSchedule</code>, which is why ordinary pods do not land there. An admission controller adds default tolerations to every pod for <code>not-ready</code> and <code>unreachable</code> with <code>tolerationSeconds: 300</code>. That 300 seconds is the answer to &quot;why did my pods wait five minutes before moving off the dead node?&quot; A toleration with <code>operator: Exists</code> and an empty key tolerates everything, which is how DaemonSets and critical system pods survive any taint.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">tolerations:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">node.kubernetes.io/unreachable</span>
+      <span class="hljs-attr">operator:</span> <span class="hljs-string">Exists</span>
+      <span class="hljs-attr">effect:</span> <span class="hljs-string">NoExecute</span>
+      <span class="hljs-attr">tolerationSeconds:</span> <span class="hljs-number">60</span>      <span class="hljs-comment"># fail over in 1 minute instead of 5</span>
+</code></pre>
+<p>To run a pod on a control-plane node (say, a debugging pod), tolerate <code>node-role.kubernetes.io/control-plane</code> with effect <code>NoSchedule</code>. Whether you should is a different question.</p>
+<h3>Pod affinity and anti-affinity</h3>
+<p><strong>What.</strong> Rules relative to <em>other pods</em>: &quot;co-locate with the cache&quot; or &quot;never share a node with another replica of me&quot;. <code>topologyKey</code> defines &quot;together&quot;: <code>kubernetes.io/hostname</code> means same node, <code>topology.kubernetes.io/zone</code> means same zone. <strong>The catch.</strong> The scheduler must compare the pending pod against existing pods across the topology, which is expensive. At thousands of nodes, inter-pod affinity measurably slows scheduling, and the Kubernetes docs warn against it in large clusters. Required anti-affinity across hostnames also hard-limits replicas to the node count: 5 replicas on 4 nodes leaves one <code>Pending</code>.</p>
+<h3>topologySpreadConstraints</h3>
+<p><strong>What.</strong> Spread matching pods evenly across a topology, bounded by <code>maxSkew</code>, the maximum allowed difference in pod count between the fullest and emptiest domain. <code>whenUnsatisfiable: DoNotSchedule</code> is a hard rule; <code>ScheduleAnyway</code> is a preference. <strong>Why it usually beats anti-affinity for spreading.</strong> It expresses &quot;even&quot;, not &quot;never together&quot;, so 6 replicas across 3 zones works (2 each) where required anti-affinity on zone would leave 3 pending. <strong>The catch.</strong> Constraints are evaluated at scheduling time only. Scale-downs and evictions can skew the spread afterwards, and nothing rebalances it (the Descheduler project exists for that).</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">topologySpreadConstraints:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">maxSkew:</span> <span class="hljs-number">1</span>
+      <span class="hljs-attr">topologyKey:</span> <span class="hljs-string">topology.kubernetes.io/zone</span>
+      <span class="hljs-attr">whenUnsatisfiable:</span> <span class="hljs-string">DoNotSchedule</span>
+      <span class="hljs-attr">labelSelector:</span>
+        <span class="hljs-attr">matchLabels:</span>
+          <span class="hljs-attr">app:</span> <span class="hljs-string">api</span>
+      <span class="hljs-attr">matchLabelKeys:</span> [<span class="hljs-string">&quot;pod-template-hash&quot;</span>]   <span class="hljs-comment"># as of 1.37: beta, on by default</span>
+</code></pre>
+<p><code>matchLabelKeys</code> makes a rolling update count only pods of the same revision, so old and new ReplicaSets do not distort the skew. It is beta (default on) for topology spread as of 1.37, while the pod-affinity variant is GA.</p>
+<h3>PriorityClass and preemption</h3>
+<p><strong>What.</strong> A cluster-scoped integer priority assigned to pods by <code>priorityClassName</code>. When a high-priority pod cannot be scheduled, the scheduler may <strong>preempt</strong>: evict lower-priority pods from a node to make room. <strong>Why.</strong> Protects platform pods (DNS, CNI, monitoring) and lets urgent work jump the queue. <strong>The catch.</strong> Preemption is a graceful deletion of someone else's pod, and a team whose jobs keep getting preempted will see it as a restart loop. Preemption tries to respect PDBs on a best-effort basis but may violate them. Too many high tiers makes the system meaningless; define three or four tiers and a policy for who may use them. Setting <code>preemptionPolicy: Never</code> gives a pod priority in the queue without letting it evict others, which is the right default for batch.</p>
+<h3>Requests, limits, and QoS</h3>
+<p><strong>What.</strong> The scheduler uses <strong>requests only</strong>: it sums requests per node and places a pod where they fit against <code>allocatable</code>. Limits are enforced later by the kubelet and kernel. QoS follows from the shape: <strong>Guaranteed</strong> (requests equal limits for CPU and memory in every container), <strong>Burstable</strong> (some requests), <strong>BestEffort</strong> (none). <strong>The catch.</strong> QoS is a summary, not the full eviction rule. Under node pressure the kubelet ranks pods by whether usage exceeds requests first, then by priority, then by how far over. A Burstable pod using less than its request can outlast a Guaranteed pod's neighbour; a BestEffort pod always exceeds its (zero) request, which is why it goes first. Set requests from measured usage: too high strands capacity, too low packs nodes until they thrash.</p>
+<h3>ResourceQuota and LimitRange</h3>
+<p><strong>What.</strong> A <code>ResourceQuota</code> caps the aggregate a namespace may request or create (CPU, memory, GPUs, object counts). A <code>LimitRange</code> sets per-pod and per-container defaults and bounds. <strong>Why.</strong> Quotas are how a shared cluster stays fair per team. <strong>The catch.</strong> Once a quota covers <code>requests.cpu</code>, every pod in that namespace must declare a request or it is rejected at admission. A LimitRange supplies defaults so users are not blocked by a missing field.</p>
+<h3>nodeName and static pods</h3>
+<p>Setting <code>spec.nodeName</code> bypasses the scheduler entirely: no filter, no score, no resource check, and a pod pointed at a full or tainted node just fails. It is legitimate for static pods and rare debugging. For anything else prefer a selector or affinity, which keeps the scheduler's safety checks.</p>
+<h3>A worked pattern: a dedicated GPU node pool</h3>
+<p>The goal: only GPU workloads run on GPU nodes, and GPU workloads only run there. That needs three pieces together.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Node side: repel everyone, label for attraction</span>
+kubectl taint nodes gpu-1 nvidia.com/gpu=present:NoSchedule
+kubectl label nodes gpu-1 accelerator=nvidia-a100
+</code></pre>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Pod</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">trainer</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">tolerations:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">nvidia.com/gpu</span>
+      <span class="hljs-attr">operator:</span> <span class="hljs-string">Equal</span>
+      <span class="hljs-attr">value:</span> <span class="hljs-string">present</span>
+      <span class="hljs-attr">effect:</span> <span class="hljs-string">NoSchedule</span>            <span class="hljs-comment"># permits landing on the tainted node</span>
+  <span class="hljs-attr">affinity:</span>
+    <span class="hljs-attr">nodeAffinity:</span>
+      <span class="hljs-attr">requiredDuringSchedulingIgnoredDuringExecution:</span>
+        <span class="hljs-attr">nodeSelectorTerms:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-attr">matchExpressions:</span>
+              <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">accelerator</span>
+                <span class="hljs-attr">operator:</span> <span class="hljs-string">In</span>
+                <span class="hljs-attr">values:</span> [<span class="hljs-string">&quot;nvidia-a100&quot;</span>]   <span class="hljs-comment"># attracts it to GPU nodes only</span>
+  <span class="hljs-attr">containers:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">trainer</span>
+      <span class="hljs-attr">image:</span> <span class="hljs-string">registry.example.org/ml/trainer:2.4</span>
+      <span class="hljs-attr">resources:</span>
+        <span class="hljs-attr">limits:</span>
+          <span class="hljs-attr">nvidia.com/gpu:</span> <span class="hljs-number">1</span>               <span class="hljs-comment"># extended resource, integer, limits only</span>
+</code></pre>
+<p>How it fits together. The <code>nvidia.com/gpu</code> resource does not exist by default. The NVIDIA device plugin (usually deployed by the GPU Operator) runs as a DaemonSet, registers with the kubelet over the device-plugin API, and the kubelet advertises <code>nvidia.com/gpu: N</code> in the node's <code>allocatable</code>. The scheduler then treats it like any countable resource. Extended resources are integers, cannot be overcommitted, and are specified in <code>limits</code> (a request, if given, must equal the limit). If the cluster enables the optional <code>ExtendedResourceToleration</code> admission plugin, pods requesting that resource get the matching toleration automatically; do not assume that it is on.</p>
+<p>The catch is the pair. Taint without the toleration leaves the pod <code>Pending</code>. Toleration without the affinity lets a CPU-only pod that happens to carry it land on a GPU node, or your GPU pod land on a CPU node and fail at device allocation. Remove the taint and everyone floods in. All three, always.</p>
+<p>DRA (Dynamic Resource Allocation) is the newer model: pods claim devices through <code>ResourceClaim</code> objects instead of counting integers, which supports sharing, partitioning (MIG), and device attributes. DRA is GA as of 1.34, with extended-resource support and device taints GA in 1.37, so it is real, but most clusters today still run the device plugin. Know both names.</p>
+<h3>Where the default scheduler stops</h3>
+<p>The default scheduler places one pod at a time. A 64-rank MPI job needs all 64 pods or none, and partial placement deadlocks the cluster with half-started jobs holding GPUs. <strong>Gang scheduling</strong> and queueing solve that: <strong>Kueue</strong> (a job-queueing controller that admits whole jobs against quotas and cohorts) and <strong>Volcano</strong> (a batch scheduler with gang scheduling and queues) are the common choices. Native gang scheduling (the <code>GenericWorkload</code> gate) is beta in 1.37 but off by default. For SLAC-style batch and GPU workloads, naming Kueue and the gang problem is the right level of depth.</p>
+<hr>
+<h2>★ etcd backup, restore, and certificates</h2>
+<p><strong>What it is.</strong> etcd holds all cluster state. Back it up and you can rebuild the control plane; lose it without a backup and the cluster is gone, even though the workloads may keep running on the nodes.</p>
+<p>Snapshot from a live member, using the certs kubeadm placed on the node:</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">sudo</span> ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key \
+  snapshot save /backup/etcd-$(<span class="hljs-built_in">date</span> +%F).db
+
+etcdutl --write-out=table snapshot status /backup/etcd-2026-10-12.db   <span class="hljs-comment"># verify it</span>
+</code></pre>
+<p>Restore uses <code>etcdutl</code>, not <code>etcdctl</code>. The <code>snapshot restore</code> and <code>snapshot status</code> subcommands on <code>etcdctl</code> were deprecated in etcd 3.5 and removed from etcdctl in 3.6. The restore procedure: stop the apiservers (move their manifests out of <code>/etc/kubernetes/manifests</code>), restore into a <strong>new</strong> data directory, point the etcd static pod's <code>etcd-data</code> hostPath at it, and let the kubelet restart etcd.</p>
+<pre><code class="hljs" data-lang="bash">etcdutl --data-dir /var/lib/etcd-restored snapshot restore /backup/etcd-2026-10-12.db
+<span class="hljs-comment"># then edit /etc/kubernetes/manifests/etcd.yaml:</span>
+<span class="hljs-comment">#   volumes: etcd-data hostPath.path -&gt; /var/lib/etcd-restored</span>
+</code></pre>
+<p>Catches: snapshots contain every Secret in the cluster unless you enable encryption at rest, so encrypt and restrict the backup. A snapshot is point-in-time: anything created after it is gone and workloads on nodes may disagree with the restored state. Test a restore somewhere; an untested backup is a hope.</p>
+<p><strong>Quorum math.</strong> etcd needs a majority: floor(n/2)+1. Three members tolerate one failure, five tolerate two (and five is the recommended production size). <strong>Four is worse than three:</strong> quorum is 3 either way, so you tolerate the same single failure but add write cost and another member that can fail. Symptoms of lost quorum: <code>kubectl</code> hangs or returns &quot;etcdserver: request timed out&quot;, the apiserver logs &quot;context deadline exceeded&quot;, and nothing can be created or changed while existing pods keep running.</p>
+<h3>Certificates</h3>
+<p>kubeadm leaf certificates (apiserver, kubelet client for the apiserver, etcd, front-proxy, and the client certs inside <code>admin.conf</code>, <code>controller-manager.conf</code>, <code>scheduler.conf</code>) are valid for <strong>one year</strong> by default. The CAs are valid for ten. Both are configurable in <code>ClusterConfiguration</code> via <code>certificateValidityPeriod</code> and <code>caCertificateValidityPeriod</code> (as of kubeadm v1beta4).</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">sudo</span> kubeadm certs check-expiration     <span class="hljs-comment"># shows every cert and days left</span>
+<span class="hljs-built_in">sudo</span> kubeadm certs renew all            <span class="hljs-comment"># renews all leaf certs on this node</span>
+</code></pre>
+<p>Renewal happens automatically on every <code>kubeadm upgrade apply</code> and <code>kubeadm upgrade node</code> (unless <code>--certificate-renewal=false</code>). The catch is the cluster that was never upgraded: it runs perfectly for a year and then every component's client certificate expires within the same minute, and <code>kubectl</code> answers &quot;x509: certificate has expired&quot;. This is the most common avoidable kubeadm outage. After a manual <code>renew</code>, the running static pods do not reload the files, so restart them (move the manifests out and back, or restart containers with <code>crictl</code>), and copy the fresh <code>admin.conf</code> over <code>~/.kube/config</code>. In an HA cluster, renew on every control-plane node.</p>
+<p>The kubelet is separate. Its <strong>client</strong> certificate (to the apiserver) rotates itself when <code>rotateCertificates: true</code>, which kubeadm sets. Its <strong>serving</strong> certificate is self-signed by default; for a CA-signed one set <code>serverTLSBootstrap: true</code> and approve the resulting CSRs, which is a manual step people forget and the reason <code>kubectl logs</code> can fail with certificate errors on some clusters.</p>
+<hr>
+<h2>Access, tenancy, and policy (brief)</h2>
+<p><strong>RBAC</strong> is four objects: <code>Role</code> and <code>ClusterRole</code> (what verbs on what resources) and <code>RoleBinding</code> and <code>ClusterRoleBinding</code> (who gets it). A ClusterRole bound by a RoleBinding is scoped to that namespace, which is the standard way to reuse a role across tenants. Test with <code>kubectl auth can-i create pods -n team-a --as=jane@example.org</code>. The catch is that RBAC is purely additive: you cannot write a deny, so the way to restrict is to grant less.</p>
+<p><strong>OIDC login</strong> points the apiserver at an identity provider. At SLAC that provider is Dex, federating to a SAML2 backend: users authenticate through the lab's SAML IdP, Dex mints OIDC tokens, and the apiserver validates them. The apiserver can be configured either with the legacy <code>--oidc-issuer-url</code>, <code>--oidc-client-id</code>, <code>--oidc-username-claim</code> and <code>--oidc-groups-claim</code> flags, or with a structured authentication configuration file (<code>--authentication-config</code>), which is GA since 1.34 and supports multiple issuers and claim validation rules. They are mutually exclusive: setting both makes the apiserver exit at startup. Groups from the token then match RBAC bindings.</p>
+<p><strong>Multi-tenancy</strong> is a spectrum of isolation versus cost.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Namespaces + quota + PSA + NetworkPolicy</th>
+<th>vCluster</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Isolation</td>
+<td>Soft: shared control plane and kernel</td>
+<td>Separate API server per tenant, still a shared node kernel</td>
+</tr>
+<tr>
+<td>CRDs and cluster-scoped objects</td>
+<td>Shared; tenants cannot install their own</td>
+<td>Tenant installs its own CRDs and operators</td>
+</tr>
+<tr>
+<td>Overhead</td>
+<td>Near zero</td>
+<td>A control plane (and its datastore) per tenant</td>
+</tr>
+<tr>
+<td>Blast radius of a bad tenant</td>
+<td>A noisy tenant affects the shared apiserver</td>
+<td>Contained to the virtual cluster's API, though not the nodes</td>
+</tr>
+<tr>
+<td>Best for</td>
+<td>Trusted teams in one organisation</td>
+<td>Teams needing admin-like freedom without separate clusters</td>
+</tr>
+</tbody>
+</table>
+<p>Neither isolates the node kernel; for hostile tenants you need sandboxed runtimes or separate clusters.</p>
+<p><strong>Admission policy</strong> engines enforce rules the API schema cannot: <strong>Kyverno</strong> (policies as YAML, can mutate and generate), <strong>OPA Gatekeeper</strong> (Rego), and the built-in <strong>ValidatingAdmissionPolicy</strong> (CEL expressions evaluated inside the apiserver, no webhook to run). The built-in option avoids the classic outage where a down policy webhook blocks every pod creation.</p>
+<hr>
+<h2>CNI and CSI in one page</h2>
+<p><strong>CNI.</strong> When the kubelet creates a pod sandbox it calls the CNI plugin, which creates the veth pair, assigns an IP from the node's pod CIDR, and wires routes. If the plugin is missing or broken, pods stay <code>ContainerCreating</code> with &quot;network plugin not ready&quot;. <code>kube-proxy</code> is separate: it programs Service virtual IPs on each node. Its modes are <code>iptables</code> (the default as of 1.37), <code>nftables</code> (GA since 1.33, intended to become the default in a later release), and <code>ipvs</code> (deprecated as of 1.37). Set the mode explicitly in the kube-proxy config so an upgrade cannot change it for you.</p>
+<p><strong>Calico vs Cilium</strong> in three lines: Calico is routing-first (BGP or VXLAN) with iptables or eBPF dataplane and mature NetworkPolicy; Cilium is eBPF-native, can replace kube-proxy, and adds L7 policy and Hubble observability; both implement NetworkPolicy. The catch worth saying: <strong>NetworkPolicy is enforced by the CNI, not by Kubernetes.</strong> Apply a policy on a CNI that does not support it and the object is accepted and does nothing.</p>
+<p><strong>CSI.</strong> A <code>StorageClass</code> names a provisioner and parameters; a PVC against it triggers dynamic provisioning of a PV. Access modes: <code>ReadWriteOnce</code> (one node), <code>ReadOnlyMany</code>, <code>ReadWriteMany</code> (many nodes), <code>ReadWriteOncePod</code> (exactly one pod). <code>volumeBindingMode: WaitForFirstConsumer</code> delays provisioning until a pod is scheduled, so the volume lands in the same zone as the pod; with <code>Immediate</code>, a zonal volume can be created where the pod cannot run, leaving it <code>Pending</code> with a volume node-affinity conflict. <code>reclaimPolicy: Delete</code> removes the backing storage with the PVC; <code>Retain</code> keeps it for manual recovery. For shared scientific datasets you want RWX (CephFS, NFS) so many job pods read one dataset; RWO block (Ceph RBD) is faster per pod but cannot be shared across nodes.</p>
+<hr>
+<h2>★ Practice: operator drills</h2>
+<h3>Drill 1: Upgrade this cluster from 1.N to 1.N+1</h3>
+<p>Narrate the plan before touching anything. Steps: (1) read release notes and run <code>kubent</code> or <code>pluto</code> for removed APIs; (2) etcd snapshot, verified; (3) confirm CNI, CSI, ingress and device plugins support N+1; (4) staging first; (5) <code>kubeadm upgrade plan</code> then <code>apply</code> on the first control-plane node; <code>upgrade node</code> on the others; (6) per node drain, kubelet, restart, uncordon, checking <code>kubectl get nodes</code> between each; (7) workers in small batches, with a canary node first; (8) add-ons. State the abort point: after <code>apply</code> there is no downgrade, so the decision to go is made before that command, and rollback means etcd restore.</p>
+<p>The catch to volunteer: the long-running jobs. Cordon the batch nodes early, let jobs drain, and schedule the drain window around the queue.</p>
+<h3>Drill 2: Drain hangs forever</h3>
+<p>Symptom: <code>kubectl drain node-7</code> prints &quot;evicting pod ...&quot; repeatedly and never returns. Ranked causes: a PDB that cannot be satisfied (single replica, or <code>minAvailable</code> equal to replicas); a pod with no controller or with local storage (drain refuses outright, which shows as an error, not a hang); a pod whose finalizer or stuck termination never completes.</p>
+<pre><code class="hljs" data-lang="bash">kubectl get pdb -A                                   <span class="hljs-comment"># ALLOWED DISRUPTIONS column: 0 is the blocker</span>
+kubectl get pods -A -o wide --field-selector spec.nodeName=node-7
+kubectl describe pdb api-pdb
+</code></pre>
+<p>Fix at the owner: add a replica, relax the budget, or schedule downtime for that service. The catch: <code>--disable-eviction</code> makes the drain finish and silently takes down a service you promised to protect.</p>
+<h3>Drill 3: Pods will not schedule on the new GPU nodes</h3>
+<p>Two opposite failures. Pods <code>Pending</code> with &quot;node(s) had untolerated taint {<a href="http://nvidia.com/gpu:">nvidia.com/gpu:</a> present}&quot;: the nodes are tainted and the pod lacks the toleration. Pods <code>Running</code> but on the wrong nodes (or failing for lack of a device): the toleration is there but there is no affinity or selector, so the toleration permitted GPU nodes without attracting to them.</p>
+<pre><code class="hljs" data-lang="bash">kubectl describe pod trainer | sed -n <span class="hljs-string">&#x27;/Events/,$p&#x27;</span>
+kubectl get nodes -L accelerator
+kubectl describe node gpu-1 | grep -A3 -E <span class="hljs-string">&quot;Taints|Allocatable&quot;</span>   <span class="hljs-comment"># is nvidia.com/gpu advertised?</span>
+</code></pre>
+<p>If <code>nvidia.com/gpu</code> is missing from Allocatable, the device plugin is not running on that node, and no scheduling rule will help. The catch: three things must agree, the taint, the label, and the device plugin.</p>
+<h3>Drill 4: Every pod was evicted from a node at once</h3>
+<p>Two causes. Someone added a <code>NoExecute</code> taint (check <code>kubectl describe node</code> Taints), which evicts every pod without a matching toleration immediately. Or the node became unreachable and stayed so for more than 300 seconds, so the default <code>not-ready</code> and <code>unreachable</code> tolerations expired and the node controller evicted everything on it.</p>
+<pre><code class="hljs" data-lang="bash">kubectl describe node node-3 | grep -A5 Taints
+kubectl get events -A --field-selector reason=TaintManagerEviction
+</code></pre>
+<p>Fix: remove the errant taint, or repair the node's network or kubelet. The catch: lowering <code>tolerationSeconds</code> to fail over faster makes brief network blips evict healthy pods, so tune it per workload, not cluster-wide.</p>
+<h3>Drill 5: <code>kubectl</code> returns x509 certificate has expired</h3>
+<p>Check from the control-plane node, where files work even if the API does not.</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-built_in">sudo</span> kubeadm certs check-expiration
+<span class="hljs-built_in">sudo</span> kubeadm certs renew all
+<span class="hljs-comment"># restart the control-plane static pods so they reload certs</span>
+<span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mkdir</span> -p /root/manifests-bak &amp;&amp; <span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mv</span> /etc/kubernetes/manifests/*.yaml /root/manifests-bak/
+<span class="hljs-built_in">sleep</span> 30
+<span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mv</span> /root/manifests-bak/*.yaml /etc/kubernetes/manifests/
+<span class="hljs-built_in">sudo</span> <span class="hljs-built_in">cp</span> /etc/kubernetes/admin.conf ~/.kube/config
+</code></pre>
+<p>Repeat on every control-plane node. The catch: the old <code>admin.conf</code> in your home directory is a copy and is also expired, so a successful renew still shows the error until you copy the new one. And an HA cluster expires all nodes together, so doing one node and stopping leaves you half-fixed.</p>
+<h3>Drill 6: A control-plane node is lost in a 3-node etcd cluster</h3>
+<p>What still works: quorum is 2 of 3, so etcd accepts writes, the other two apiservers serve through the load balancer, and scheduling and controllers run. You have lost your safety margin: one more failure loses quorum. Replace it promptly and in the right order.</p>
+<pre><code class="hljs" data-lang="bash">kubectl delete node cp-3                              <span class="hljs-comment"># drop the dead Node object</span>
+<span class="hljs-comment"># on a healthy member: find and remove the dead etcd member FIRST</span>
+etcdctl --endpoints=... --cacert=... --cert=... --key=... member list
+etcdctl ... member remove &lt;dead-member-id&gt;
+<span class="hljs-comment"># then join the replacement</span>
+kubeadm init phase upload-certs --upload-certs        <span class="hljs-comment"># prints a certificate key</span>
+kubeadm token create --print-join-command             <span class="hljs-comment"># append --control-plane --certificate-key &lt;key&gt;</span>
+</code></pre>
+<p>The catch: remove the dead member before adding the new one. With a dead member still counted, adding a fourth raises quorum to 3 while only two are alive, and you can lock the cluster out of writes.</p>
+<h3>Drill 7: A team's job gets preempted repeatedly</h3>
+<p>A high-priority tier is displacing their batch job, which restarts from zero each time. Check <code>kubectl get priorityclass</code> and the job's <code>priorityClassName</code>, and look for <code>Preempted</code> events. The design fix is on the owner side: give long batch work its own PriorityClass with <code>preemptionPolicy: Never</code> so it queues fairly but evicts nobody, protect the high tier by quota (only platform namespaces may use it via a ResourceQuota on <code>priorityclasses</code>), have the job checkpoint, and put a queueing system (Kueue) in front so jobs are admitted when capacity exists instead of competing in the scheduler. The catch: raising the batch job's priority just moves the preemption onto someone else.</p>
+<hr>
+<h2>Question bank: cluster operations</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>What they are testing</th>
+<th>Concise answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>How do you upgrade a worker node?</td>
+<td>Whether you know the sequence and why</td>
+<td>Drain, upgrade the <code>kubeadm</code> package, <code>kubeadm upgrade node</code>, upgrade <code>kubelet</code>, daemon-reload and restart, uncordon. Drain first because an in-place minor kubelet upgrade restarts every container.</td>
+</tr>
+<tr>
+<td>How do you upgrade a cluster?</td>
+<td>Ordering and risk</td>
+<td>Snapshot etcd, one minor at a time, first control-plane node <code>upgrade apply</code>, others <code>upgrade node</code>, then workers, then add-ons. Control plane first because nodes may lag the apiserver, never lead it.</td>
+</tr>
+<tr>
+<td>Can you skip a minor version?</td>
+<td>Policy knowledge</td>
+<td>No. One minor at a time, finishing each hop.</td>
+</tr>
+<tr>
+<td>What is the version skew policy?</td>
+<td>Precision</td>
+<td>As of 1.37: kubelet and kube-proxy up to 3 minors older than the apiserver, never newer; controller-manager and scheduler up to 1 older; kubectl within 1 either way; HA apiservers within 1.</td>
+</tr>
+<tr>
+<td>Difference between cordon and drain?</td>
+<td>Basics</td>
+<td>Cordon marks unschedulable and leaves running pods. Drain is cordon plus evicting pods through the Eviction API.</td>
+</tr>
+<tr>
+<td>What does drain actually call?</td>
+<td>Mechanism</td>
+<td>The Eviction API, which respects PodDisruptionBudgets. <code>--disable-eviction</code> switches to plain delete and bypasses them.</td>
+</tr>
+<tr>
+<td>Why does my drain hang?</td>
+<td>Troubleshooting</td>
+<td>Usually a PDB with zero allowed disruptions (single replica and <code>minAvailable: 1</code>). Check <code>kubectl get pdb -A</code>.</td>
+</tr>
+<tr>
+<td>What is a PDB and when does it bite?</td>
+<td>Disruption model</td>
+<td>It limits voluntary disruptions (drain, eviction) to a floor or ceiling. It bites during upgrades when replicas equal the budget, and it does not cover node crashes.</td>
+</tr>
+<tr>
+<td>What happens to pods without a controller on drain?</td>
+<td>Failure modes</td>
+<td>Drain refuses without <code>--force</code>; with it they are deleted and never recreated.</td>
+</tr>
+<tr>
+<td>What happens to <code>emptyDir</code> data on drain?</td>
+<td>Data safety</td>
+<td>It is deleted with the pod. Drain requires <code>--delete-emptydir-data</code> to proceed.</td>
+</tr>
+<tr>
+<td>What is a taint? A toleration?</td>
+<td>Basics</td>
+<td>A taint repels pods from a node; a toleration lets a pod tolerate a taint.</td>
+</tr>
+<tr>
+<td>Why doesn't a toleration attract a pod?</td>
+<td>The classic gotcha</td>
+<td>Tolerations only remove a filter. Attraction needs a nodeSelector or node affinity. Dedicated nodes need taint plus toleration plus affinity.</td>
+</tr>
+<tr>
+<td>What are the taint effects?</td>
+<td>Depth</td>
+<td><code>NoSchedule</code> blocks new pods, <code>PreferNoSchedule</code> is soft, <code>NoExecute</code> also evicts running pods without a toleration.</td>
+</tr>
+<tr>
+<td>Why did pods wait five minutes after a node died?</td>
+<td>Defaults</td>
+<td>Admission adds <code>not-ready</code> and <code>unreachable</code> NoExecute tolerations with <code>tolerationSeconds: 300</code> to every pod.</td>
+</tr>
+<tr>
+<td>nodeSelector vs node affinity?</td>
+<td>Basics</td>
+<td>nodeSelector is an exact-match hard requirement. Affinity adds operators (<code>In</code>, <code>NotIn</code>, <code>Exists</code>, <code>Gt</code>) and soft preferences with weights.</td>
+</tr>
+<tr>
+<td>What does <code>IgnoredDuringExecution</code> mean?</td>
+<td>Subtlety</td>
+<td>Rules are checked only when scheduling. Relabelling a node later does not evict running pods.</td>
+</tr>
+<tr>
+<td>How do you dedicate nodes to a team?</td>
+<td>Design</td>
+<td>Taint the nodes, label them, and give that team's pods the toleration and a node affinity or selector for the label. Add a quota so the team cannot overrun the pool.</td>
+</tr>
+<tr>
+<td>How would you add a GPU node pool?</td>
+<td>End to end</td>
+<td>Install the driver and runtime, join the nodes, taint and label them, deploy the device plugin so <code>nvidia.com/gpu</code> appears in allocatable, then use limits plus toleration plus affinity in pods.</td>
+</tr>
+<tr>
+<td>How do you spread replicas across zones?</td>
+<td>Scheduling</td>
+<td><code>topologySpreadConstraints</code> with <code>topologyKey: topology.kubernetes.io/zone</code> and <code>maxSkew: 1</code>. Preferred over anti-affinity because it expresses &quot;even&quot;, not &quot;never together&quot;.</td>
+</tr>
+<tr>
+<td>DaemonSet vs Deployment with anti-affinity?</td>
+<td>Judgement</td>
+<td>A DaemonSet guarantees one per matching node and follows nodes as they join. Anti-affinity gives &quot;at most one per node&quot; for a fixed replica count and can leave pods Pending.</td>
+</tr>
+<tr>
+<td>How does the scheduler pick a node?</td>
+<td>Mechanism</td>
+<td>Filter nodes that cannot run the pod (resources, taints, selectors, volumes), score the rest (spread, affinity preferences, resource balance), bind to the highest.</td>
+</tr>
+<tr>
+<td>What are static pods?</td>
+<td>kubeadm basics</td>
+<td>Pods the kubelet runs directly from manifest files, with no API-server scheduling. kubeadm's control plane runs this way.</td>
+</tr>
+<tr>
+<td>Where are control-plane manifests on a kubeadm node?</td>
+<td>Layout</td>
+<td><code>/etc/kubernetes/manifests</code>, with certs in <code>/etc/kubernetes/pki</code>.</td>
+</tr>
+<tr>
+<td>How do you run a pod on a control-plane node?</td>
+<td>Taints</td>
+<td>Tolerate <code>node-role.kubernetes.io/control-plane:NoSchedule</code>, optionally with a selector for that label.</td>
+</tr>
+<tr>
+<td>How do you back up etcd?</td>
+<td>Operations</td>
+<td><code>etcdctl snapshot save</code> with <code>--endpoints</code>, <code>--cacert</code>, <code>--cert</code>, <code>--key</code> from <code>/etc/kubernetes/pki/etcd</code>; verify with <code>etcdutl snapshot status</code>; encrypt it.</td>
+</tr>
+<tr>
+<td>How do you restore etcd?</td>
+<td>Operations</td>
+<td>Stop apiservers, <code>etcdutl snapshot restore --data-dir &lt;new&gt;</code>, repoint the etcd static pod's hostPath, let the kubelet restart it.</td>
+</tr>
+<tr>
+<td>Why 3 or 5 etcd members and not 4?</td>
+<td>Quorum math</td>
+<td>Quorum is floor(n/2)+1. Four needs 3, tolerating one failure like three, with more cost. Five tolerates two.</td>
+</tr>
+<tr>
+<td>What happens when kubeadm certs expire?</td>
+<td>The year-one outage</td>
+<td>Components fail with x509 errors and <code>kubectl</code> stops. Fix with <code>kubeadm certs renew all</code>, restart static pods, refresh <code>admin.conf</code>. Upgrades renew them, so upgrade at least yearly.</td>
+</tr>
+<tr>
+<td>What QoS class gets evicted first?</td>
+<td>Pressure behaviour</td>
+<td>BestEffort, then Burstable pods over their requests. Precisely, the kubelet ranks by usage over request, then priority.</td>
+</tr>
+<tr>
+<td>What does the scheduler use, requests or limits?</td>
+<td>Resources</td>
+<td>Requests only. Limits are enforced by the kubelet and kernel at runtime.</td>
+</tr>
+<tr>
+<td>What is PriorityClass and preemption?</td>
+<td>Scheduling policy</td>
+<td>An integer priority per pod; a pending high-priority pod can evict lower-priority pods to fit. Use <code>preemptionPolicy: Never</code> for batch that should queue, not evict.</td>
+</tr>
+<tr>
+<td>How do you restrict what a namespace can consume?</td>
+<td>Multi-tenancy</td>
+<td>ResourceQuota for aggregate caps and LimitRange for defaults and per-pod bounds.</td>
+</tr>
+<tr>
+<td>Namespaces vs vCluster?</td>
+<td>Tenancy tradeoff</td>
+<td>Namespaces share one control plane and no custom CRDs per tenant; vCluster gives each tenant its own API server and CRDs at the cost of overhead. Neither isolates the kernel.</td>
+</tr>
+<tr>
+<td>How does OIDC login work with the apiserver?</td>
+<td>Auth</td>
+<td>The apiserver validates tokens from an issuer (Dex federating to SAML). Configure via <code>--authentication-config</code> (GA 1.34) or legacy <code>--oidc-*</code> flags, never both.</td>
+</tr>
+<tr>
+<td>Who enforces NetworkPolicy?</td>
+<td>CNI</td>
+<td>The CNI plugin. Kubernetes stores the object; a CNI without support silently ignores it.</td>
+</tr>
+<tr>
+<td>Why <code>WaitForFirstConsumer</code>?</td>
+<td>Storage topology</td>
+<td>It delays volume provisioning until the pod is scheduled, so the volume lands in a zone the pod can run in.</td>
+</tr>
+<tr>
+<td>How is MicroK8s different from kubeadm?</td>
+<td>Your experience</td>
+<td>MicroK8s is a snap with dqlite and addons, upgraded by <code>snap refresh</code>. kubeadm uses packages, etcd and static pods, and you run each upgrade step and bring your own CNI and CSI.</td>
+</tr>
+<tr>
+<td>What does kubeadm not do?</td>
+<td>Scope</td>
+<td>It does not install a kubelet, runtime or CNI, and it does not manage the lifecycle beyond init, join, upgrade and cert renewal.</td>
+</tr>
+</tbody>
+</table>
 <hr>
 <h2>How to narrate this in the interview</h2>
 <p>Interviewers running a live Kubernetes round are not testing whether you can recite YAML. They are watching how you reason under a symptom. Say the hypothesis before you run the command. &quot;I expect the Events block to name why the scheduler rejected this pod, so I'll describe it first.&quot; Then read the output and update your hypothesis out loud. &quot;Events say insufficient memory. My next step is to check node allocatable capacity against this pod's resource request.&quot;</p>
 <p>That loop, stated clearly, is the answer. The interviewer can see you understand the mechanism, knew which command to run before you ran it, and move from symptom to root cause rather than from topic to topic. Speed matters less than the ability to demonstrate that each move follows logically from what the previous one showed.</p>
+<p>Operational answers need a different shape: state the invariant, the order, the rollback, and the blast radius. For an upgrade plan: &quot;The invariant is that no kubelet is ever newer than the apiserver and no node is drained below a PDB. Control plane first, one minor at a time, etcd snapshot before <code>upgrade apply</code> because that is the point of no return, workers in batches behind a canary node.&quot; For a scheduling design: &quot;Taint to repel, label and affinity to attract, a quota so the team cannot overrun the pool, a PriorityClass tier that does not preempt batch work.&quot; Naming the failure you are guarding against in each step is what turns a command list into a plan.</p>
+<p>Be straight about where your experience sits. &quot;I ran MicroK8s in production for a 14.5M-user service, where the snap hid the upgrade sequence. I know the sequence and the reasons for it, and kubeadm makes me run each step myself&quot; is a stronger answer than bluffing fleet experience, and the follow-ups will find the edge anyway.</p>
 
   </main>
   <footer class="tip-jar">
