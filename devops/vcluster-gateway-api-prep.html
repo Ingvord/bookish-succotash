@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>vCluster and Gateway API: Follow the Request</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #3d6b22;
+  --accent-soft:  #3d6b2214;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- callouts ---------- */
+.callout {
+  margin: 1.6rem 0;
+  padding: 1.1rem 1.4rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+}
+.callout-label {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout-warning { border-left-color: #a3372b; background: #a3372b14; }
+.callout-warning .callout-label { color: #a3372b; }
+.callout-insight { border-left-color: #2d6a44; background: #2d6a4414; }
+.callout-insight .callout-label { color: #2d6a44; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · DevOps · Multi-tenancy and Traffic</div>
+    <h1>vCluster and Gateway API: Follow the Request</h1>
+    <div class="sub">Virtual clusters, the Gateway API, and the live break-fix drill of tracing a failing curl through route, service, pod, and volume.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>When the curl fails and the clock is running</h2>
+<p>The interviewer hands you a terminal and says: &quot;curl to this service does not work. Find out why.&quot; The platform is one shared kubeadm cluster, each tenant project gets a <strong>vCluster</strong>, services are exposed through the <strong>Gateway API</strong>, and <strong>Kyverno</strong> enforces admission policy. You have never run two of those four in production, and that is fine. The test is not whether you have memorised vCluster's Helm values. It is whether you can walk the request path layer by layer, out loud, and say which layer each symptom points at.</p>
+<p>The shape of the answer is a funnel: gateway, route, service, endpoints, pod, volume. At every step you read one status object, name what it told you, and move one layer inward. This guide builds that funnel for a multi-tenant cluster, fills in the two technologies that are new to you, and ends with the exact drill you are likely to get. Facts tied to a version are marked as of the versions current at writing: vCluster 0.37, Gateway API 1.6, Kyverno 1.19.</p>
+<p>This guide leans on two others. For the get/describe/logs loop, taint effects, and the &quot;a toleration permits, it does not attract&quot; catch, see the Kubernetes guide (&quot;Scenario 1&quot;, &quot;Scenario 5&quot;, &quot;Taints and tolerations&quot;). For DNS <code>ndots</code> and conntrack, see the Linux guide. They are not repeated here.</p>
+<hr>
+<h2>Read the symptom, pick the layer</h2>
+<p>Before touching kubectl, the <code>curl -v</code> output already narrows the search. Run it with <code>-v</code> and read the first thing that goes wrong.</p>
+<pre><code class="hljs" data-lang="bash">curl -v https://app.team-a.example.org/healthz
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>What curl shows</th>
+<th>Layer it points at</th>
+<th>First command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Could not resolve host</code></td>
+<td>DNS record missing or wrong</td>
+<td><code>dig app.team-a.example.org</code></td>
+</tr>
+<tr>
+<td><code>Connection refused</code></td>
+<td>Nothing listening on the address and port: Gateway not Programmed, wrong port, LB not exposed</td>
+<td><code>kubectl get gateway -A</code></td>
+</tr>
+<tr>
+<td><code>Connection timed out</code></td>
+<td>Address unreachable: no LB address, firewall, NetworkPolicy, wrong IP</td>
+<td><code>kubectl get gateway -A -o wide</code>, then the data-plane Service</td>
+</tr>
+<tr>
+<td>TLS handshake error, <code>unknown ca</code>, wrong cert</td>
+<td>Listener certificate, SNI versus hostname</td>
+<td><code>kubectl describe gateway</code> (listener <code>ResolvedRefs</code>)</td>
+</tr>
+<tr>
+<td><code>404 Not Found</code> from the gateway (often an Envoy or NGINX default body)</td>
+<td>Gateway is alive but no route matched: not attached, hostname or path mismatch</td>
+<td><code>kubectl get httproute -o yaml</code> (parent conditions)</td>
+</tr>
+<tr>
+<td><code>503</code> or <code>no healthy upstream</code></td>
+<td>Route matched but the backend has nothing: unresolved ref, zero endpoints, pods not Ready</td>
+<td><code>kubectl get endpointslices</code></td>
+</tr>
+<tr>
+<td><code>200</code> but wrong content</td>
+<td>Weights, path rewrite, or the wrong backend</td>
+<td>route <code>backendRefs</code></td>
+</tr>
+</tbody>
+</table>
+<p>The catch: a 404 and a 503 look similar to a stressed reader and mean opposite things. <strong>404 means the gateway does not know this request belongs to anyone.</strong> The fault is at or before the route. <strong>503 means the gateway knows exactly who should answer and nobody is home.</strong> The fault is at or after the Service. Saying that sentence out loud early in the drill is worth more than any command.</p>
+<hr>
+<h2>★ The request path in a multi-tenant cluster</h2>
+<p>One diagram carries the whole guide. Read it top to bottom, and notice the boundary on the left: the tenant sees only part of the path.</p>
+<pre><code class="hljs" data-lang="text">client
+  |  DNS: app.team-a.example.org -&gt; Gateway address
+  v
++-------------------------- HOST CLUSTER ------------------------------+
+|  GatewayClass          (infra provider; host only)                   |
+|  Gateway               (platform team; host namespace)               |
+|    listener: port 443, protocol HTTPS, hostname *.team-a.example.org |
+|              tls.certificateRefs -&gt; Secret                           |
+|              allowedRoutes: namespaces.from Selector / Same / All    |
+|        ^                                                             |
+|        | parentRefs (attach)                                         |
+|  +----------------- vCluster &quot;team-a&quot; (host namespace vc-team-a) --+ |
+|  | TENANT VIEW (virtual API server)                               | |
+|  |   HTTPRoute  hostnames, matches, backendRefs  --synced--&gt;  copy | |
+|  |   Service                                    --synced--&gt;  copy | |
+|  |   EndpointSlices                             --synced--&gt;  copy | |
+|  |   Pod  (what the tenant sees)                --synced--&gt;  pod-x-ns-x-team-a
+|  |   PVC                                        --synced--&gt;  copy | |
+|  |   (tenant CRDs, RBAC, Namespaces: virtual only)                | |
+|  +----------------------------------------------------------------+ |
+|  PV, StorageClass, Node, taints, ResourceQuota (host only unless     |
+|  sync is enabled)                                                    |
+|        Service -&gt; EndpointSlices -&gt; Pod (Ready?) -&gt; PVC -&gt; PV -&gt; node
++----------------------------------------------------------------------+
+</code></pre>
+<p>Three categories of object matter, and every debugging move is &quot;which category is this in&quot;:</p>
+<ul>
+<li><strong>Tenant-only.</strong> Namespaces, RBAC, CRDs and custom resources created inside the virtual cluster. The host has no idea they exist.</li>
+<li><strong>Synced.</strong> Pods, Services, Endpoints, PVCs, ConfigMaps and Secrets by default; Gateway API objects and a few others only when enabled. The syncer copies them to the host and rewrites names, so they are real host objects the host scheduler and host controllers act on.</li>
+<li><strong>Host-only.</strong> GatewayClass, the Gateway and its data plane, Nodes and their taints, PVs, StorageClasses, ResourceQuota, the node kernel. The tenant cannot see most of these by default, but every one of them can fail the request.</li>
+</ul>
+<p>The catch is the one the interview exposed: <strong>the tenant sees &quot;Pending&quot; or &quot;404&quot; and the cause lives in a host-only object they cannot read.</strong> When a ticket comes in from a tenant, your first question is always which side of the boundary the failing object is on.</p>
+<hr>
+<h2>★ vCluster in depth</h2>
+<h3>What it is and why a platform ships it</h3>
+<p><strong>What.</strong> A vCluster is a Kubernetes control plane (API server, controller manager, a datastore, and a component called the syncer) that runs as a pod, or a StatefulSet, inside a namespace of a host cluster. The tenant gets a kubeconfig for that virtual API server and behaves as if they have a whole cluster. Pods they create are copied by the syncer into the host namespace, where the host's scheduler and kubelets actually run them.</p>
+<p><strong>Why.</strong> Tenants get cluster-admin-like freedom, can install their own CRDs and operators, can create their own namespaces and RBAC, and do not need their own nodes. The platform gets one fleet of nodes to patch and bill.</p>
+<p><strong>The catch.</strong> It is a control-plane boundary, not a kernel boundary. All tenants' pods share the host kernel and, unless you segregate it, the same nodes. For hostile tenants you still need sandboxed runtimes or separate clusters.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Namespaces + RBAC + quota + PSA</th>
+<th>vCluster</th>
+<th>Dedicated cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Isolation</td>
+<td>Soft: shared API server and kernel</td>
+<td>Own API server, shared nodes and kernel</td>
+<td>Hard: own everything</td>
+</tr>
+<tr>
+<td>CRD and cluster-scoped freedom</td>
+<td>None; tenants cannot install CRDs</td>
+<td>Full inside the virtual cluster</td>
+<td>Full</td>
+</tr>
+<tr>
+<td>Blast radius of a bad tenant</td>
+<td>Shared API server, shared etcd</td>
+<td>Contained to the virtual API; nodes still shared</td>
+<td>Contained</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>Near zero</td>
+<td>One control plane and datastore per tenant (small, but 100 tenants is 100 control planes)</td>
+<td>Full cluster per tenant: nodes, control plane, ops</td>
+</tr>
+<tr>
+<td>Ops overhead</td>
+<td>Lowest</td>
+<td>Medium: upgrade vClusters and host separately, version skew</td>
+<td>Highest: N clusters to patch</td>
+</tr>
+<tr>
+<td>Best for</td>
+<td>Trusted teams, uniform needs</td>
+<td>Teams that need admin freedom without a cluster</td>
+<td>Compliance boundaries, hostile tenants</td>
+</tr>
+</tbody>
+</table>
+<p>Pair this table with the shorter namespaces-versus-vCluster comparison in the Kubernetes guide's &quot;Access, tenancy, and policy&quot;. The line to say in the room: vCluster buys control-plane isolation and CRD freedom at the price of another thing to upgrade, and it does not buy kernel isolation.</p>
+<h3>The syncer and what it copies</h3>
+<p>The syncer watches the virtual cluster and the host namespace and reconciles in both directions.</p>
+<ul>
+<li><strong>toHost</strong> (tenant to host). Enabled by default: pods, services, endpoints, secrets, configMaps, PersistentVolumeClaims. Disabled by default: ingresses, Gateway API objects, networkPolicies, persistentVolumes, storageClasses, serviceAccounts, PodDisruptionBudgets, priorityClasses, namespaces, customResources, volume snapshots.</li>
+<li><strong>fromHost</strong> (host to tenant). Enabled by default: events. Disabled by default: nodes, ingressClasses, gatewayClasses, gateways, storageClasses, CSI objects, host configMaps and secrets, customResources.</li>
+</ul>
+<p>The config lives in <code>vcluster.yaml</code>. Everything is under <code>sync.toHost</code> and <code>sync.fromHost</code>, each resource with an <code>enabled</code> flag.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">sync:</span>
+  <span class="hljs-attr">toHost:</span>
+    <span class="hljs-attr">ingresses:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">false</span>        <span class="hljs-comment"># default</span>
+    <span class="hljs-attr">persistentVolumeClaims:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>         <span class="hljs-comment"># default</span>
+    <span class="hljs-attr">gatewayApi:</span>
+      <span class="hljs-attr">httpRoutes:</span>
+        <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>       <span class="hljs-comment"># opt in: routes created in the vCluster reach the host</span>
+      <span class="hljs-attr">referenceGrants:</span>
+        <span class="hljs-attr">enabled:</span> <span class="hljs-string">auto</span>
+  <span class="hljs-attr">fromHost:</span>
+    <span class="hljs-attr">nodes:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>         <span class="hljs-comment"># opt in: tenant can see (read-only) host nodes</span>
+    <span class="hljs-attr">storageClasses:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-string">auto</span>
+</code></pre>
+<p>This block says: sync HTTPRoutes to the host, let the syncer decide about ReferenceGrants, show host nodes and StorageClasses inside the virtual cluster. Each line you leave out keeps the default above. The catch to say aloud: <strong>if a resource is not in the toHost list, the host controller never sees it.</strong> A tenant who creates an Ingress on a vCluster with <code>ingresses.enabled: false</code> gets an object that exists and does nothing, with no error. That silent no-op is the most common first ticket.</p>
+<h3>How names are rewritten</h3>
+<p>A pod called <code>nginx-6d6565-abcde</code> in tenant namespace <code>demo</code> in vCluster <code>team-a</code> appears on the host as <code>nginx-6d6565-abcde-x-demo-x-team-a</code>, inside the host namespace that holds the vCluster (for example <code>vc-team-a</code>). The pattern is <code>NAME-x-NAMESPACE-x-VCLUSTER_NAME</code>. Names longer than the Kubernetes limit are truncated and hashed, so do not parse them with a regex; look them up by the labels the syncer adds (<code>vcluster.loft.sh/...</code>) or by grepping.</p>
+<p>The reason is collision avoidance: many virtual namespaces map into one host namespace, and <code>demo/nginx</code> in two vClusters must not clash. The catch: when a tenant pastes a pod name and says &quot;it is stuck&quot;, the name on the host is different, and you need to translate it before you can run anything host-side.</p>
+<h3>Scheduling: who places the pod</h3>
+<p>The <strong>host scheduler</strong> places synced pods, on <strong>host nodes</strong>, by default. That means host taints, host node labels, host ResourceQuota and host LimitRange all apply to tenant pods, even when the tenant cannot see the nodes. A tenant who tolerates nothing and lands on a tainted pool is Pending for a reason that exists only on the host.</p>
+<p>There is an optional virtual scheduler (<code>controlPlane.distro.k8s.scheduler.enabled: true</code>, which requires <code>sync.fromHost.nodes.enabled: true</code>). With it, the tenant schedules against its own view of nodes and can label and taint them without touching the host, and the syncer only syncs pods that already have a node. The catch is that the host kubelet and admission still enforce host-level constraints, so a virtual scheduler does not exempt the pod from host quota or from taints that gate the node.</p>
+<p>For the taint mechanics themselves (effects, <code>tolerationSeconds</code>, the pair &quot;taint to repel, selector to attract&quot;) see the Kubernetes guide's &quot;Taints and tolerations&quot;.</p>
+<h3>Storage and networking in one pass</h3>
+<p><strong>Storage.</strong> PVCs sync to the host, so the host's StorageClass provisions the volume. StorageClasses and PVs are not shown to the tenant by default, so <code>kubectl get sc</code> inside the vCluster may be empty while PVCs bind happily from the host default class. Enable <code>fromHost.storageClasses</code> to let tenants see and select. The catch: a PVC that stays Pending inside the vCluster usually has its explanation in an event on the <strong>host</strong> PVC, which names the host StorageClass and node constraints.</p>
+<p><strong>Networking.</strong> Services and Endpoints sync, so a Service is a real host Service with a real ClusterIP-based path. Each vCluster runs its own CoreDNS, which resolves tenant names and forwards the rest. A tenant pod that is Running but cannot resolve a name is usually a DNS problem inside the virtual cluster (CoreDNS pod, or the rewritten Service cannot be found), not the host's DNS.</p>
+<h3>Debugging from both sides</h3>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Which vClusters exist, and what state are they in</span>
+vcluster list
+
+<span class="hljs-comment"># Point kubectl at the tenant&#x27;s virtual API server</span>
+vcluster connect team-a --namespace vc-team-a
+
+<span class="hljs-comment"># Inside: what the tenant sees</span>
+kubectl get pods -A
+kubectl describe pod nginx-6d6565-abcde -n demo
+
+<span class="hljs-comment"># Host side: the same pod under its rewritten name</span>
+kubectl -n vc-team-a get pods | grep nginx
+kubectl -n vc-team-a describe pod nginx-6d6565-abcde-x-demo-x-team-a
+
+<span class="hljs-comment"># Syncer logs when something is not appearing on the host</span>
+kubectl -n vc-team-a logs team-a-0 -c syncer --<span class="hljs-built_in">tail</span>=100
+</code></pre>
+<p><code>vcluster connect</code> switches your kube context to the virtual cluster (it writes or updates a kubeconfig and, by default, may start a background proxy that needs Docker; run <code>vcluster connect --help</code> on your binary to confirm the flags in your version). The host-side <code>describe</code> is where the answer usually is, because the Events there come from the real scheduler and kubelet. The syncer logs show why an object was skipped: validation failure, missing dependency, or unsupported kind.</p>
+<p>The catches, collected:</p>
+<ul>
+<li><strong>Tenant sees Pending, cause is a host taint or quota.</strong> The tenant cannot inspect it. You can, on the host.</li>
+<li><strong>Default sync is narrow.</strong> Ingress, Gateway API, PVs and StorageClasses all need enabling.</li>
+<li><strong>Version skew.</strong> The virtual API server version and the host version are independent. A vCluster running a newer API than the host can accept manifests the host side of the syncer cannot translate; upgrade host first, then vClusters, and test the sync after each.</li>
+</ul>
+<hr>
+<h2>★ Gateway API in depth</h2>
+<h3>The role split and the Ingress mapping</h3>
+<p>Gateway API splits what Ingress crammed into one object, and the split matches who owns what.</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Owns</th>
+<th>Ingress equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Infrastructure provider</td>
+<td><code>GatewayClass</code> (which controller implements it)</td>
+<td><code>IngressClass</code></td>
+</tr>
+<tr>
+<td>Cluster operator / platform team</td>
+<td><code>Gateway</code> (addresses, listeners, TLS, which namespaces may attach)</td>
+<td>The Ingress controller's Service plus global config</td>
+</tr>
+<tr>
+<td>Application team</td>
+<td><code>HTTPRoute</code> (hostnames, paths, backends)</td>
+<td>The <code>Ingress</code> object</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Ingress concept</th>
+<th>Gateway API equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ingressClassName</code></td>
+<td><code>Gateway.spec.gatewayClassName</code></td>
+</tr>
+<tr>
+<td><code>spec.rules[].host</code></td>
+<td><code>HTTPRoute.spec.hostnames</code> plus listener <code>hostname</code></td>
+</tr>
+<tr>
+<td><code>spec.rules[].http.paths</code></td>
+<td><code>HTTPRoute.spec.rules[].matches</code></td>
+</tr>
+<tr>
+<td><code>spec.tls[].secretName</code></td>
+<td><code>listeners[].tls.certificateRefs</code> (on the Gateway, not the route)</td>
+</tr>
+<tr>
+<td>Annotations (rewrite, redirect, timeouts)</td>
+<td><code>filters</code> and policy attachments, now typed</td>
+</tr>
+<tr>
+<td>Canary annotation</td>
+<td><code>backendRefs[].weight</code></td>
+</tr>
+<tr>
+<td>(nothing)</td>
+<td><code>allowedRoutes</code>, <code>ReferenceGrant</code>: explicit cross-team permission</td>
+</tr>
+</tbody>
+</table>
+<p>If you come from a single shared Ingress on MicroK8s, the translation is: the Ingress controller's config becomes a Gateway you do not own, and your Ingress becomes an HTTPRoute that has to be <strong>allowed</strong> to attach. That word &quot;allowed&quot; is the whole new idea.</p>
+<h3>Listeners and allowedRoutes</h3>
+<p>A Gateway has listeners. Each has a port, protocol, optional hostname, optional TLS config, and an <code>allowedRoutes</code> block that says who may attach.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">gateway.networking.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">Gateway</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">public-web</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">platform-gateways</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">gatewayClassName:</span> <span class="hljs-string">envoy</span>
+  <span class="hljs-attr">listeners:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">https</span>
+      <span class="hljs-attr">port:</span> <span class="hljs-number">443</span>
+      <span class="hljs-attr">protocol:</span> <span class="hljs-string">HTTPS</span>
+      <span class="hljs-attr">hostname:</span> <span class="hljs-string">&quot;*.team-a.example.org&quot;</span>
+      <span class="hljs-attr">tls:</span>
+        <span class="hljs-attr">mode:</span> <span class="hljs-string">Terminate</span>
+        <span class="hljs-attr">certificateRefs:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-attr">kind:</span> <span class="hljs-string">Secret</span>
+            <span class="hljs-attr">name:</span> <span class="hljs-string">team-a-wildcard</span>
+      <span class="hljs-attr">allowedRoutes:</span>
+        <span class="hljs-attr">namespaces:</span>
+          <span class="hljs-attr">from:</span> <span class="hljs-string">Selector</span>
+          <span class="hljs-attr">selector:</span>
+            <span class="hljs-attr">matchLabels:</span>
+              <span class="hljs-attr">gateway-access:</span> <span class="hljs-string">public-web</span>
+        <span class="hljs-attr">kinds:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-attr">kind:</span> <span class="hljs-string">HTTPRoute</span>
+</code></pre>
+<p>This listener terminates TLS for any host under <code>team-a.example.org</code> and accepts HTTPRoutes only from namespaces labelled <code>gateway-access=public-web</code>. Two things bite. First, <code>allowedRoutes.namespaces.from</code> <strong>defaults to <code>Same</code></strong>, meaning only routes in the Gateway's own namespace attach, so a Gateway someone wrote without that block silently refuses every tenant route. Second, the <code>hostname</code> on the listener and the <code>hostnames</code> on the route must intersect; if they do not, the route is accepted by nobody and the fault is a hostname mismatch rather than a permission.</p>
+<h3>HTTPRoute</h3>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">gateway.networking.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">HTTPRoute</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">app</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">team-a-app</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">parentRefs:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">public-web</span>
+      <span class="hljs-attr">namespace:</span> <span class="hljs-string">platform-gateways</span>
+      <span class="hljs-attr">sectionName:</span> <span class="hljs-string">https</span>
+  <span class="hljs-attr">hostnames:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-string">app.team-a.example.org</span>
+  <span class="hljs-attr">rules:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">matches:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">path:</span>
+            <span class="hljs-attr">type:</span> <span class="hljs-string">PathPrefix</span>
+            <span class="hljs-attr">value:</span> <span class="hljs-string">/</span>
+      <span class="hljs-attr">backendRefs:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">app-v1</span>
+          <span class="hljs-attr">port:</span> <span class="hljs-number">80</span>
+          <span class="hljs-attr">weight:</span> <span class="hljs-number">90</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">app-v2</span>
+          <span class="hljs-attr">port:</span> <span class="hljs-number">80</span>
+          <span class="hljs-attr">weight:</span> <span class="hljs-number">10</span>
+</code></pre>
+<p><code>parentRefs</code> is the attachment request: which Gateway, in which namespace, optionally which listener via <code>sectionName</code>. <code>backendRefs</code> are Services in the route's namespace (a cross-namespace backend needs a grant, below). Weights are relative, not percentages, so 90 and 10 gives a 90/10 split and 1 and 0 sends everything to the first backend. The catch: a <code>backendRef.port</code> must be the <strong>Service</strong> port, not the container port; the wrong port gives a <code>BackendNotFound</code> or a 503 that looks like an empty backend.</p>
+<h3>ReferenceGrant: the target namespace owns the permission</h3>
+<p>A route may reference a Service in another namespace, and a Gateway may reference a Secret in another namespace, only if the <strong>target</strong> namespace has granted it. The grant is a <code>ReferenceGrant</code> created <strong>in the namespace that owns the target object</strong>.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">gateway.networking.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ReferenceGrant</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">allow-routes-from-team-a-app</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">shared-services</span>          <span class="hljs-comment"># lives where the Service is</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">from:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">group:</span> <span class="hljs-string">gateway.networking.k8s.io</span>
+      <span class="hljs-attr">kind:</span> <span class="hljs-string">HTTPRoute</span>
+      <span class="hljs-attr">namespace:</span> <span class="hljs-string">team-a-app</span>           <span class="hljs-comment"># who is allowed to reference</span>
+  <span class="hljs-attr">to:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">group:</span> <span class="hljs-string">&quot;&quot;</span>
+      <span class="hljs-attr">kind:</span> <span class="hljs-string">Service</span>                   <span class="hljs-comment"># what they may reference</span>
+</code></pre>
+<p>Read it as the owner of <code>shared-services</code> saying &quot;HTTPRoutes from <code>team-a-app</code> may point at Services here&quot;. The reason it lives in the target namespace is simple: the owner of the thing being referenced must consent, otherwise any team could point at anyone's Secret or Service. A second grant is needed for a Gateway pointing at a TLS Secret in another namespace, with <code>from.kind: Gateway</code> and <code>to.kind: Secret</code>. As of Gateway API 1.5, ReferenceGrant is in the standard channel as v1. The catch: the grant has <strong>no status</strong>. You confirm it worked only by watching the route reach <code>ResolvedRefs=True</code>.</p>
+<h3>Status is the debugger</h3>
+<p>Everything the controller decided is written back to status. Read the route's parents and the Gateway's listeners and you have the diagnosis.</p>
+<pre><code class="hljs" data-lang="bash">kubectl get httproute app -n team-a-app -o yaml
+</code></pre>
+<p>Look at <code>status.parents[].conditions</code>. A healthy route has <code>Accepted=True</code> and <code>ResolvedRefs=True</code>. A Gateway's <code>status.listeners[]</code> carries per-listener <code>Accepted</code>, <code>ResolvedRefs</code>, <code>Programmed</code>, and <code>attachedRoutes</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Object</th>
+<th>Condition</th>
+<th>Reason</th>
+<th>What it means</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Route parent</td>
+<td><code>Accepted=False</code></td>
+<td><code>NotAllowedByListeners</code></td>
+<td>No listener's <code>allowedRoutes</code> permits this route's namespace or kind</td>
+<td>Label the namespace, widen <code>allowedRoutes</code>, or move the route</td>
+</tr>
+<tr>
+<td>Route parent</td>
+<td><code>Accepted=False</code></td>
+<td><code>NoMatchingListenerHostname</code></td>
+<td>Listener and route hostnames do not intersect</td>
+<td>Fix <code>hostnames</code> on route or <code>hostname</code> on listener</td>
+</tr>
+<tr>
+<td>Route parent</td>
+<td><code>Accepted=False</code></td>
+<td><code>NoMatchingParent</code></td>
+<td><code>sectionName</code> or <code>port</code> matches no listener</td>
+<td>Correct <code>parentRefs</code></td>
+</tr>
+<tr>
+<td>Route parent</td>
+<td><code>Accepted=False</code></td>
+<td><code>UnsupportedValue</code> / <code>IncompatibleFilters</code></td>
+<td>A field or filter combination the controller rejects</td>
+<td>Read the message; remove the offending filter</td>
+</tr>
+<tr>
+<td>Route parent</td>
+<td><code>Accepted=False</code></td>
+<td><code>Pending</code></td>
+<td>Controller has not reconciled yet</td>
+<td>Is the controller running?</td>
+</tr>
+<tr>
+<td>Route parent</td>
+<td><code>ResolvedRefs=False</code></td>
+<td><code>RefNotPermitted</code></td>
+<td>Cross-namespace backend without a ReferenceGrant</td>
+<td>Add grant in the backend's namespace</td>
+</tr>
+<tr>
+<td>Route parent</td>
+<td><code>ResolvedRefs=False</code></td>
+<td><code>BackendNotFound</code></td>
+<td>Service does not exist, or wrong name or port</td>
+<td>Fix name, namespace, or port</td>
+</tr>
+<tr>
+<td>Route parent</td>
+<td><code>ResolvedRefs=False</code></td>
+<td><code>InvalidKind</code></td>
+<td><code>backendRef</code> kind or group unsupported</td>
+<td>Use Service, or a kind the implementation supports</td>
+</tr>
+<tr>
+<td>Gateway</td>
+<td><code>Programmed=False</code></td>
+<td><code>AddressNotAssigned</code> / <code>Pending</code> / <code>Invalid</code></td>
+<td>No LB address yet, controller not reconciling, or config invalid</td>
+<td>Check LB provisioner and GatewayClass controller</td>
+</tr>
+<tr>
+<td>Gateway</td>
+<td><code>Accepted=False</code></td>
+<td><code>ListenersNotValid</code>, <code>InvalidParameters</code></td>
+<td>One or more listeners or the <code>parametersRef</code> are bad</td>
+<td>Read listener status</td>
+</tr>
+<tr>
+<td>Listener</td>
+<td><code>ResolvedRefs=False</code></td>
+<td><code>InvalidCertificateRef</code></td>
+<td>TLS Secret missing or malformed</td>
+<td>Fix the Secret</td>
+</tr>
+<tr>
+<td>Listener</td>
+<td><code>ResolvedRefs=False</code></td>
+<td><code>RefNotPermitted</code></td>
+<td>TLS Secret in another namespace without a grant</td>
+<td>Add grant <code>from: Gateway</code> in the Secret's namespace</td>
+</tr>
+<tr>
+<td>Listener</td>
+<td><code>Conflicted=True</code></td>
+<td><code>HostnameConflict</code>, <code>ProtocolConflict</code></td>
+<td>Two listeners clash on port, hostname, or protocol</td>
+<td>De-duplicate</td>
+</tr>
+</tbody>
+</table>
+<p>Two different kinds of &quot;not allowed&quot; show up, and telling them apart is a mark of fluency. <code>NotAllowedByListeners</code> is <strong>the Gateway owner</strong> saying no (the listener's <code>allowedRoutes</code>). <code>RefNotPermitted</code> is <strong>the backend or Secret owner</strong> saying no (a missing ReferenceGrant). The fix lives in a different namespace and with a different team in each case.</p>
+<h3>The catch list</h3>
+<ul>
+<li><strong>Accepted but 503.</strong> <code>Accepted=True</code> and <code>ResolvedRefs=False</code>: the route attached, the backend did not resolve, the data plane returns 503.</li>
+<li><strong>Hostname mismatch is silent.</strong> Listener says <code>*.team-a.example.org</code>, route says <code>app.example.org</code>; nothing errors in apply, the route simply never attaches.</li>
+<li><strong><code>allowedRoutes: Same</code> with a route in another namespace.</strong> The default. Everything looks right and nothing attaches.</li>
+<li><strong>Cross-namespace backend without a grant.</strong> Route accepted, backend refused.</li>
+<li><strong>Gateway not Programmed.</strong> No address, so curl times out or refuses; check the GatewayClass controller and the address provisioner before anything else.</li>
+<li><strong>Listener <code>attachedRoutes: 0</code>.</strong> Useful single number: if it is zero, no route is attached to that listener, whatever the route's own YAML claims.</li>
+</ul>
+<p>Common implementations you may be asked about: Envoy Gateway, Cilium, Istio, NGINX Gateway Fabric, Traefik, kgateway. All are listed as conformant for the 1.6 release; the status condition shapes above are the same across them, though message text differs.</p>
+<p>As of 1.5, <code>ListenerSet</code> is in the standard channel, which lets an application team contribute listeners to a Gateway without editing it; whether your platform exposes that is a policy question for the Gateway owner.</p>
+<h3>How Gateway API behaves inside a vCluster</h3>
+<p>By default Gateway API objects do not sync. To let tenants publish routes, the platform enables <code>sync.toHost.gatewayApi.httpRoutes</code> (and <code>tlsRoutes</code>, <code>referenceGrants</code> as needed) and imports the host Gateway into the virtual cluster with <code>sync.fromHost.gateways</code> (plus <code>gatewayClasses</code>), with <code>mappings.byName</code> translating the host's <code>namespace/name</code> to the name the tenant will use in <code>parentRefs</code>. GRPCRoute, TCPRoute and UDPRoute have no native sync keys; those need the generic <code>customResources</code> path.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">sync:</span>
+  <span class="hljs-attr">toHost:</span>
+    <span class="hljs-attr">gatewayApi:</span>
+      <span class="hljs-attr">httpRoutes:</span>
+        <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+      <span class="hljs-attr">referenceGrants:</span>
+        <span class="hljs-attr">enabled:</span> <span class="hljs-string">auto</span>
+  <span class="hljs-attr">fromHost:</span>
+    <span class="hljs-attr">gatewayClasses:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+    <span class="hljs-attr">gateways:</span>
+      <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+      <span class="hljs-attr">mappings:</span>
+        <span class="hljs-attr">byName:</span>
+          <span class="hljs-attr">&quot;platform-gateways/public-web&quot;:</span> <span class="hljs-string">&quot;shared-gateways/shared-web&quot;</span>
+</code></pre>
+<p>This says: HTTPRoutes created in the vCluster are copied to the host, and the host Gateway <code>platform-gateways/public-web</code> shows up inside the tenant as <code>shared-gateways/shared-web</code>. The tenant's route names <code>shared-web</code> in <code>parentRefs</code>; the syncer translates. The catch is a second debugging surface: <strong>in the default single-namespace mode the syncer itself validates <code>allowedRoutes</code> and ReferenceGrants against the tenant's objects, and if the check fails it does not sync the route at all.</strong> It records a Warning event such as <code>RefNotPermitted</code> on the tenant's route and the route has no <code>Accepted</code> parent. So &quot;no status on the route&quot; in a vCluster means look at <code>kubectl get events</code> first, and Gateway status second. This is also why tenants raise tickets for new routes: the host Gateway's listeners, hostnames and namespace labels are platform-owned, and a route outside them never reaches the data plane.</p>
+<hr>
+<h2>★ Kyverno: the policy layer for routes and tenants</h2>
+<h3>Three rule types</h3>
+<p><strong>What.</strong> Kyverno is an admission controller whose policies are Kubernetes YAML. A policy has rules of three main kinds.</p>
+<ul>
+<li><strong>Validate.</strong> Allow or deny a request that matches (for example, deny an HTTPRoute with a hostname outside the tenant's domains).</li>
+<li><strong>Mutate.</strong> Change the request on the way in (add a label, add a default toleration, inject a securityContext).</li>
+<li><strong>Generate.</strong> Create other resources in response to an event (when a Namespace is created, generate a NetworkPolicy and a ReferenceGrant).</li>
+</ul>
+<p>A cluster-scoped <code>ClusterPolicy</code> applies everywhere; a namespaced <code>Policy</code> applies in its namespace only. <code>validationFailureAction: Enforce</code> blocks a violating request at apply time; <code>Audit</code> lets it through and records the violation in a <strong>PolicyReport</strong>.</p>
+<p><strong>Why.</strong> Gateway API tells you what is <em>allowed to route</em>; Kyverno tells you what is <em>allowed to exist</em>. Letting tenants self-serve routes safely is mostly a Kyverno job.</p>
+<p><strong>The catch.</strong> Kyverno's newer policy types (<code>ValidatingPolicy</code>, <code>MutatingPolicy</code>, <code>GeneratingPolicy</code>, under <code>policies.kyverno.io/v1</code>) became stable in 1.17, and <code>ClusterPolicy</code> and <code>Policy</code> are deprecated, with removal planned in a later release (check the release notes for your version; planned for 1.20 at the time of writing). A cluster that still runs <code>ClusterPolicy</code> is normal today, but a platform engineer should know the new types exist and that a policy using <code>validationActions: [Deny]</code> replaces <code>validationFailureAction: Enforce</code>.</p>
+<h3>Which layer rejected my route?</h3>
+<p>Two different systems can say no, and they speak in different places.</p>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Who said no</th>
+<th>Where you see it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kubectl apply</code> fails with <code>admission webhook &quot;validate.kyverno.svc-fail&quot; denied the request: ...</code></td>
+<td>Kyverno (Enforce)</td>
+<td>Immediately, at apply time, as an error</td>
+</tr>
+<tr>
+<td>Apply succeeds, <code>PolicyReport</code> shows <code>fail</code> for the resource</td>
+<td>Kyverno (Audit)</td>
+<td><code>kubectl get policyreport -n &lt;ns&gt;</code> or <code>kubectl get polr</code></td>
+</tr>
+<tr>
+<td>Apply succeeds, route <code>status.parents[].conditions</code> has <code>Accepted=False</code></td>
+<td>Gateway controller</td>
+<td>Route status</td>
+</tr>
+<tr>
+<td>Apply succeeds, tenant route has no status and a Warning event <code>RefNotPermitted</code></td>
+<td>vCluster syncer</td>
+<td><code>kubectl get events</code> in the vCluster</td>
+</tr>
+</tbody>
+</table>
+<p>The rule of thumb: <strong>an apply-time error is admission (Kyverno); a post-apply condition is the Gateway controller.</strong> If the object exists and has status, Kyverno has already let it through.</p>
+<h3>Worked example: restrict route hostnames to a tenant's domains</h3>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">kyverno.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterPolicy</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">restrict-httproute-hostnames</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">validationFailureAction:</span> <span class="hljs-string">Enforce</span>
+  <span class="hljs-attr">background:</span> <span class="hljs-literal">false</span>
+  <span class="hljs-attr">rules:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">hostnames-must-be-in-tenant-domain</span>
+      <span class="hljs-attr">match:</span>
+        <span class="hljs-attr">any:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-attr">resources:</span>
+              <span class="hljs-attr">kinds:</span>
+                <span class="hljs-bullet">-</span> <span class="hljs-string">HTTPRoute</span>
+      <span class="hljs-attr">validate:</span>
+        <span class="hljs-attr">message:</span> <span class="hljs-string">&quot;HTTPRoute hostnames must end with .<span class="hljs-template-variable">{{request.namespace}}</span>.example.org&quot;</span>
+        <span class="hljs-attr">foreach:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-attr">list:</span> <span class="hljs-string">&quot;request.object.spec.hostnames&quot;</span>
+            <span class="hljs-attr">deny:</span>
+              <span class="hljs-attr">conditions:</span>
+                <span class="hljs-attr">all:</span>
+                  <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">&quot;<span class="hljs-template-variable">{{ element }}</span>&quot;</span>
+                    <span class="hljs-attr">operator:</span> <span class="hljs-string">NotEquals</span>
+                    <span class="hljs-attr">value:</span> <span class="hljs-string">&quot;*.<span class="hljs-template-variable">{{request.namespace}}</span>.example.org&quot;</span>
+</code></pre>
+<p>This rule runs on every HTTPRoute and denies it when a hostname does not fit the namespace's domain. Two catches. The wildcard comparison above is illustrative: production rules use <code>wildcard</code> matching functions or a lookup against a tenant-to-domain ConfigMap rather than string equality, so test it with <code>kyverno test</code> before enforcing. And <code>background: false</code> is needed here because <code>request.namespace</code> is not available in background scans.</p>
+<p>The same intent in the newer CEL-based type reads as a single expression.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">policies.kyverno.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ValidatingPolicy</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">restrict-httproute-hostnames</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">validationActions:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-string">Deny</span>
+  <span class="hljs-attr">matchConstraints:</span>
+    <span class="hljs-attr">resourceRules:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">apiGroups:</span> [<span class="hljs-string">&quot;gateway.networking.k8s.io&quot;</span>]
+        <span class="hljs-attr">apiVersions:</span> [<span class="hljs-string">&quot;v1&quot;</span>]
+        <span class="hljs-attr">operations:</span> [<span class="hljs-string">&quot;CREATE&quot;</span>, <span class="hljs-string">&quot;UPDATE&quot;</span>]
+        <span class="hljs-attr">resources:</span> [<span class="hljs-string">&quot;httproutes&quot;</span>]
+  <span class="hljs-attr">validations:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">expression:</span> <span class="hljs-string">&gt;-
+        object.spec.hostnames.all(h, h.endsWith(&quot;.&quot; + object.metadata.namespace + &quot;.example.org&quot;))
+</span>      <span class="hljs-attr">message:</span> <span class="hljs-string">&quot;HTTPRoute hostnames must be under &lt;namespace&gt;.example.org&quot;</span>
+</code></pre>
+<p><code>validationActions</code> takes <code>Deny</code> and <code>Audit</code> (the docs examples use these; whether <code>Warn</code> is accepted should be checked against your Kyverno version). The CEL form is evaluated in-process with no per-rule JMESPath, which is why it is the direction of travel.</p>
+<h3>Worked example: generate a ReferenceGrant at tenant onboarding</h3>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">kyverno.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterPolicy</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">onboard-tenant-namespace</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">rules:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">label-and-grant</span>
+      <span class="hljs-attr">match:</span>
+        <span class="hljs-attr">any:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-attr">resources:</span>
+              <span class="hljs-attr">kinds:</span>
+                <span class="hljs-bullet">-</span> <span class="hljs-string">Namespace</span>
+              <span class="hljs-attr">selector:</span>
+                <span class="hljs-attr">matchLabels:</span>
+                  <span class="hljs-attr">tenant:</span> <span class="hljs-string">&quot;true&quot;</span>
+      <span class="hljs-attr">generate:</span>
+        <span class="hljs-attr">apiVersion:</span> <span class="hljs-string">gateway.networking.k8s.io/v1</span>
+        <span class="hljs-attr">kind:</span> <span class="hljs-string">ReferenceGrant</span>
+        <span class="hljs-attr">name:</span> <span class="hljs-string">allow-gateway-to-cert</span>
+        <span class="hljs-attr">namespace:</span> <span class="hljs-string">&quot;<span class="hljs-template-variable">{{request.object.metadata.name}}</span>&quot;</span>
+        <span class="hljs-attr">synchronize:</span> <span class="hljs-literal">true</span>
+        <span class="hljs-attr">data:</span>
+          <span class="hljs-attr">spec:</span>
+            <span class="hljs-attr">from:</span>
+              <span class="hljs-bullet">-</span> <span class="hljs-attr">group:</span> <span class="hljs-string">gateway.networking.k8s.io</span>
+                <span class="hljs-attr">kind:</span> <span class="hljs-string">Gateway</span>
+                <span class="hljs-attr">namespace:</span> <span class="hljs-string">platform-gateways</span>
+            <span class="hljs-attr">to:</span>
+              <span class="hljs-bullet">-</span> <span class="hljs-attr">group:</span> <span class="hljs-string">&quot;&quot;</span>
+                <span class="hljs-attr">kind:</span> <span class="hljs-string">Secret</span>
+</code></pre>
+<p>When a Namespace labelled <code>tenant=true</code> is created, Kyverno creates a ReferenceGrant in it that lets the platform Gateway reference Secrets there (the wildcard cert flow). <code>synchronize: true</code> means that if someone deletes the grant, Kyverno puts it back. The catch: Kyverno needs RBAC to create ReferenceGrants, and generate rules fail quietly when its service account lacks it, so read the policy's events and the <code>kyverno-admission-controller</code> logs when a generated object does not appear.</p>
+<h3>Worked example: require tolerations or nodeSelectors</h3>
+<p>A validate rule can demand that workloads in a namespace declare a <code>nodeSelector</code> pointing at the tenant's pool, so tenants cannot land on shared system nodes. The reverse, a <strong>mutate</strong> rule that injects a toleration for a dedicated pool, is convenient and dangerous.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">kyverno.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ClusterPolicy</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">add-pool-toleration</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">rules:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">add-toleration</span>
+      <span class="hljs-attr">match:</span>
+        <span class="hljs-attr">any:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-attr">resources:</span>
+              <span class="hljs-attr">kinds:</span>
+                <span class="hljs-bullet">-</span> <span class="hljs-string">Pod</span>
+              <span class="hljs-attr">namespaceSelector:</span>
+                <span class="hljs-attr">matchLabels:</span>
+                  <span class="hljs-attr">pool:</span> <span class="hljs-string">dedicated</span>
+      <span class="hljs-attr">mutate:</span>
+        <span class="hljs-attr">patchesJson6902:</span> <span class="hljs-string">|-
+          - op: add
+            path: &quot;/spec/tolerations/-&quot;
+            value:
+              key: &quot;dedicated&quot;
+              operator: &quot;Equal&quot;
+              value: &quot;tenant&quot;
+              effect: &quot;NoSchedule&quot;
+</span></code></pre>
+<p>This appends a toleration to every Pod in namespaces labelled <code>pool=dedicated</code>. The catch, and the reason it is in this guide: <strong>a policy that silently mutates tolerations (or strips them, or a mutate rule that fails open) is a legitimate cause of the exact scheduling failure you are debugging.</strong> The pod YAML the tenant wrote has no toleration, the pod on the host has one, or the reverse. When a tolerations story does not add up, <code>kubectl get pod -o yaml</code> on the <strong>host</strong> copy is the source of truth, and <code>kubectl get cpol</code> plus the pod's annotations (<code>policies.kyverno.io/last-applied-patches</code>) tells you what Kyverno changed.</p>
+<h3>Rolling out a policy and where Kyverno runs with vCluster</h3>
+<p>Roll out in stages: ship as <code>Audit</code>, read PolicyReports for violations for a week, fix or exempt the legitimate offenders (a <code>PolicyException</code>, or <code>exclude</code> blocks), then flip to <code>Enforce</code>. The catch is that flipping to Enforce with the webhook set to <code>failurePolicy: Fail</code> means an unhealthy Kyverno blocks every matching create; keep the webhook scoped, and give it replicas. The built-in ValidatingAdmissionPolicy avoids that class of outage for simple rules (see the Kubernetes guide).</p>
+<p>With vCluster there are two models. <strong>Kyverno inside each vCluster</strong> gives tenants their own policy plane and their own PolicyReports, at the cost of N Kyvernos. <strong>One Kyverno on the host</strong>, with vCluster's external admission enforcement, lets the host's webhook configuration cover virtual API servers too; the host Kyverno also sees the synced, renamed pods in the host namespace, so a host-side <code>Enforce</code> rule can reject a pod the tenant thought was created successfully (it was admitted by the virtual API server, then refused when the syncer tried to create it on the host). That last case shows up as a syncer error and a Warning event rather than an apply-time error to the tenant.</p>
+<hr>
+<h2>★ Storage and scheduling: the taint that blocks a PVC</h2>
+<h3>WaitForFirstConsumer couples volume to pod</h3>
+<p>A StorageClass with <code>volumeBindingMode: WaitForFirstConsumer</code> does not bind or provision the PV when the PVC is created. It waits until a pod that uses the PVC is scheduled, then binds on that pod's node (or zone). That is deliberate: a local or zonal volume must be created where the pod will run, not where the PVC was created.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">storage.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">StorageClass</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">local-nvme</span>
+<span class="hljs-attr">provisioner:</span> <span class="hljs-string">kubernetes.io/no-provisioner</span>
+<span class="hljs-attr">volumeBindingMode:</span> <span class="hljs-string">WaitForFirstConsumer</span>
+</code></pre>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">PersistentVolume</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">nvme-node-7</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">capacity:</span>
+    <span class="hljs-attr">storage:</span> <span class="hljs-string">200Gi</span>
+  <span class="hljs-attr">accessModes:</span> [<span class="hljs-string">&quot;ReadWriteOnce&quot;</span>]
+  <span class="hljs-attr">storageClassName:</span> <span class="hljs-string">local-nvme</span>
+  <span class="hljs-attr">local:</span>
+    <span class="hljs-attr">path:</span> <span class="hljs-string">/mnt/nvme0</span>
+  <span class="hljs-attr">nodeAffinity:</span>
+    <span class="hljs-attr">required:</span>
+      <span class="hljs-attr">nodeSelectorTerms:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">matchExpressions:</span>
+            <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">kubernetes.io/hostname</span>
+              <span class="hljs-attr">operator:</span> <span class="hljs-string">In</span>
+              <span class="hljs-attr">values:</span> [<span class="hljs-string">&quot;node-7&quot;</span>]
+</code></pre>
+<p>The class says &quot;bind late&quot;. The PV says &quot;I exist only on node-7&quot;. Together they mean: the PVC cannot bind until a pod is scheduled, and the pod can only be scheduled to a node that satisfies the PV's <code>nodeAffinity</code>. If node-7 carries a taint the pod does not tolerate, <strong>both</strong> stay Pending: the pod because no node is eligible, the PVC because there is no consumer scheduled yet. This is not a deadlock in the strict sense, it is a missing toleration, but it presents as two Pending objects that each point at the other.</p>
+<h3>How to read it</h3>
+<pre><code class="hljs" data-lang="bash">kubectl describe pod web-0 -n demo
+<span class="hljs-comment"># Events:</span>
+<span class="hljs-comment">#   Warning  FailedScheduling  0/6 nodes are available: 1 node(s) had untolerated taint</span>
+<span class="hljs-comment">#   {dedicated: storage}, 5 node(s) had volume node affinity conflict.</span>
+<span class="hljs-comment">#   preemption: 0/6 nodes are available: 6 Preemption is not helpful for scheduling.</span>
+
+kubectl describe pvc data-web-0 -n demo
+<span class="hljs-comment"># Events:</span>
+<span class="hljs-comment">#   Normal  WaitForFirstConsumer  persistentvolume-controller</span>
+<span class="hljs-comment">#   waiting for first consumer to be created before binding</span>
+</code></pre>
+<p>Read the pod message as an arithmetic proof: six nodes, five rejected for &quot;volume node affinity conflict&quot; (they are not node-7, so the local PV cannot be used there), one rejected for the taint (node-7 itself). The one node that could satisfy the volume is the one the pod cannot land on. The PVC event is not an error, it is the normal waiting message; the cause lives on the pod. The catch for newcomers is to chase the PVC because it is the &quot;storage&quot; object. The fix always starts at the pod's FailedScheduling message.</p>
+<h3>Fix options and which one to pick</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>When</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Add a toleration to the workload</td>
+<td>The node is dedicated storage and this workload is meant to use it</td>
+<td>Safest: scoped to the workload; pair with nodeSelector so it is intended</td>
+</tr>
+<tr>
+<td>Retaint or remove the taint</td>
+<td>The taint is stale, or wrongly applied</td>
+<td>Affects every other workload on that node; blast radius is wide</td>
+</tr>
+<tr>
+<td>Change StorageClass topology / <code>allowedTopologies</code></td>
+<td>The volume could live on a non-tainted node</td>
+<td>Requires new volumes; data does not move</td>
+</tr>
+<tr>
+<td>Move the volume (restore to another PV/node)</td>
+<td>The data must run elsewhere</td>
+<td>Slow and risky; last resort</td>
+</tr>
+</tbody>
+</table>
+<p>A platform engineer reaches for the toleration first, delivered through whatever mechanism owns the workload (the Helm values, or a Kyverno rule if tenants are not supposed to hand-write tolerations). Removing the taint is the tempting one-liner and the wrong default because it undoes an isolation decision someone made on purpose.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">tolerations:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">dedicated</span>
+      <span class="hljs-attr">operator:</span> <span class="hljs-string">Equal</span>
+      <span class="hljs-attr">value:</span> <span class="hljs-string">storage</span>
+      <span class="hljs-attr">effect:</span> <span class="hljs-string">NoSchedule</span>
+</code></pre>
+<p>This allows the pod to land on nodes tainted <code>dedicated=storage:NoSchedule</code>. Remember from the Kubernetes guide that a toleration only permits; the PV's <code>nodeAffinity</code> is what attracts here. In a vCluster, remember also that this must reach the pod that the <strong>host</strong> scheduler sees, so a toleration added by a host-side mutate rule and a toleration written by the tenant are both valid sources, and the host copy is the one that counts.</p>
+<hr>
+<h2>★ The drill, worked end to end</h2>
+<p>The task: <code>curl https://app.team-a.example.org/healthz</code> fails. You have access to the vCluster and, as the platform engineer, to the host. Narrate &quot;outside in&quot;.</p>
+<h3>Step 1: read the curl</h3>
+<pre><code class="hljs" data-lang="bash">curl -sv https://app.team-a.example.org/healthz -o /dev/null 2&gt;&amp;1 | grep -E <span class="hljs-string">&quot;^(\*|&lt;)&quot;</span> | <span class="hljs-built_in">head</span> -20
+</code></pre>
+<pre><code class="hljs" data-lang="text">* Connected to app.team-a.example.org (203.0.113.40) port 443
+* SSL connection using TLSv1.3
+&lt; HTTP/2 404
+&lt; server: envoy
+&lt; content-length: 0
+</code></pre>
+<p>Say: &quot;DNS resolves, TLS completes, I get an Envoy 404 with an empty body. The gateway is alive and serving this hostname's certificate, but no route matched. The fault is at or before the route.&quot; That one paragraph rules out DNS, the load balancer and the listener certificate in under a minute. A 503 here would have sent you to Step 4 directly.</p>
+<h3>Step 2: the Gateway</h3>
+<pre><code class="hljs" data-lang="bash">kubectl --context host get gateway -A
+</code></pre>
+<pre><code class="hljs" data-lang="text">NAMESPACE           NAME         CLASS   ADDRESS        PROGRAMMED   AGE
+platform-gateways   public-web   envoy   203.0.113.40   True         41d
+</code></pre>
+<p><code>PROGRAMMED=True</code> and an address that matches the one curl connected to. Check the listener for attached routes.</p>
+<pre><code class="hljs" data-lang="bash">kubectl --context host -n platform-gateways get gateway public-web \
+  -o jsonpath=<span class="hljs-string">&#x27;{range .status.listeners[*]}{.name}{&quot;  attached=&quot;}{.attachedRoutes}{&quot;\n&quot;}{end}&#x27;</span>
+</code></pre>
+<pre><code class="hljs" data-lang="text">https  attached=0
+</code></pre>
+<p><code>attachedRoutes=0</code> confirms it: the Gateway is healthy and nothing is attached to the <code>https</code> listener. Now the route.</p>
+<h3>Step 3: the route</h3>
+<p>Inside the vCluster:</p>
+<pre><code class="hljs" data-lang="bash">vcluster connect team-a --namespace vc-team-a
+kubectl get httproute app -n team-a-app -o yaml
+</code></pre>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">status:</span>
+  <span class="hljs-attr">parents:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">parentRef:</span>
+        <span class="hljs-attr">name:</span> <span class="hljs-string">shared-web</span>
+        <span class="hljs-attr">namespace:</span> <span class="hljs-string">shared-gateways</span>
+        <span class="hljs-attr">sectionName:</span> <span class="hljs-string">https</span>
+      <span class="hljs-attr">controllerName:</span> <span class="hljs-string">gateway.envoyproxy.io/gatewayclass-controller</span>
+      <span class="hljs-attr">conditions:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">type:</span> <span class="hljs-string">Accepted</span>
+          <span class="hljs-attr">status:</span> <span class="hljs-string">&quot;False&quot;</span>
+          <span class="hljs-attr">reason:</span> <span class="hljs-string">NotAllowedByListeners</span>
+          <span class="hljs-attr">message:</span> <span class="hljs-string">Listener</span> <span class="hljs-string">does</span> <span class="hljs-string">not</span> <span class="hljs-string">allow</span> <span class="hljs-string">route</span> <span class="hljs-string">from</span> <span class="hljs-string">namespace</span> <span class="hljs-string">team-a-app</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">type:</span> <span class="hljs-string">ResolvedRefs</span>
+          <span class="hljs-attr">status:</span> <span class="hljs-string">&quot;False&quot;</span>
+          <span class="hljs-attr">reason:</span> <span class="hljs-string">RefNotPermitted</span>
+          <span class="hljs-attr">message:</span> <span class="hljs-string">Backend</span> <span class="hljs-string">ref</span> <span class="hljs-string">to</span> <span class="hljs-string">Service</span> <span class="hljs-string">shared-services/app-v1</span> <span class="hljs-string">not</span> <span class="hljs-string">permitted</span> <span class="hljs-string">by</span> <span class="hljs-string">any</span> <span class="hljs-string">ReferenceGrant</span>
+</code></pre>
+<p>Two faults at once, which is the interview twist. <code>NotAllowedByListeners</code> is the Gateway owner saying no: the listener's <code>allowedRoutes</code> does not include this namespace. <code>RefNotPermitted</code> is the backend owner saying no: the Service lives in <code>shared-services</code> and nobody granted the route access. Fix both, in their respective owner namespaces.</p>
+<p>If the route had <strong>no status at all</strong>, you would check events instead, because the syncer may have refused to sync it:</p>
+<pre><code class="hljs" data-lang="bash">kubectl get events -n team-a-app --field-selector involvedObject.name=app
+</code></pre>
+<pre><code class="hljs" data-lang="text">Warning  RefNotPermitted  httproute/app  route namespace &quot;team-a-app&quot; not allowed by listener &quot;https&quot; of gateway shared-gateways/shared-web
+</code></pre>
+<p>Fix 1 (platform team owns the Gateway policy): label the tenant namespace so the listener's selector matches. In default single-namespace mode the syncer checks the label on the namespace inside the vCluster; in multi-namespace mode the host's mapped namespace is the one the gateway controller checks.</p>
+<pre><code class="hljs" data-lang="bash">kubectl label namespace team-a-app gateway-access=public-web
+</code></pre>
+<p>or widen the listener:</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">allowedRoutes:</span>
+  <span class="hljs-attr">namespaces:</span>
+    <span class="hljs-attr">from:</span> <span class="hljs-string">Selector</span>
+    <span class="hljs-attr">selector:</span>
+      <span class="hljs-attr">matchLabels:</span>
+        <span class="hljs-attr">gateway-access:</span> <span class="hljs-string">public-web</span>
+</code></pre>
+<p>Fix 2, in <code>shared-services</code> (the backend's owner):</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">apiVersion:</span> <span class="hljs-string">gateway.networking.k8s.io/v1</span>
+<span class="hljs-attr">kind:</span> <span class="hljs-string">ReferenceGrant</span>
+<span class="hljs-attr">metadata:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">allow-team-a-routes</span>
+  <span class="hljs-attr">namespace:</span> <span class="hljs-string">shared-services</span>
+<span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">from:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">group:</span> <span class="hljs-string">gateway.networking.k8s.io</span>
+      <span class="hljs-attr">kind:</span> <span class="hljs-string">HTTPRoute</span>
+      <span class="hljs-attr">namespace:</span> <span class="hljs-string">team-a-app</span>
+  <span class="hljs-attr">to:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">group:</span> <span class="hljs-string">&quot;&quot;</span>
+      <span class="hljs-attr">kind:</span> <span class="hljs-string">Service</span>
+      <span class="hljs-attr">name:</span> <span class="hljs-string">app-v1</span>
+</code></pre>
+<p>Pinning <code>to.name</code> narrows the grant to one Service, which is the least-privilege form and the better answer in the room. After both fixes, re-read the route; both conditions should flip. If they do and curl now returns a 503, you are one layer in.</p>
+<h3>Step 4: service and endpoints</h3>
+<pre><code class="hljs" data-lang="bash">kubectl get endpointslices -n shared-services -l kubernetes.io/service-name=app-v1
+</code></pre>
+<pre><code class="hljs" data-lang="text">NAME             ADDRESSTYPE   PORTS   ENDPOINTS   AGE
+app-v1-x7k2p     IPv4          8080    &lt;unset&gt;     41d
+</code></pre>
+<p>No endpoints. The Service exists and its selector is plausible, but no Ready pod backs it. This is the Kubernetes guide's Scenario 5 territory (selector, targetPort, Ready), so check pods next.</p>
+<pre><code class="hljs" data-lang="bash">kubectl get pods -n shared-services -l app=app-v1
+</code></pre>
+<pre><code class="hljs" data-lang="text">NAME       READY   STATUS    RESTARTS   AGE
+app-v1-0   0/1     Pending   0          3h
+</code></pre>
+<p>Pending. Here is the vCluster fork. <strong>Inside the vCluster</strong> the tenant describe says:</p>
+<pre><code class="hljs" data-lang="bash">kubectl describe pod app-v1-0 -n shared-services
+</code></pre>
+<pre><code class="hljs" data-lang="text">Events:
+  Warning  FailedScheduling  ... 0/6 nodes are available: pod has unbound immediate PersistentVolumeClaims.
+</code></pre>
+<p>The tenant-side message is vague (the virtual API server does not know host nodes). <strong>On the host</strong>, with the rewritten name:</p>
+<pre><code class="hljs" data-lang="bash">kubectl --context host -n vc-team-a get pods | grep app-v1
+kubectl --context host -n vc-team-a describe pod app-v1-0-x-shared-services-x-team-a
+</code></pre>
+<pre><code class="hljs" data-lang="text">Events:
+  Warning  FailedScheduling  ... 0/6 nodes are available: 1 node(s) had untolerated taint
+  {dedicated: storage}, 5 node(s) had volume node affinity conflict.
+</code></pre>
+<h3>Step 5: the PVC and the taint</h3>
+<pre><code class="hljs" data-lang="bash">kubectl --context host -n vc-team-a describe pvc data-app-v1-0-x-shared-services-x-team-a
+</code></pre>
+<pre><code class="hljs" data-lang="text">StorageClass:  local-nvme
+Status:        Pending
+Events:
+  Normal  WaitForFirstConsumer  waiting for first consumer to be created before binding
+</code></pre>
+<p>The picture is complete: a WaitForFirstConsumer PVC whose only eligible PV lives on a node tainted <code>dedicated=storage:NoSchedule</code>, and a pod with no matching toleration. The PVC is waiting on the pod and the pod is blocked by the taint, so both stay Pending and the Service has no endpoints.</p>
+<p>Fix: add the toleration to the workload (in the tenant's Deployment or StatefulSet, or through the platform's mechanism), pair it with a selector so the intent is explicit.</p>
+<pre><code class="hljs" data-lang="yaml"><span class="hljs-attr">spec:</span>
+  <span class="hljs-attr">template:</span>
+    <span class="hljs-attr">spec:</span>
+      <span class="hljs-attr">nodeSelector:</span>
+        <span class="hljs-attr">storage-tier:</span> <span class="hljs-string">nvme</span>
+      <span class="hljs-attr">tolerations:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">key:</span> <span class="hljs-string">dedicated</span>
+          <span class="hljs-attr">operator:</span> <span class="hljs-string">Equal</span>
+          <span class="hljs-attr">value:</span> <span class="hljs-string">storage</span>
+          <span class="hljs-attr">effect:</span> <span class="hljs-string">NoSchedule</span>
+</code></pre>
+<p>Because a StatefulSet's pod template is mostly mutable (tolerations are, via the template), applying this rolls the pod. The new pod is scheduled to node-7, the PVC binds, and the pod goes Ready.</p>
+<h3>Step 6: verify end to end</h3>
+<pre><code class="hljs" data-lang="bash">kubectl get httproute app -n team-a-app \
+  -o jsonpath=<span class="hljs-string">&#x27;{range .status.parents[0].conditions[*]}{.type}={.status} {.reason}{&quot;\n&quot;}{end}&#x27;</span>
+kubectl get endpointslices -n shared-services -l kubernetes.io/service-name=app-v1
+curl -s -o /dev/null -w <span class="hljs-string">&quot;%{http_code}\n&quot;</span> https://app.team-a.example.org/healthz
+</code></pre>
+<pre><code class="hljs" data-lang="text">Accepted=True Accepted
+ResolvedRefs=True ResolvedRefs
+NAME             ADDRESSTYPE   PORTS   ENDPOINTS     AGE
+app-v1-x7k2p     IPv4          8080    10.42.7.19    41d
+200
+</code></pre>
+<p>All conditions True, an endpoint present, curl returns 200. Close the loop out loud: &quot;Two independent faults, route permission and a taint blocking the volume's only node. I would also ask why the taint was not covered by the workload's template, and add a Kyverno validate or a chart default so the next tenant does not hit it.&quot;</p>
+<hr>
+<h2>★ Practice drills</h2>
+<h3>Drill 1: 404 and the route says Accepted=False, NoMatchingListenerHostname</h3>
+<p>Symptom: curl returns a gateway 404. The route exists, <code>attachedRoutes</code> is 0. Ranked causes: listener hostname and route hostnames do not intersect; route <code>sectionName</code> points at a different listener; a wildcard listener <code>*.example.org</code> versus a route host <code>app.team-a.example.org</code> is fine, but <code>*.team-a.example.org</code> versus <code>app.example.org</code> is not.</p>
+<pre><code class="hljs" data-lang="bash">kubectl get gateway public-web -n platform-gateways -o jsonpath=<span class="hljs-string">&#x27;{.spec.listeners[*].hostname}{&quot;\n&quot;}&#x27;</span>
+kubectl get httproute app -n team-a-app -o jsonpath=<span class="hljs-string">&#x27;{.spec.hostnames}{&quot;\n&quot;}&#x27;</span>
+kubectl get httproute app -n team-a-app -o jsonpath=<span class="hljs-string">&#x27;{.status.parents[*].conditions[?(@.type==&quot;Accepted&quot;)].reason}{&quot;\n&quot;}&#x27;</span>
+</code></pre>
+<p>Fix at the owner: if the platform's listener is correct, change the route's <code>hostnames</code>; if the tenant needs a domain the listener does not cover, the platform adds a listener or a ListenerSet. The catch: no apply-time error is raised for a hostname that cannot match, so this fails silently unless you read status.</p>
+<h3>Drill 2: HTTPS listener not Accepted, TLS Secret in another namespace</h3>
+<p>Symptom: TLS handshake fails or the listener shows <code>ResolvedRefs=False</code>. The wildcard Secret lives in <code>cert-store</code>, the Gateway in <code>platform-gateways</code>.</p>
+<pre><code class="hljs" data-lang="bash">kubectl get gateway public-web -n platform-gateways -o jsonpath=<span class="hljs-string">&#x27;{.status.listeners[?(@.name==&quot;https&quot;)].conditions}&#x27;</span> | jq .
+</code></pre>
+<pre><code class="hljs" data-lang="text">[{&quot;type&quot;:&quot;ResolvedRefs&quot;,&quot;status&quot;:&quot;False&quot;,&quot;reason&quot;:&quot;RefNotPermitted&quot;,
+  &quot;message&quot;:&quot;Secret cert-store/team-a-wildcard not permitted by any ReferenceGrant&quot;}]
+</code></pre>
+<p>Fix: a ReferenceGrant in <code>cert-store</code> with <code>from.kind: Gateway</code>, <code>from.namespace: platform-gateways</code>, <code>to.kind: Secret</code>. The catch: the grant goes in the <strong>Secret's</strong> namespace, and the <code>from</code> kind is Gateway, not HTTPRoute. Mixing these up is the most common version of this mistake.</p>
+<h3>Drill 3: Weighted canary sending 100% to the wrong backend</h3>
+<p>Symptom: a 90/10 split sends everything to v2. Ranked causes: weights written on the wrong list or with a typo (<code>weight: 0</code> on v1); two rules, the more specific path rule overriding; an implementation that treats a missing <code>weight</code> as 1 and an explicit <code>0</code> as drain.</p>
+<pre><code class="hljs" data-lang="bash">kubectl get httproute app -n team-a-app -o jsonpath=<span class="hljs-string">&#x27;{range .spec.rules[*].backendRefs[*]}{.name}{&quot;=&quot;}{.weight}{&quot;\n&quot;}{end}&#x27;</span>
+<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> $(<span class="hljs-built_in">seq</span> 1 50); <span class="hljs-keyword">do</span> curl -s https://app.team-a.example.org/version; <span class="hljs-built_in">echo</span>; <span class="hljs-keyword">done</span> | <span class="hljs-built_in">sort</span> | <span class="hljs-built_in">uniq</span> -c
+</code></pre>
+<p>Fix: set both weights explicitly and check there is no second rule with a longer prefix match capturing the traffic. The catch: weights are relative, so <code>weight: 1</code> and <code>weight: 9</code> give 10/90; a backend with no endpoints still receives its share and returns 503s, which can look like a flaky app rather than a canary pointing at a dead Service.</p>
+<h3>Drill 4: A tenant PVC is Pending because the host quota is exhausted</h3>
+<p>Symptom: PVC Pending inside the vCluster, no useful event for the tenant. Ranked causes: host <code>ResourceQuota</code> on the vCluster's namespace (<code>requests.storage</code> or PVC count); StorageClass with no capacity; WaitForFirstConsumer waiting on an unscheduled pod.</p>
+<pre><code class="hljs" data-lang="bash">kubectl --context host -n vc-team-a describe resourcequota
+kubectl --context host -n vc-team-a get pvc
+kubectl --context host -n vc-team-a describe pvc data-x-demo-x-team-a
+</code></pre>
+<pre><code class="hljs" data-lang="text">Name:             vc-team-a-quota
+Resource          Used    Hard
+requests.storage  980Gi   1Ti
+persistentvolumeclaims  24  25
+</code></pre>
+<p>Fix at the owner: raise the quota (a platform decision), or have the tenant delete unused PVCs. The catch: quota is enforced where the object is created, which is the <strong>host</strong> namespace, so the tenant's own virtual <code>ResourceQuota</code> can show plenty of room while the host one is full. The failure message is often a <code>forbidden: exceeded quota</code> on the syncer's create, visible in syncer logs.</p>
+<h3>Drill 5: A vCluster pod is Running but DNS fails</h3>
+<p>Symptom: the app logs <code>no such host</code> for a Service name; the pod is Running and Ready. Ranked causes: the vCluster's CoreDNS pod is down or not synced; the Service being resolved was never synced to the host (disabled resource, or a name that only exists in the virtual cluster as an ExternalName); the pod's <code>ndots</code> search path produces many failed lookups (see the Linux guide's &quot;DNS and <code>ndots</code>&quot;).</p>
+<pre><code class="hljs" data-lang="bash">kubectl get pods -n kube-system -l k8s-app=kube-dns
+kubectl run dnscheck --image=busybox:1.36 --restart=Never -it --<span class="hljs-built_in">rm</span> -- nslookup app-v1.shared-services.svc.cluster.local
+kubectl --context host -n vc-team-a get pods | grep coredns
+</code></pre>
+<p>Fix: restore CoreDNS (in a vCluster it is usually a synced pod in the host namespace, so check the host event log for it too), or enable the missing sync. The catch: tenant &quot;cluster.local&quot; names resolve inside the virtual cluster's CoreDNS, not the host's, so the host's DNS being healthy proves nothing.</p>
+<h3>Drill 6: Gateway has no address because the GatewayClass controller is not running</h3>
+<p>Symptom: <code>kubectl get gateway</code> shows an empty ADDRESS and <code>PROGRAMMED</code> is blank or False; routes show <code>Accepted=False, reason Pending</code>. Ranked causes: the controller (Envoy Gateway, Cilium operator, NGINX Gateway Fabric) is not running or is crash-looping; the GatewayClass is not <code>Accepted</code>; the cluster has no LoadBalancer provider so the data-plane Service stays <code>&lt;pending&gt;</code>.</p>
+<pre><code class="hljs" data-lang="bash">kubectl get gatewayclass
+kubectl get gateway -A
+kubectl -n envoy-gateway-system get pods
+kubectl -n envoy-gateway-system get svc
+</code></pre>
+<pre><code class="hljs" data-lang="text">NAME    CONTROLLER                                       ACCEPTED   AGE
+envoy   gateway.envoyproxy.io/gatewayclass-controller    Unknown    41d
+</code></pre>
+<p>Fix: restore the controller first, since nothing downstream will reconcile without it; then check for the LB provisioner. The catch: a <code>Pending</code> route reason means &quot;no controller has reconciled this&quot;, which is not a problem with the route at all. On bare metal or MicroK8s-style clusters, the data-plane Service may never get an external IP without MetalLB or equivalent, and a vCluster does not synthesize addresses.</p>
+<hr>
+<h2>Question bank</h2>
+<p>Questions are grouped loosely from &quot;what is it&quot; to &quot;what would you do&quot;. Answers are the short version you would say aloud.</p>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>What they are testing</th>
+<th>Concise answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What is a vCluster?</td>
+<td>Basic model</td>
+<td>A control plane per tenant running as pods in a host namespace, plus a syncer that copies selected objects (pods, services, PVCs) to the host where they actually run.</td>
+</tr>
+<tr>
+<td>vCluster vs namespaces vs a dedicated cluster?</td>
+<td>Tradeoff reasoning</td>
+<td>Namespaces are cheap but share the API server and CRDs. vCluster gives each tenant an API server and CRD freedom on shared nodes. Dedicated clusters give hard isolation at full cost. None of the first two isolate the kernel.</td>
+</tr>
+<tr>
+<td>What does the syncer do?</td>
+<td>Mechanism</td>
+<td>Watches the virtual API server and the host namespace; copies enabled resource kinds to the host with rewritten names, and copies status and events back.</td>
+</tr>
+<tr>
+<td>Who schedules a vCluster pod?</td>
+<td>Layer awareness</td>
+<td>The host scheduler by default, onto host nodes, so host taints, selectors and quota apply. An optional virtual scheduler exists but host constraints still hold at the kubelet and admission.</td>
+</tr>
+<tr>
+<td>What is the host name of tenant pod <code>web</code> in ns <code>demo</code>, vCluster <code>team-a</code>?</td>
+<td>Debug skill</td>
+<td><code>web-x-demo-x-team-a</code> in the host namespace that holds the vCluster.</td>
+</tr>
+<tr>
+<td>Which resources sync by default?</td>
+<td>Config knowledge</td>
+<td>Pods, services, endpoints, PVCs, configmaps, secrets to host; events from host. Ingresses, Gateway API, PVs, StorageClasses, nodes and CRs are opt-in.</td>
+</tr>
+<tr>
+<td>A tenant creates an Ingress and nothing happens. Why?</td>
+<td>Gotcha</td>
+<td><code>sync.toHost.ingresses</code> is off by default, so the object exists only in the virtual cluster.</td>
+</tr>
+<tr>
+<td>Tenant sees Pending, cause is invisible. Where do you look?</td>
+<td>Cross-boundary debugging</td>
+<td>Host side: describe the renamed pod, check taints, host ResourceQuota, and PVC events.</td>
+</tr>
+<tr>
+<td>Ingress vs Gateway API?</td>
+<td>Fluency</td>
+<td>Gateway API splits roles (GatewayClass, Gateway, Route), is typed instead of annotation-driven, and has explicit cross-namespace permission with allowedRoutes and ReferenceGrant.</td>
+</tr>
+<tr>
+<td>Who owns which Gateway API object?</td>
+<td>Role model</td>
+<td>Infra provider owns GatewayClass, platform or cluster operator owns Gateway, app teams own HTTPRoute.</td>
+</tr>
+<tr>
+<td>What is <code>allowedRoutes</code>?</td>
+<td>Listener policy</td>
+<td>A listener field that restricts which namespaces and route kinds may attach; default namespaces <code>from: Same</code>.</td>
+</tr>
+<tr>
+<td>What is a ReferenceGrant and which namespace does it live in?</td>
+<td>Cross-namespace permission</td>
+<td>It lets a resource in one namespace reference one in another. It lives in the <strong>target</strong> namespace, because the owner of the referenced object must consent.</td>
+</tr>
+<tr>
+<td>What are the two uses of a ReferenceGrant in Gateway API?</td>
+<td>Detail</td>
+<td>Route to a Service in another namespace (from HTTPRoute, to Service), and Gateway to a TLS Secret in another namespace (from Gateway, to Secret).</td>
+</tr>
+<tr>
+<td>How do you debug a route that is not attached?</td>
+<td>Method</td>
+<td>Read <code>status.parents[].conditions</code> on the route, then <code>status.listeners[]</code> on the Gateway (<code>attachedRoutes</code>), then events if status is empty (syncer in a vCluster).</td>
+</tr>
+<tr>
+<td>What do Accepted and ResolvedRefs mean on a route?</td>
+<td>Status literacy</td>
+<td>Accepted: the Gateway agreed to attach it (listener allows, hostname matches, parent exists). ResolvedRefs: every backendRef resolved (exists, permitted). Accepted but not ResolvedRefs gives a 503.</td>
+</tr>
+<tr>
+<td>NotAllowedByListeners vs RefNotPermitted?</td>
+<td>Precision</td>
+<td>The first is the Gateway owner's allowedRoutes saying no; the second is the backend or Secret owner's missing ReferenceGrant. Different owners, different fix namespaces.</td>
+</tr>
+<tr>
+<td>404 versus 503 from the gateway?</td>
+<td>Layer reading</td>
+<td>404: the gateway has no matching route (fault at or before the route). 503: a route matched but the backend is unresolved or has no ready endpoints (fault at or after the Service).</td>
+</tr>
+<tr>
+<td>Gateway has no address. What do you check?</td>
+<td>Ordering</td>
+<td>GatewayClass Accepted, controller pods running, data-plane Service type and LB provisioner, then Gateway <code>Programmed</code> reason.</td>
+</tr>
+<tr>
+<td>Listener hostname versus route hostname?</td>
+<td>Silent failure</td>
+<td>They must intersect or the route never attaches; no apply-time error, only <code>NoMatchingListenerHostname</code>.</td>
+</tr>
+<tr>
+<td>How do you do a canary in Gateway API?</td>
+<td>Feature</td>
+<td>Two <code>backendRefs</code> with relative <code>weight</code>s on one rule; weights are not percentages.</td>
+</tr>
+<tr>
+<td>How does WaitForFirstConsumer interact with taints?</td>
+<td>Crossover</td>
+<td>The PVC binds only after a pod is scheduled; if the only node satisfying the PV's nodeAffinity is tainted and the pod lacks the toleration, pod and PVC both stay Pending.</td>
+</tr>
+<tr>
+<td>Pod Pending with <code>volume node affinity conflict</code>. Meaning?</td>
+<td>Reading events</td>
+<td>The pod's bound or candidate PV is pinned to a node the pod cannot be placed on, or no node satisfies both the PV and pod constraints.</td>
+</tr>
+<tr>
+<td>Toleration vs nodeSelector for dedicated nodes?</td>
+<td>Scheduling catch</td>
+<td>A toleration permits; it does not attract. Use a taint to repel others and a selector or affinity to attract yours.</td>
+</tr>
+<tr>
+<td>Which fix for the taint blocking a PVC?</td>
+<td>Judgment</td>
+<td>Add a toleration (plus selector) to the workload; avoid removing the taint, which undoes an isolation choice for every workload on that node.</td>
+</tr>
+<tr>
+<td>Validate vs mutate vs generate rules in Kyverno?</td>
+<td>Concepts</td>
+<td>Validate allows or denies; mutate changes the request; generate creates other resources in response to an event.</td>
+</tr>
+<tr>
+<td>Enforce vs Audit, and how do you roll out a new policy?</td>
+<td>Operations</td>
+<td>Enforce blocks at admission; Audit records in PolicyReports. Ship as Audit, read reports, fix or exempt offenders, then Enforce, with the webhook scoped and replicated.</td>
+</tr>
+<tr>
+<td>How would you let tenants self-serve routes safely with Kyverno?</td>
+<td>Design</td>
+<td>Validate hostnames against the tenant's domains, generate the namespace label and ReferenceGrants at onboarding, require backends in the same namespace, keep Gateway listeners platform-owned.</td>
+</tr>
+<tr>
+<td>How do you tell a Kyverno rejection from a Gateway rejection?</td>
+<td>Diagnosis</td>
+<td>Kyverno denies at apply time with an admission webhook error (or shows in a PolicyReport); the Gateway controller writes a condition on the route status after the object exists.</td>
+</tr>
+<tr>
+<td>Where does Kyverno run with vCluster?</td>
+<td>Architecture</td>
+<td>Inside each vCluster for tenant-owned policy, or one host Kyverno covering virtual API servers via vCluster's external admission enforcement; host Kyverno also sees synced pods.</td>
+</tr>
+<tr>
+<td>Can a Kyverno policy cause a scheduling failure?</td>
+<td>Insight</td>
+<td>Yes: a mutate rule that adds, strips, or fails to add tolerations or selectors changes the pod the scheduler sees. Inspect the host pod YAML and last-applied-patches.</td>
+</tr>
+<tr>
+<td>Which Gateway API implementations do you know?</td>
+<td>Landscape</td>
+<td>Envoy Gateway, Cilium, Istio, NGINX Gateway Fabric, Traefik, kgateway; all conformant to recent releases, with differences in extension policies and defaults.</td>
+</tr>
+<tr>
+<td>Version skew between virtual and host control planes?</td>
+<td>Operations</td>
+<td>Upgrade host first, then vClusters, and re-test sync; a virtual API newer than the host can accept manifests the host side cannot translate.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>How to say it in the room</h2>
+<h3>Narrate the funnel</h3>
+<p>Open with the frame, then keep to it. A narration that works under pressure:</p>
+<p>&quot;I will go from the outside in: gateway, route, service, pod, volume. First the curl, to see which layer fails. Then the Gateway's Programmed status and the listener's attached routes. Then the route's parent conditions, which tell me whether the Gateway accepted it and whether its backends resolved. Then the Service's EndpointSlices, then the pod's events, then the PVC. In a vCluster I check both sides, because the tenant sees the symptom and the host holds the cause.&quot;</p>
+<p>Say the layer before you run the command, and say what the output means after. Interviewers are scoring the reasoning, and a wrong guess that you rule out cleanly scores better than a lucky command you cannot explain.</p>
+<p>Two lines worth having ready: &quot;404 means the gateway does not know this request belongs to anyone; 503 means it knows and nobody is home.&quot; And: &quot;A toleration permits, it does not attract, so I would pair it with a selector.&quot;</p>
+<h3>The honest bridge</h3>
+<p>Do not bluff. A line that is true and strong:</p>
+<p>&quot;I have not run vCluster or the Gateway API in production. My production experience is a single Ingress fronting several services on MicroK8s, and I hold the CKA and CKAD, so scheduling, taints, PVC binding and storage classes are things I know well underneath. What is new to me is the control-plane split and the status model. The way I reason about it is the same as for Ingress: find the owner of each object, read what that owner's controller wrote back in status, and fix at the owner layer rather than patching the symptom.&quot;</p>
+<p>Then show it: name the one vCluster fact you know cold (the default sync list and that the host scheduler places pods), and the one Gateway API fact (<code>allowedRoutes</code> defaults to <code>Same</code> and ReferenceGrants live in the target namespace). Two precise facts earn more trust than ten vague ones.</p>
+<h3>Facts to treat as time-sensitive</h3>
+<p>Marked as of writing: vCluster 0.37 (config under <code>sync.toHost</code> and <code>sync.fromHost</code>, Gateway API sync under <code>sync.toHost.gatewayApi</code>), Gateway API 1.6 (HTTPRoute, GRPCRoute, ReferenceGrant, ListenerSet and TLSRoute are standard channel), Kyverno 1.19 (CEL policy types are v1, <code>ClusterPolicy</code> deprecated). Flag names for <code>vcluster connect</code> and the exact syncer container name vary by version; confirm with <code>--help</code> and <code>kubectl get pod -o yaml</code> on the day. The condition types and reasons above are stable across Gateway API releases and across implementations.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

@@ -182,6 +182,14 @@ const GUIDES = [
     subtitle: 'The host-level layer a Kubernetes platform engineer gets probed on: processes, memory, cgroups, storage, networking, and the commands to diagnose each live.',
     accent:   '#245e6a',  // petrol
   },
+  {
+    src:      '.claude/devops-md/vcluster-gateway-api-prep.md',
+    out:      'devops/vcluster-gateway-api-prep.html',
+    kicker:   'Interview Preparation · DevOps · Multi-tenancy and Traffic',
+    title:    'vCluster and Gateway API: Follow the Request',
+    subtitle: 'Virtual clusters, the Gateway API, and the live break-fix drill of tracing a failing curl through route, service, pod, and volume.',
+    accent:   '#3d6b22',  // fern
+  },
 
   // ---- Level ---------------------------------------------------
   {
@@ -322,6 +330,7 @@ const GUIDES = [
 //  graphite    #3d4552   leadership-prep               -- AA on white (~9:1)
 //  espresso    #5c4033   agent-skill-design-prep       -- AA on white (~8:1)
 //  iris        #4b4aa8   system-design-component-cheatsheet -- AA on white (7.4:1)
+//  fern        #3d6b22   vcluster-gateway-api-prep        -- AA on white (6.3:1)
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------
