@@ -54,6 +54,14 @@ const GUIDES = [
     accent:   '#9a4a1f',  // copper -- AA on white (6.3:1)
   },
   {
+    src:      '.claude/backend-md/java-backend-question-bank.md',
+    out:      'backend/java-backend-question-bank.html',
+    kicker:   'Interview Preparation · Java Developer',
+    title:    'Java Backend Round: 25 Questions Answered',
+    subtitle: 'JVM allocation and JIT, collections, thread pools, Spring transactions, microservice resilience, Kafka error handling, Hibernate fetching, and two coding problems, each with the mechanism and the catch.',
+    accent:   '#7c2f22',  // mahogany -- AA on white (9.2:1)
+  },
+  {
     src:      '.claude/backend-md/nodejs-backend-prep.md',
     out:      'backend/nodejs-backend-prep.html',
     kicker:   'Interview Preparation · Staff Backend',
@@ -331,6 +339,7 @@ const GUIDES = [
 //  espresso    #5c4033   agent-skill-design-prep       -- AA on white (~8:1)
 //  iris        #4b4aa8   system-design-component-cheatsheet -- AA on white (7.4:1)
 //  fern        #3d6b22   vcluster-gateway-api-prep        -- AA on white (6.3:1)
+//  mahogany    #7c2f22   java-backend-question-bank       -- AA on white (9.2:1)
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------

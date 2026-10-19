@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Java Backend Round: 25 Questions Answered</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #7c2f22;
+  --accent-soft:  #7c2f2214;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- callouts ---------- */
+.callout {
+  margin: 1.6rem 0;
+  padding: 1.1rem 1.4rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+}
+.callout-label {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout-warning { border-left-color: #a3372b; background: #a3372b14; }
+.callout-warning .callout-label { color: #a3372b; }
+.callout-insight { border-left-color: #2d6a44; background: #2d6a4414; }
+.callout-insight .callout-label { color: #2d6a44; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Java Developer</div>
+    <h1>Java Backend Round: 25 Questions Answered</h1>
+    <div class="sub">JVM allocation and JIT, collections, thread pools, Spring transactions, microservice resilience, Kafka error handling, Hibernate fetching, and two coding problems, each with the mechanism and the catch.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>How this round works</h2>
+<p>This is a breadth round. Expect an interviewer to move from the JVM heap to a Spring transaction to a Kafka retry topic in the space of twenty minutes, then finish with two whiteboard problems. Nobody expects a lecture on each topic. They are listening for one thing: do you give the mechanism, and do you name the catch? &quot;Use a thread pool&quot; is a feature. &quot;Size it from the wait-to-compute ratio, and know that a full queue silently defers the rejection policy until after the queue fills&quot; is an answer.</p>
+<p>The 25 questions fall into eight clusters, and this guide follows them in order:</p>
+<ol>
+<li><strong>JVM internals</strong> (1 to 3): allocation, escape analysis, JIT</li>
+<li><strong>Collections and functional Java</strong> (4 to 8): lists, <code>Collector</code>, <code>Optional</code>, lambdas</li>
+<li><strong>Thread pools</strong> (9 to 10): sizing and saturation</li>
+<li><strong>Spring transactions</strong> (11 to 13): propagation, isolation, rollback</li>
+<li><strong>APIs and microservices</strong> (14 to 18): rate limiting, pagination, outbox, service auth, tracing</li>
+<li><strong>Messaging</strong> (19 to 20): poison messages, retry topics, dead letter topics</li>
+<li><strong>JPA and Hibernate</strong> (21 to 23): fetching strategies, EAGER, dirty checking</li>
+<li><strong>Coding</strong> (24 to 25): median of two sorted arrays, LRU cache</li>
+</ol>
+<p>Version baseline for this guide: Java 25 is the current LTS and JDK 27 reached general availability on 15 September 2026 as a non-LTS release. Spring Framework 7 ships <code>@Retryable</code> and <code>@ConcurrencyLimit</code> in core. Where an answer depends on a version, the version is named. Everything about HotSpot internals (tiers, thresholds, EA) is stable across these releases; exact flag defaults are worth confirming with <code>-XX:+PrintFlagsFinal</code> on the JVM you actually run.</p>
+<p>Each answer below follows one shape: the question in bold, a short italic note on what the interviewer is testing, then the answer with its catch.</p>
+<hr>
+<h2>The mental model: every answer is a cost, then a failure mode</h2>
+<p>Almost every question in this list has the same skeleton. A mechanism has a <strong>cost model</strong> (what it pays for, as a function of what), and it has a <strong>failure mode</strong> (what it does when you push it past the design point). The answers that sound senior state both in one breath.</p>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Cost model</th>
+<th>Failure mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Temporary objects</td>
+<td>Allocation is a pointer bump; young GC pays for survivors, not garbage</td>
+<td>Premature promotion, GC pauses when allocation rate outruns the young gen</td>
+</tr>
+<tr>
+<td><code>CopyOnWriteArrayList</code></td>
+<td>Reads free, every write copies the array</td>
+<td>Write-heavy use turns O(1) appends into O(n) each</td>
+</tr>
+<tr>
+<td>Thread pool</td>
+<td>Threads buy parallelism up to the bottleneck resource</td>
+<td>Unbounded queue hides saturation until the heap is gone</td>
+</tr>
+<tr>
+<td><code>@Transactional</code></td>
+<td>Proxy wraps the call, commit on return</td>
+<td>Self-invocation skips the proxy; checked exceptions commit</td>
+</tr>
+<tr>
+<td>Offset pagination</td>
+<td>Database scans and discards <code>OFFSET</code> rows</td>
+<td>Page 50,000 is 50,000 times slower than page 1</td>
+</tr>
+<tr>
+<td><code>EAGER</code> fetch</td>
+<td>Loads the graph on every load</td>
+<td>One query becomes hundreds, on paths that never needed the data</td>
+</tr>
+</tbody>
+</table>
+<p>Hold that table in your head. When a question is unfamiliar, ask &quot;what does this cost, and what happens at 10x load?&quot; and you will land close to the right answer.</p>
+<hr>
+<h2>JVM: allocation, escape analysis, and the JIT</h2>
+<p><strong>1. What happens when you create millions of temporary objects inside a loop?</strong> <em>Testing whether you know that allocation is cheap and the real cost is elsewhere.</em> Creating a short-lived object on HotSpot is nearly free. Each thread owns a <strong>TLAB</strong> (thread-local allocation buffer), a private slice of eden, so <code>new</code> is a pointer bump plus a bounds check: a handful of instructions, no lock, no CAS. Dead objects cost nothing to reclaim, because a young collection copies only the <strong>live</strong> objects out of eden and then resets the whole region. Young GC cost scales with survivors, not with garbage.</p>
+<p>The catch is that &quot;millions of temporaries&quot; hurts in four indirect ways:</p>
+<ul>
+<li><strong>Allocation rate sets GC frequency.</strong> With a 200 MB eden and an allocation rate of 1 GB/s, you run five young collections a second. Each is a short stop-the-world pause plus copying, so p99 latency picks up a regular tick.</li>
+<li><strong>Premature promotion.</strong> If a collection happens while a batch of temporaries is still live (a loop that builds a large intermediate list, say), those objects are copied to survivor space and then promoted to old gen after a few cycles. Now they die in old gen, where only a more expensive collection reclaims them.</li>
+<li><strong>Cache and memory bandwidth.</strong> Streaming through fresh memory at GB/s evicts useful cache lines. The loop is slower than the instruction count suggests.</li>
+<li><strong>Humongous objects in G1.</strong> An allocation of half a region size or more (region size is 1 to 32 MB depending on heap) goes straight to a special old-gen path. A loop that allocates large arrays can trigger concurrent cycles for no good reason.</li>
+</ul>
+<p>The usual offenders in real code are boxing (<code>Integer</code> in a <code>Map&lt;Integer, Integer&gt;</code> hot loop), string concatenation with <code>+</code> inside a loop, <code>stream()</code> pipelines created per element, and <code>String.format</code> in logging calls.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Allocates a StringBuilder and a String per iteration, plus boxed Longs.</span>
+<span class="hljs-type">long</span> <span class="hljs-variable">sum</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+Map&lt;Long, Long&gt; counts = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+<span class="hljs-keyword">for</span> (<span class="hljs-type">long</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">50_000_000L</span>; i++) {
+    counts.merge(i % <span class="hljs-number">1000</span>, <span class="hljs-number">1L</span>, Long::sum);   <span class="hljs-comment">// boxes key and value every call</span>
+    <span class="hljs-type">String</span> <span class="hljs-variable">tag</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;id-&quot;</span> + i;                  <span class="hljs-comment">// new String every iteration</span>
+    sum += tag.length();
+}
+</code></pre>
+<p>Before changing anything, measure. Run with <code>-Xlog:gc*</code> to see young GC frequency and pause times, use JFR's allocation profiling (or async-profiler in <code>alloc</code> mode) to find the allocation sites, and use JMH with <code>-prof gc</code> to get bytes allocated per operation. The fix, if the data demands one, is usually structural: primitive collections or arrays, a reused <code>StringBuilder</code>, <code>mapToInt</code> instead of boxed streams. Do not reach for object pooling on small objects. A pooled object is long-lived by design, so it lives in old gen and every write of a young reference into it dirties a card, which taxes the GC more than the allocation ever did.</p>
+<p><strong>2. Explain escape analysis and how the JVM can optimize object allocation.</strong> <em>Testing whether you know what the optimizer does to your <code>new</code>.</em> Escape analysis (EA) is a C2 compiler phase that asks of each allocation: can a reference to this object be seen outside the method (or thread) that created it? If the object never <strong>escapes</strong>, C2 can drop the heap allocation entirely.</p>
+<p>An object escapes if the reference is stored in a field of a heap object or a static, returned, passed to a call that is not inlined, or published to another thread. If it does not, three optimizations become legal:</p>
+<ul>
+<li><strong>Scalar replacement.</strong> The object is never built. Its fields become local variables (often registers), and the allocation, the header, and the later GC work disappear.</li>
+<li><strong>Lock elision.</strong> A <code>synchronized</code> block on a non-escaping object can never contend, so the lock is removed.</li>
+<li><strong>Stack-like allocation effect.</strong> HotSpot does not allocate on the stack; scalar replacement gives the same payoff by deleting the object.</li>
+</ul>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">record</span> <span class="hljs-title class_">Point</span><span class="hljs-params">(<span class="hljs-type">double</span> x, <span class="hljs-type">double</span> y)</span> {}
+
+<span class="hljs-keyword">static</span> <span class="hljs-type">double</span> <span class="hljs-title function_">dist</span><span class="hljs-params">(<span class="hljs-type">double</span> ax, <span class="hljs-type">double</span> ay, <span class="hljs-type">double</span> bx, <span class="hljs-type">double</span> by)</span> {
+    <span class="hljs-type">Point</span> <span class="hljs-variable">a</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Point</span>(ax, ay);   <span class="hljs-comment">// does not escape if dist() and the</span>
+    <span class="hljs-type">Point</span> <span class="hljs-variable">b</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Point</span>(bx, by);   <span class="hljs-comment">// accessors are inlined into the caller</span>
+    <span class="hljs-type">double</span> <span class="hljs-variable">dx</span> <span class="hljs-operator">=</span> a.x() - b.x(), dy = a.y() - b.y();
+    <span class="hljs-keyword">return</span> Math.sqrt(dx * dx + dy * dy);
+}
+</code></pre>
+<p>After C2 compiles and inlines this, both <code>Point</code> allocations are scalar-replaced and the machine code is just arithmetic.</p>
+<p>The catch is that EA is <strong>fragile and invisible</strong>. It only works when everything the object touches is inlined, so a method over the inlining size limit, a megamorphic call site, or a single non-inlined call that receives the object makes it escape and the optimization silently vanishes. HotSpot's C2 EA is flow-insensitive: if the object escapes on any path, even a rare error path, the whole allocation stays. (GraalVM's compiler does partial escape analysis, which materializes the object only on the escaping branch.) EA also works only in C2-compiled code, not in the interpreter or C1, so it applies only after warmup. Never write code that depends on it. Prove it with a JMH benchmark using <code>-prof gc</code>: allocation per op dropping to near zero is the signature, and flipping <code>-XX:-DoEscapeAnalysis</code> should bring it back.</p>
+<p><strong>3. What is JIT compilation? How does the JVM optimize frequently executed code?</strong> <em>Testing the tiered model and, more importantly, speculation and deoptimization.</em> The JVM starts by interpreting bytecode, counts invocations and loop back-edges per method, and compiles the hot ones to native code at runtime. HotSpot uses <strong>tiered compilation</strong>: tier 0 is the interpreter, tiers 1 to 3 are C1 (fast compile, light optimization, tier 3 adds profiling), and tier 4 is C2 (slow compile, aggressive optimization, using the profile gathered in tier 3). Rough promotion points are hundreds of invocations for C1 and thousands for C2, plus back-edge counters that trigger <strong>OSR</strong> (on-stack replacement) so a long-running loop in <code>main</code> can switch to compiled code mid-execution.</p>
+<p>What C2 does with the profile:</p>
+<ul>
+<li><strong>Inlining.</strong> The single most important optimization, because it exposes everything else. Small methods (under about 35 bytecodes) inline always; hot ones up to about 325. A call site that has only ever seen one receiver class (monomorphic) is inlined with a cheap type guard; two classes (bimorphic) also inline; three or more (megamorphic) fall back to a vtable call that cannot be inlined.</li>
+<li><strong>Speculative optimization.</strong> If a branch has never been taken, C2 compiles it out as an &quot;uncommon trap&quot;. If a class hierarchy has one implementor, it devirtualizes the call.</li>
+<li><strong>Loop optimizations</strong>: unrolling, range-check elimination, vectorization with SIMD.</li>
+<li><strong>Escape analysis, lock elision, dead-code elimination, constant folding.</strong></li>
+</ul>
+<p>The catch is <strong>deoptimization</strong>. Speculation can be wrong: a new subclass loads, or the &quot;never taken&quot; branch is taken. The JVM then throws away the compiled code, falls back to the interpreter, and recompiles. A production symptom is a latency spike right after a deploy or when a rare code path first fires, because the compiled code for the whole hot method is invalidated.</p>
+<p>Other consequences you should be able to name: <strong>warmup</strong> (the first minutes of a fresh pod are slower, so benchmark after warmup with JMH, never with a single <code>System.nanoTime()</code> around a loop), <strong>code cache</strong> exhaustion (<code>-XX:ReservedCodeCacheSize</code>; when full, compilation stops and the app slows with no error), and the container effect (a pod limited to 1 CPU shares that CPU between your threads and the compiler threads, so warmup is much longer). Mitigations: AppCDS and the ahead-of-time cache work from Project Leyden (which stores class loading and, since JDK 25, method profiles from a training run), or GraalVM native image when startup matters more than peak throughput. Useful flags for investigation: <code>-XX:+PrintCompilation</code> and <code>-XX:+UnlockDiagnosticVMOptions -XX:+PrintInlining</code>.</p>
+<hr>
+<h2>Collections and functional Java</h2>
+<p><strong>4. Compare ArrayList and LinkedList for a high-throughput production application.</strong> <em>Testing whether you reason from hardware or recite Big-O tables.</em> The textbook says <code>LinkedList</code> has O(1) insertion and <code>ArrayList</code> has O(n), and the textbook is wrong in practice. Answer: use <code>ArrayList</code>, and use <code>ArrayDeque</code> when you need a queue or deque. <code>LinkedList</code> is almost never the right choice.</p>
+<p>Why:</p>
+<ul>
+<li><strong>Memory.</strong> An <code>ArrayList</code> stores one 4-byte reference per element (compressed oops) in a contiguous array. A <code>LinkedList</code> node is an object with a 12-byte header and three references (<code>item</code>, <code>next</code>, <code>prev</code>), 24 bytes before the element itself. For a million <code>Integer</code>s that is roughly 4 MB of references versus 24 MB of nodes, plus garbage-collector work proportional to the object count.</li>
+<li><strong>Cache behavior.</strong> Walking an <code>ArrayList</code> is a sequential scan that the hardware prefetcher loves. Walking a <code>LinkedList</code> is pointer chasing across the heap, where each hop is a probable cache miss (tens to a hundred nanoseconds against a nanosecond for a hit). Iteration is often 5x to 10x slower.</li>
+<li><strong>Random access.</strong> <code>get(i)</code> is O(1) versus O(n).</li>
+<li><strong>The insertion claim.</strong> &quot;O(1) insert&quot; is O(1) only if you already hold the node. Finding the position is O(n) pointer chasing. Inserting in the middle of an <code>ArrayList</code> is a <code>System.arraycopy</code>, a memmove at memory-bandwidth speed, which beats the pointer walk for any realistic size.</li>
+</ul>
+<p>The catch for <code>ArrayList</code>: growth is by 1.5x with a full copy, so a list you know will hold 100,000 elements should be created with <code>new ArrayList&lt;&gt;(100_000)</code>. Removing from the front is O(n); if that is your access pattern, you wanted <code>ArrayDeque</code>. In high-throughput service code the real answer is often &quot;neither&quot;: a bounded <code>ArrayBlockingQueue</code> or a concurrent structure, since neither list is thread-safe.</p>
+<p><strong>5. Explain how CopyOnWriteArrayList works and when it becomes a bad choice.</strong> <em>Testing whether you know the write cost and the snapshot semantics.</em> It keeps its elements in a <code>volatile</code> array. Reads are plain volatile reads of that array reference, with no locking at all. Every mutation takes a lock, copies the entire array, modifies the copy, and publishes it by assigning the new array to the volatile field. Iterators capture the array reference at creation, so they iterate a <strong>snapshot</strong>: they never throw <code>ConcurrentModificationException</code>, never see later writes, and do not support <code>remove()</code> through the iterator.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Ideal use: a listener registry. Reads (event dispatch) vastly outnumber writes (subscribe).</span>
+<span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> List&lt;EventListener&gt; listeners = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CopyOnWriteArrayList</span>&lt;&gt;();
+
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">publish</span><span class="hljs-params">(Event e)</span> {
+    <span class="hljs-keyword">for</span> (EventListener l : listeners) {   <span class="hljs-comment">// snapshot: safe even if a listener unsubscribes itself</span>
+        l.onEvent(e);
+    }
+}
+</code></pre>
+<p>The loop is safe even if a listener removes itself during dispatch, which is exactly the property that makes this class worth having.</p>
+<p>It becomes a bad choice when:</p>
+<ul>
+<li><strong>Writes are frequent.</strong> Each <code>add</code> is O(n) copy plus garbage. Filling it with n elements one at a time is O(n²) and churns the young gen. At 100,000 elements, one append copies about 400 KB.</li>
+<li><strong>The list is large</strong>, for the same reason, plus a transient 2x memory spike per write.</li>
+<li><strong>You need read-your-writes while iterating.</strong> The snapshot is deliberately stale.</li>
+<li><strong>Writers contend.</strong> All writes serialize on one lock.</li>
+</ul>
+<p>Alternatives depend on the need: batch writes with <code>addAll</code> (one copy), hold an immutable list in an <code>AtomicReference</code> and swap it, use <code>ConcurrentLinkedQueue</code> for queue semantics, or <code>Collections.synchronizedList</code> when write-heavy and you accept locked reads.</p>
+<p><strong>6. How would you create a custom Collector?</strong> <em>Testing whether you understand the four functions and why a combiner exists.</em> A <code>Collector&lt;T, A, R&gt;</code> is four functions plus a set of characteristics. The <strong>supplier</strong> creates a mutable accumulator <code>A</code>, the <strong>accumulator</strong> folds one element into it, the <strong>combiner</strong> merges two accumulators (needed so a parallel stream can fold sub-ranges independently and join them), and the <strong>finisher</strong> converts <code>A</code> to the result <code>R</code>. <code>Collector.of(...)</code> builds one without implementing the interface.</p>
+<p>A useful example is a &quot;top N by comparator&quot; collector that holds only N elements in memory, regardless of stream size:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> &lt;T&gt; Collector&lt;T, ?, List&lt;T&gt;&gt; topN(<span class="hljs-type">int</span> n, Comparator&lt;? <span class="hljs-built_in">super</span> T&gt; cmp) {
+    <span class="hljs-keyword">return</span> Collector.of(
+        () -&gt; <span class="hljs-keyword">new</span> <span class="hljs-title class_">PriorityQueue</span>&lt;T&gt;(n + <span class="hljs-number">1</span>, cmp),                <span class="hljs-comment">// min-heap: smallest of the kept N on top</span>
+        (heap, t) -&gt; { heap.add(t); <span class="hljs-keyword">if</span> (heap.size() &gt; n) heap.poll(); },
+        (left, right) -&gt; {                                      <span class="hljs-comment">// merge two partial heaps</span>
+            left.addAll(right);
+            <span class="hljs-keyword">while</span> (left.size() &gt; n) left.poll();
+            <span class="hljs-keyword">return</span> left;
+        },
+        heap -&gt; {                                               <span class="hljs-comment">// finisher: sorted, best first</span>
+            List&lt;T&gt; out = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;(heap);
+            out.sort(cmp.reversed());
+            <span class="hljs-keyword">return</span> out;
+        },
+        Collector.Characteristics.UNORDERED);
+}
+
+<span class="hljs-comment">// usage</span>
+List&lt;Order&gt; top3 = orders.stream().collect(topN(<span class="hljs-number">3</span>, Comparator.comparing(Order::total)));
+</code></pre>
+<p>The heap keeps the N largest seen so far; each insertion evicts the smallest, so memory is O(N) and time is O(M log N) for M elements. The combiner makes it correct under <code>parallelStream()</code>.</p>
+<p>The catches, which interviewers like: the combiner must be <strong>associative</strong> and must not mutate shared state, or parallel results are wrong. The accumulator must only touch its own <code>A</code> (never a captured outer variable). Characteristics are promises: <code>UNORDERED</code> says encounter order does not matter, <code>IDENTITY_FINISH</code> says the finisher is a cast and can be skipped, <code>CONCURRENT</code> says one accumulator may be written by many threads (so <code>A</code> must be thread-safe). Declaring one falsely produces wrong results that only show up in parallel. Also note that for most needs, <code>Collectors.teeing</code>, <code>groupingBy</code> with a downstream collector, or <code>collectingAndThen</code> compose existing collectors without writing a new one.</p>
+<p><strong>7. Explain Optional and situations where using it can actually make code worse.</strong> <em>Testing taste: do you know what it was designed for?</em> <code>Optional&lt;T&gt;</code> was designed for one job: a <strong>return type</strong> that says &quot;there may be no result&quot; and forces the caller to deal with it, mostly in stream pipelines (<code>findFirst</code>, <code>max</code>). Its authors have said it was never meant as a general null replacement.</p>
+<p>It makes code worse when used:</p>
+<ul>
+<li><strong>As a field.</strong> It is not <code>Serializable</code>, it adds an object and a pointer per field, and frameworks (JPA, Jackson) handle it poorly. A nullable field with a nullable getter returning <code>Optional</code> is the idiomatic form.</li>
+<li><strong>As a method parameter.</strong> The caller must now wrap, and you still have to handle <code>null</code> for the <code>Optional</code> itself. Overload the method or use a nullable parameter with a documented contract.</li>
+<li><strong>Inside collections.</strong> <code>List&lt;Optional&lt;X&gt;&gt;</code> and <code>Map&lt;K, Optional&lt;V&gt;&gt;</code> are almost always a modeling error. Use an absent key or an empty list.</li>
+<li><strong>With <code>isPresent()</code> followed by <code>get()</code>.</strong> That is a null check with extra allocation and ceremony, and <code>get()</code> without a check throws <code>NoSuchElementException</code>. Use <code>orElse</code>, <code>orElseThrow</code>, <code>map</code>, <code>ifPresentOrElse</code>.</li>
+<li><strong>With an eager <code>orElse</code>.</strong> <code>orElse(expensive())</code> evaluates <code>expensive()</code> even when a value is present; <code>orElseGet(() -&gt; expensive())</code> is lazy. This is a real performance bug in hot paths.</li>
+<li><strong>In hot loops.</strong> Each <code>Optional</code> is an allocation, which escape analysis may remove but cannot be relied on to. Use <code>OptionalInt</code> and friends for primitives.</li>
+</ul>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// Reads well: Optional as a return type, composed with map and orElseThrow.</span>
+<span class="hljs-type">String</span> <span class="hljs-variable">city</span> <span class="hljs-operator">=</span> userRepo.findById(id)
+        .map(User::address)
+        .map(Address::city)
+        .orElseThrow(() -&gt; <span class="hljs-keyword">new</span> <span class="hljs-title class_">NotFoundException</span>(<span class="hljs-string">&quot;no city for &quot;</span> + id));
+</code></pre>
+<p>Never call <code>Optional.of(maybeNull)</code> (it throws <code>NullPointerException</code>; use <code>ofNullable</code>), and never assign <code>null</code> to an <code>Optional</code> variable. <code>Optional</code> is also a value-based class: do not synchronize on it or compare by identity.</p>
+<p><strong>8. Compare Java lambdas with anonymous inner classes internally.</strong> <em>Testing whether you know <code>invokedynamic</code>.</em> They look interchangeable and compile completely differently.</p>
+<p>An <strong>anonymous class</strong> is compiled by <code>javac</code> to its own class file (<code>Outer$1.class</code>), loaded by the class loader like any other class. Each evaluation of the <code>new Foo() { ... }</code> expression allocates a fresh instance, and in an instance context it always holds a hidden reference to the enclosing <code>this</code>, whether it needs it or not. Inside it, <code>this</code> means the anonymous object itself.</p>
+<p>A <strong>lambda</strong> body is compiled into a private synthetic method (such as <code>lambda$main$0</code>) in the enclosing class, and the lambda expression becomes an <code>invokedynamic</code> call site. The first time that site executes, the bootstrap method <code>LambdaMetafactory.metafactory</code> spins a hidden class (defined at runtime, not on disk) that implements the functional interface and delegates to the synthetic method, then links it to the call site permanently. Consequences:</p>
+<ul>
+<li><strong>No class file per lambda</strong>, so smaller jars and no per-lambda class-loading cost at load time.</li>
+<li><strong>A non-capturing lambda is a singleton</strong>: the call site returns the same cached instance every time. A capturing lambda allocates one instance per evaluation, holding only the captured values.</li>
+<li><strong><code>this</code> means the enclosing instance</strong>, and a lambda captures <code>this</code> only if its body uses it. Anonymous classes always capture it, which is a classic memory leak (a long-lived listener pinning a whole activity or service).</li>
+<li><strong>Lambdas can target only functional interfaces</strong>; anonymous classes can extend classes, hold state, and implement several methods.</li>
+</ul>
+<p>The catch is startup: the first execution of each lambda call site pays the bootstrap and class-spinning cost, which adds up in a large app with thousands of lambdas and is one reason AppCDS and AOT caches archive lambda forms. Steady-state performance is equal or better for lambdas, since the JIT inlines through the <code>invokedynamic</code> target. Do not rely on lambda identity or <code>toString()</code>, and expect different stack-trace frames (<code>lambda$...</code>).</p>
+<hr>
+<h2>Thread pools</h2>
+<p><strong>9. How would you choose the optimal thread-pool size for CPU-bound versus I/O-bound tasks?</strong> <em>Testing whether you size from a model and then measure.</em> For <strong>CPU-bound</strong> work, threads beyond the core count only add context switches and cache thrash, so size at about <code>N_cpu</code> (or <code>N_cpu + 1</code> to cover the occasional page fault). For <strong>I/O-bound</strong> work, threads spend most of their time waiting, so you can run more of them than cores. The classic formula (from <em>Java Concurrency in Practice</em>) is:</p>
+<pre><code class="hljs" data-lang="text">threads = N_cpu * target_utilization * (1 + wait_time / compute_time)
+</code></pre>
+<p>With 8 cores, 100% target utilization, and a task that waits 90 ms on a database for every 10 ms of CPU, that is <code>8 * (1 + 90/10) = 80</code> threads. Little's law gives the same answer from the other side: concurrency in flight <code>L = throughput * latency</code>. To sustain 800 requests/s at 100 ms each you need about 80 requests in flight.</p>
+<p>The catch is that the formula sizes the pool for the CPU, but the real limit is usually <strong>a downstream resource</strong>: the database connection pool (if it has 20 connections, an 80-thread pool just queues 60 threads on the pool, burning memory), a rate-limited third-party API, or a remote service's capacity. Size to the tightest bottleneck, then load test, because wait and compute times drift as the system changes. Keep separate pools per dependency (a <strong>bulkhead</strong>) so one slow dependency cannot starve the others. Also, in a container, <code>Runtime.availableProcessors()</code> reflects the CPU limit, not the host, so check what the JVM actually sees.</p>
+<p>On Java 21 and later, the better answer for I/O-bound work is <strong>virtual threads</strong>: one per task, no pool to size, and a blocked virtual thread frees its carrier. Since JDK 24 (JEP 491), blocking inside <code>synchronized</code> no longer pins the carrier, which removed the most common reason virtual threads stalled; remaining pins come from native frames and class initialization. The sizing problem does not vanish, it moves: with no pool limit, protect the downstream with a <code>Semaphore</code> or Spring Framework 7's <code>@ConcurrencyLimit</code>.</p>
+<p><strong>10. What happens when a thread pool's queue becomes full?</strong> <em>Testing whether you know the order in which <code>ThreadPoolExecutor</code> escalates.</em> The order is counterintuitive. A <code>ThreadPoolExecutor</code> with <code>corePoolSize</code> C, <code>maximumPoolSize</code> M, and a work queue behaves like this on <code>execute()</code>:</p>
+<ol>
+<li>Fewer than C threads running: start a new thread, even if others are idle.</li>
+<li>Otherwise, try to enqueue the task.</li>
+<li>Only if the <strong>queue is full</strong>, start extra threads up to M.</li>
+<li>If M threads are running and the queue is full: invoke the <code>RejectedExecutionHandler</code>.</li>
+</ol>
+<p>The handler options are <code>AbortPolicy</code> (the default, throws <code>RejectedExecutionException</code>), <code>CallerRunsPolicy</code> (the submitting thread runs the task itself), <code>DiscardPolicy</code> (drops silently), and <code>DiscardOldestPolicy</code> (drops the head of the queue and retries).</p>
+<p>The catches:</p>
+<ul>
+<li><strong><code>Executors.newFixedThreadPool(n)</code> uses an unbounded <code>LinkedBlockingQueue</code></strong>, so step 3 never happens and the pool never rejects. Under overload the queue grows until the heap is exhausted, and latency for every queued task climbs first. This is one of the most common production incidents in Java services.</li>
+<li><strong><code>newCachedThreadPool()</code> uses a <code>SynchronousQueue</code> and an unbounded maximum</strong>, so overload creates thousands of threads instead.</li>
+<li><strong><code>CallerRunsPolicy</code> provides backpressure</strong> (the producer slows down because it is busy working), which is often what you want, but if the caller is a Tomcat request thread it stalls that request, and if it is a Kafka consumer thread it can exceed <code>max.poll.interval.ms</code> and trigger a rebalance.</li>
+<li><strong><code>DiscardPolicy</code> is silent data loss.</strong></li>
+</ul>
+<pre><code class="hljs" data-lang="java"><span class="hljs-type">ThreadPoolExecutor</span> <span class="hljs-variable">pool</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThreadPoolExecutor</span>(
+        <span class="hljs-number">8</span>, <span class="hljs-number">32</span>,                                  <span class="hljs-comment">// core, max</span>
+        <span class="hljs-number">60</span>, TimeUnit.SECONDS,
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBlockingQueue</span>&lt;&gt;(<span class="hljs-number">200</span>),          <span class="hljs-comment">// bounded: overload becomes visible</span>
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThreadFactoryBuilder</span>().setNameFormat(<span class="hljs-string">&quot;orders-%d&quot;</span>).build(),
+        <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThreadPoolExecutor</span>.CallerRunsPolicy());   <span class="hljs-comment">// slow the producer instead of dropping</span>
+</code></pre>
+<p>A bounded queue plus an explicit rejection policy turns overload into a signal you can alert on. Export queue depth, active count, and rejected count as metrics. Whichever policy you pick, decide it consciously and make it observable.</p>
+<hr>
+<h2>Spring transactions</h2>
+<p><strong>11. What is the difference between REQUIRED, REQUIRES_NEW, NESTED, and MANDATORY propagation?</strong> <em>Testing whether you know what happens to the physical transaction.</em> Propagation defines what a <code>@Transactional</code> method does when called while a transaction already exists.</p>
+<table>
+<thead>
+<tr>
+<th>Propagation</th>
+<th>Transaction exists</th>
+<th>No transaction</th>
+<th>Failure behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>REQUIRED</code> (default)</td>
+<td>Joins it</td>
+<td>Starts one</td>
+<td>Inner failure marks the shared transaction rollback-only</td>
+</tr>
+<tr>
+<td><code>REQUIRES_NEW</code></td>
+<td>Suspends it, starts an independent one</td>
+<td>Starts one</td>
+<td>Inner commit or rollback is independent of the outer</td>
+</tr>
+<tr>
+<td><code>NESTED</code></td>
+<td>Creates a <strong>savepoint</strong> inside it</td>
+<td>Starts one</td>
+<td>Inner rollback goes back to the savepoint; outer can continue</td>
+</tr>
+<tr>
+<td><code>MANDATORY</code></td>
+<td>Joins it</td>
+<td>Throws <code>IllegalTransactionStateException</code></td>
+<td>Asserts a caller-owned transaction</td>
+</tr>
+</tbody>
+</table>
+<p>Practical uses: <code>REQUIRES_NEW</code> for work that must persist even if the caller rolls back (an audit log row, a failed-attempt counter). <code>NESTED</code> for &quot;try this part and recover if it fails&quot; inside a bigger unit. <code>MANDATORY</code> for repository-style code that must never run outside a service-layer transaction.</p>
+<p>The catches are what make this a senior question:</p>
+<ul>
+<li><strong><code>REQUIRES_NEW</code> needs a second database connection while holding the first.</strong> If every request thread does this, a pool of 10 connections can fully deadlock with 10 threads each holding one connection and waiting for another. Size the pool for it or avoid nested <code>REQUIRES_NEW</code>.</li>
+<li><strong><code>NESTED</code> is savepoint-based, so it needs JDBC savepoint support.</strong> <code>DataSourceTransactionManager</code> allows it by default; <code>JpaTransactionManager</code> needs <code>setNestedTransactionAllowed(true)</code>, and even then the persistence context is not rolled back with the savepoint, so entities modified in the failed inner block stay modified in memory. It is rarely worth it with JPA.</li>
+<li><strong>Self-invocation bypasses the proxy.</strong> <code>@Transactional</code> is applied by a Spring AOP proxy, so <code>this.otherMethod()</code> inside the same class runs with no transaction logic at all, whatever its annotation says. The same applies to <code>private</code> and <code>final</code> methods. Fix by moving the method to another bean.</li>
+</ul>
+<p><strong>12. Explain transaction isolation levels and phantom reads.</strong> <em>Testing whether you map each level to the anomaly it permits, and know the databases differ.</em> Isolation controls what a transaction can see of concurrent transactions' work. The SQL standard defines four levels by the anomalies they allow:</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Dirty read</th>
+<th>Non-repeatable read</th>
+<th>Phantom read</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>READ_UNCOMMITTED</code></td>
+<td>possible</td>
+<td>possible</td>
+<td>possible</td>
+</tr>
+<tr>
+<td><code>READ_COMMITTED</code></td>
+<td>no</td>
+<td>possible</td>
+<td>possible</td>
+</tr>
+<tr>
+<td><code>REPEATABLE_READ</code></td>
+<td>no</td>
+<td>no</td>
+<td>possible (by the standard)</td>
+</tr>
+<tr>
+<td><code>SERIALIZABLE</code></td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<p>A <strong>dirty read</strong> sees uncommitted data. A <strong>non-repeatable read</strong> reads the same row twice and gets different values because another transaction committed an update between them. A <strong>phantom read</strong> runs the same range query twice (<code>WHERE amount &gt; 100</code>) and gets a different <strong>set of rows</strong> because another transaction inserted or deleted a matching row.</p>
+<pre><code class="hljs" data-lang="sql"><span class="hljs-comment">-- Transaction A                              -- Transaction B</span>
+<span class="hljs-keyword">BEGIN</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">count</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">WHERE</span> status<span class="hljs-operator">=</span><span class="hljs-string">&#x27;NEW&#x27;</span>;  <span class="hljs-comment">-- 10</span>
+                                              <span class="hljs-keyword">INSERT INTO</span> orders(status) <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;NEW&#x27;</span>); <span class="hljs-keyword">COMMIT</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">count</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">WHERE</span> status<span class="hljs-operator">=</span><span class="hljs-string">&#x27;NEW&#x27;</span>;  <span class="hljs-comment">-- 11  (phantom)</span>
+</code></pre>
+<p>The catch: <strong>the standard's table is not what your database does.</strong> PostgreSQL defaults to <code>READ COMMITTED</code>; its <code>REPEATABLE READ</code> is snapshot isolation and does prevent phantoms, but still allows <strong>write skew</strong> (two transactions each read an overlapping set and write disjoint rows, jointly violating an invariant). PostgreSQL's <code>SERIALIZABLE</code> uses serializable snapshot isolation and aborts with SQLSTATE <code>40001</code>, so the application must retry. MySQL InnoDB defaults to <code>REPEATABLE READ</code>, where consistent reads use a snapshot but locking reads (<code>SELECT ... FOR UPDATE</code>) take next-key locks that block inserts into the range. Higher isolation costs throughput and produces more lock waits or serialization failures. The practical alternative to <code>SERIALIZABLE</code> is a targeted fix: <code>SELECT ... FOR UPDATE</code>, a unique constraint, or optimistic locking with a <code>@Version</code> column. In Spring, set it with <code>@Transactional(isolation = Isolation.SERIALIZABLE)</code>, and remember it applies only when this call starts the transaction, not when it joins an existing one.</p>
+<p><strong>13. What happens when an exception occurs inside a @Transactional method?</strong> <em>Testing the default rollback rule and the rollback-only trap.</em> By default Spring rolls back on <strong>unchecked</strong> exceptions (<code>RuntimeException</code> and <code>Error</code>) and <strong>commits on checked exceptions</strong>. That is inherited from the EJB convention, and it surprises people: a method that throws <code>IOException</code> or your own <code>extends Exception</code> commits whatever it already wrote. Opt in with <code>@Transactional(rollbackFor = Exception.class)</code>, or make your business exceptions unchecked.</p>
+<p>The trap with <code>REQUIRED</code> propagation: the inner method and the outer method share one physical transaction. When an inner <code>@Transactional</code> method throws a runtime exception, the proxy marks the shared transaction <strong>rollback-only</strong> as the exception passes through. If the outer method catches the exception and carries on, the outer commit fails with <code>UnexpectedRollbackException: Transaction silently rolled back because it has been marked as rollback-only</code>.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-meta">@Transactional</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">placeOrder</span><span class="hljs-params">(Order o)</span> {
+    orderRepo.save(o);
+    <span class="hljs-keyword">try</span> {
+        loyaltyService.addPoints(o);     <span class="hljs-comment">// @Transactional(REQUIRED) throws RuntimeException</span>
+    } <span class="hljs-keyword">catch</span> (RuntimeException e) {
+        log.warn(<span class="hljs-string">&quot;points failed&quot;</span>, e);    <span class="hljs-comment">// swallowed, but the transaction is already rollback-only</span>
+    }
+}   <span class="hljs-comment">// commit attempt -&gt; UnexpectedRollbackException; the order is NOT saved</span>
+</code></pre>
+<p>If the points failure should not undo the order, give <code>addPoints</code> <code>REQUIRES_NEW</code> (so it commits or fails independently) or move it after the commit with <code>@TransactionalEventListener(phase = AFTER_COMMIT)</code>.</p>
+<p>Other related catches: a failure on the commit itself (a deferred constraint, a serialization failure) surfaces after your method body finishes, outside any <code>try</code> inside it; the exception is also translated, so catch Spring's <code>DataAccessException</code> hierarchy, not <code>SQLException</code>; and <code>@Transactional(readOnly = true)</code> is a hint, not a guarantee, though with Hibernate it also skips dirty-checking work (see question 23).</p>
+<hr>
+<h2>APIs and microservices</h2>
+<p><strong>14. How would you protect a REST API from excessive traffic?</strong> <em>Testing layered defense, not a single library.</em> Defend at several layers, because each stops a different failure.</p>
+<ol>
+<li><strong>Edge (CDN, WAF, load balancer).</strong> Blocks volumetric abuse and bots before they reach your servers.</li>
+<li><strong>API gateway rate limiting</strong>, per client (API key, user ID, or IP). The usual algorithm is a <strong>token bucket</strong>: a bucket refills at a steady rate (say 100 tokens/s) up to a capacity (burst of 200), and each request spends a token. It allows controlled bursts and enforces an average. Alternatives: a fixed window (simple, but allows 2x the limit across a window boundary), sliding window counter (smooth, a little more state), leaky bucket (smooths output rate).</li>
+<li><strong>Application-level limits</strong> for finer rules (per tenant, per endpoint cost): Bucket4j or Resilience4j <code>RateLimiter</code>. With more than one instance, the counters must be <strong>shared</strong>, typically in Redis with an atomic Lua script (otherwise each of N instances allows the full limit, and the real limit is N times higher).</li>
+<li><strong>Concurrency and load shedding.</strong> Rate limits cap request rate, but a slow dependency makes requests pile up regardless. Limit in-flight requests (a bulkhead, or <code>@ConcurrencyLimit</code> in Spring Framework 7), set timeouts everywhere, and shed load with a fast <code>503</code> when saturated instead of queueing until everything is slow.</li>
+</ol>
+<p>Respond with <code>429 Too Many Requests</code> and a <code>Retry-After</code> header so well-behaved clients back off; add rate-limit headers for visibility. The catches: the limiter itself must not become a single point of failure (decide fail-open or fail-closed when Redis is down; fail-open is common for public APIs, fail-closed for expensive or sensitive ones), limiting by IP punishes users behind a NAT and is trivially bypassed by botnets, and retries from clients can amplify an overload, so pair limits with exponential backoff and jitter on the client side.</p>
+<p><strong>15. How would you design pagination for millions of records?</strong> <em>Testing whether you know why <code>OFFSET</code> fails.</em> The naive approach is <code>LIMIT 50 OFFSET 1000000</code>. The database cannot jump to row 1,000,000; it reads and discards a million rows to return 50, so page N costs O(N). Deep pages get slower and slower, and concurrent inserts shift the window so users see duplicates or miss rows.</p>
+<p>The scalable design is <strong>keyset (seek) pagination</strong>: remember the last row you returned and ask for rows after it, using an indexed, unique, stable sort key.</p>
+<pre><code class="hljs" data-lang="sql"><span class="hljs-comment">-- Index: CREATE INDEX idx_orders_created_id ON orders (created_at DESC, id DESC);</span>
+<span class="hljs-keyword">SELECT</span> id, created_at, total
+<span class="hljs-keyword">FROM</span> orders
+<span class="hljs-keyword">WHERE</span> (created_at, id) <span class="hljs-operator">&lt;</span> (:lastCreatedAt, :lastId)   <span class="hljs-comment">-- the cursor from the previous page</span>
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> created_at <span class="hljs-keyword">DESC</span>, id <span class="hljs-keyword">DESC</span>
+LIMIT <span class="hljs-number">50</span>;
+</code></pre>
+<p>Cost is a single index seek plus 50 rows, the same on page 1 and page 100,000. The <code>id</code> tiebreaker is essential: <code>created_at</code> alone is not unique, and without a unique tiebreaker rows get skipped or repeated at page boundaries. The API returns an <strong>opaque cursor</strong> (base64 of the last key values) instead of a page number. Spring Data supports this directly with <code>ScrollPosition</code> and <code>Window</code>.</p>
+<p>The tradeoffs: no random jump to &quot;page 500&quot;, no cheap total count (an exact <code>COUNT(*)</code> on millions of rows is itself a scan in PostgreSQL, so return an estimate or &quot;more available&quot; flag instead), and the sort must match an index, so every sortable column needs one. Verify with <code>EXPLAIN</code> that the row-value comparison actually uses the index on your database version. If the product truly needs page numbers (an admin grid), keep offset pagination but cap the depth and require filters.</p>
+<p><strong>16. Explain the Outbox Pattern and why it is useful in microservices.</strong> <em>Testing whether you understand the dual-write problem.</em> A service often must update its database and publish an event (<code>OrderCreated</code>) to Kafka. These are two systems with no shared transaction. If you commit first and the publish fails, downstream never hears about the order. If you publish first and the commit fails, downstream hears about an order that does not exist. This is the <strong>dual-write problem</strong>, and no ordering of the two calls fixes it.</p>
+<p>The outbox pattern removes it: write the event as a row in an <code>outbox</code> table <strong>in the same local database transaction</strong> as the business change. Either both commit or neither does. A separate <strong>relay</strong> then reads the outbox and publishes to the broker, marking rows sent.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-meta">@Transactional</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">placeOrder</span><span class="hljs-params">(Order order)</span> {
+    orderRepo.save(order);
+    outboxRepo.save(<span class="hljs-keyword">new</span> <span class="hljs-title class_">OutboxEvent</span>(
+            UUID.randomUUID(), <span class="hljs-string">&quot;Order&quot;</span>, order.getId(), <span class="hljs-string">&quot;OrderCreated&quot;</span>, toJson(order)));
+}   <span class="hljs-comment">// one commit covers both rows; nothing talks to Kafka here</span>
+</code></pre>
+<p>The relay is either a <strong>poller</strong> (a scheduled job running <code>SELECT ... FROM outbox WHERE sent = false ORDER BY id LIMIT 100 FOR UPDATE SKIP LOCKED</code>, which lets several relay instances work without colliding) or <strong>change data capture</strong> (Debezium tails the database log and publishes outbox inserts, with its outbox event router; lower latency and no polling load, but more infrastructure).</p>
+<p>The catches: delivery is <strong>at-least-once</strong>. The relay can publish and crash before marking the row sent, so it publishes again. Consumers must be <strong>idempotent</strong> (dedupe on the event ID, using an inbox table or a unique constraint). For per-aggregate ordering, use the aggregate ID as the Kafka message key. The outbox table needs a cleanup job, or it grows without bound and the poller query slows. And polling adds latency equal to the poll interval.</p>
+<p><strong>17. How would you handle service-to-service authentication?</strong> <em>Testing whether you separate &quot;which service&quot; from &quot;on behalf of which user.&quot;</em> Two separate questions get conflated here: proving <strong>service identity</strong>, and carrying <strong>end-user context</strong>.</p>
+<p>For service identity, the common options:</p>
+<ul>
+<li><strong>mTLS.</strong> Both sides present certificates, so the connection itself authenticates the caller. Usually delivered by a service mesh (Istio, Linkerd) or SPIFFE/SPIRE, which issue short-lived workload certificates and rotate them automatically, so application code never touches keys.</li>
+<li><strong>OAuth 2.0 client credentials.</strong> The calling service gets a short-lived JWT access token from the authorization server and sends it as a bearer token. The receiver validates the signature, expiry, <strong>audience</strong> (<code>aud</code>: the token was meant for me), and scopes. Cache the token until shortly before it expires instead of fetching one per call.</li>
+<li><strong>Network policy</strong> (Kubernetes <code>NetworkPolicy</code>) as defense in depth, not as the sole control.</li>
+</ul>
+<p>For user context, do not forward the user's own token blindly to every downstream service (a compromised service can replay it elsewhere). Use <strong>token exchange</strong> (RFC 8693) to mint a narrowly scoped token for the next hop, or pass the user identity as a signed claim inside the service's own token.</p>
+<p>The catches: long-lived static API keys and shared secrets are the failure mode this question probes, since they leak and are never rotated. Validating a JWT's signature but skipping <code>aud</code> and <code>iss</code> checks lets any token from the same issuer work against any service. A token cache must handle clock skew and concurrent refresh. And mTLS proves who the caller is, not what it is allowed to do, so you still need authorization on top.</p>
+<p><strong>18. How would you implement distributed tracing across microservices?</strong> <em>Testing context propagation, which is where tracing breaks.</em> A <strong>trace</strong> is the full journey of a request, made of <strong>spans</strong> (one per operation). Every span carries the trace ID, so a backend (Jaeger, Tempo, Zipkin) can stitch spans from different services into one tree. The standard wire format is the W3C <code>traceparent</code> header:</p>
+<pre><code class="hljs" data-lang="text">traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01
+             ver  trace-id (16 bytes hex)          parent span-id   flags (sampled)
+</code></pre>
+<p>In Spring Boot you use <strong>Micrometer Tracing</strong> with an OpenTelemetry bridge and exporter (OTLP). Instrumented clients (<code>RestClient</code>, <code>WebClient</code>, <code>RestTemplate</code> built from the Boot builders), servers, JDBC, and messaging inject and extract the header automatically. For Kafka, enable observation on the template and listener containers so the trace context travels in record headers. Put the trace ID in your logs via MDC (Boot does this for you) so you can jump from a log line to the trace and back.</p>
+<p>The catches, which is where real incidents hide:</p>
+<ul>
+<li><strong>Context is thread-local.</strong> It is lost whenever work hops threads: a raw <code>ExecutorService</code>, <code>CompletableFuture.supplyAsync</code>, and reactive chains. Wrap executors with Micrometer's context-propagation support or the instrumented Spring executors.</li>
+<li><strong>A single uninstrumented hop</strong> (a service, a queue consumer, a scheduled job) breaks the chain into two unrelated traces.</li>
+<li><strong>Sampling.</strong> Tracing every request at high traffic is expensive. Head-based sampling (decide at the entry, say 10%) is cheap but may miss the rare slow or failed request; tail-based sampling (decide after seeing the whole trace, in the OpenTelemetry Collector) keeps errors and slow traces but requires buffering. Spring Boot's default sampling probability is 10%, so &quot;I see no trace for this request&quot; is often just sampling.</li>
+<li><strong>High-cardinality attributes</strong> on spans or metrics (user IDs, full URLs) inflate cost.</li>
+</ul>
+<hr>
+<h2>Messaging: poison messages, retry topics, and dead letter topics</h2>
+<p><strong>19. How would you handle poison messages?</strong> <em>Testing whether you know a poison message blocks the partition.</em> A poison message is one that can never be processed successfully: malformed payload, a schema the consumer cannot deserialize, or data that violates an invariant. In Kafka a consumer processes a partition strictly in order, so if it fails and retries forever, <strong>everything behind that record is stuck</strong>, and consumer lag grows.</p>
+<p>The strategy is to bound retries and then park the message:</p>
+<ol>
+<li><strong>Classify.</strong> A transient failure (database timeout, downstream 503) deserves retries. A permanent failure (bad JSON, validation error) deserves none.</li>
+<li><strong>Retry a bounded number of times</strong> with backoff.</li>
+<li><strong>Publish to a dead letter topic (DLT)</strong> with the original record and failure metadata, commit the offset, and move on.</li>
+<li><strong>Alert and make it replayable.</strong></li>
+</ol>
+<p>Deserialization failures happen before your listener runs, in the consumer's <code>poll()</code>, and by default they cause an endless loop. Wrap the deserializer in <code>ErrorHandlingDeserializer</code>, which turns the failure into a <code>DeserializationException</code> carried with the raw bytes, so the error handler can route it.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-meta">@Bean</span>
+DefaultErrorHandler <span class="hljs-title function_">errorHandler</span><span class="hljs-params">(KafkaTemplate&lt;Object, Object&gt; template)</span> {
+    <span class="hljs-type">var</span> <span class="hljs-variable">recoverer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DeadLetterPublishingRecoverer</span>(template);          <span class="hljs-comment">// publishes to &lt;topic&gt;.DLT</span>
+    <span class="hljs-type">var</span> <span class="hljs-variable">handler</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DefaultErrorHandler</span>(recoverer, <span class="hljs-keyword">new</span> <span class="hljs-title class_">FixedBackOff</span>(<span class="hljs-number">1000L</span>, <span class="hljs-number">3L</span>)); <span class="hljs-comment">// 3 retries, 1s apart</span>
+    handler.addNotRetryableExceptions(ValidationException.class);        <span class="hljs-comment">// permanent: straight to DLT</span>
+    <span class="hljs-keyword">return</span> handler;
+}
+</code></pre>
+<p>Spring Kafka already treats several exceptions as non-retryable by default (<code>DeserializationException</code>, <code>MessageConversionException</code>, <code>ClassCastException</code>, among others), so they skip the retries and go straight to the DLT.</p>
+<p>The catches: blocking retries with a long backoff stall the whole partition, so keep them short or use retry topics (next question). The DLT must be monitored; an unwatched DLT is just a slower way of losing data. Include the original topic, partition, offset, and exception in headers (the recoverer does) so a person can diagnose and replay. And the DLT publish itself can fail, so decide what happens then (the default handler re-seeks and retries the record).</p>
+<p><strong>20. Explain retry topics and Dead Letter Topics.</strong> <em>Testing the ordering tradeoff of non-blocking retry.</em> With <strong>blocking retry</strong> (the <code>DefaultErrorHandler</code> above), the consumer re-attempts the failed record in place and the partition waits. With <strong>non-blocking retry</strong>, a failed record is published to a <strong>retry topic</strong> and the main consumer immediately moves on. A separate consumer reads the retry topic after a delay. If it fails again it goes to the next retry topic with a longer delay, and when the attempts are exhausted it lands in the <strong>dead letter topic</strong>, where it waits for a human or a repair job.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-meta">@RetryableTopic(
+        attempts = &quot;4&quot;,                                   // 1 original + 3 retries
+        backOff = @BackOff(delay = 1000, multiplier = 2.0, maxDelay = 10_000),
+        dltStrategy = DltStrategy.FAIL_ON_ERROR,
+        exclude = { ValidationException.class })</span>          <span class="hljs-comment">// never retry these</span>
+<span class="hljs-meta">@KafkaListener(topics = &quot;orders&quot;)</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">handle</span><span class="hljs-params">(OrderEvent event)</span> { orderService.process(event); }
+
+<span class="hljs-meta">@DltHandler</span>
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">handleDlt</span><span class="hljs-params">(OrderEvent event, <span class="hljs-meta">@Header(KafkaHeaders.EXCEPTION_MESSAGE)</span> String reason)</span> {
+    log.error(<span class="hljs-string">&quot;order {} dead-lettered: {}&quot;</span>, event.id(), reason);   <span class="hljs-comment">// alert, persist for replay</span>
+}
+</code></pre>
+<p>Spring creates topics such as <code>orders-retry-1000</code>, <code>orders-retry-2000</code>, <code>orders-retry-4000</code>, and <code>orders-dlt</code>. The retry consumer pauses the partition until the record's scheduled time arrives, rather than sleeping a thread, so delays do not trip <code>max.poll.interval.ms</code>.</p>
+<p>The catches:</p>
+<ul>
+<li><strong>Ordering is lost.</strong> A retried record is processed after later records for the same key. If events must be applied in order (an <code>OrderCancelled</code> after <code>OrderCreated</code>), non-blocking retry breaks that, and you need blocking retry for that flow or consumer logic that tolerates out-of-order events.</li>
+<li><strong>More topics and more partitions to manage</strong>, and DLT partitioning must match or be handled (the recoverer writes to the same partition number by default, so the DLT needs at least as many partitions).</li>
+<li><strong>Duplicates.</strong> Delivery is at-least-once, so handlers must be idempotent.</li>
+<li><strong>Poison pills at scale.</strong> A burst of failures floods the retry topics; keep retry counts small and consider a circuit breaker so a dead downstream does not send every message through all the retries.</li>
+</ul>
+<p>Rule of thumb: blocking retry (short, bounded) for ordered streams; retry topics for independent events where throughput matters more than order; a DLT in both cases, with an alert and a replay tool.</p>
+<hr>
+<h2>JPA and Hibernate</h2>
+<p><strong>21. Compare JOIN FETCH, Entity Graphs, batch fetching, and lazy loading.</strong> <em>Testing whether you can solve N+1 and know what each fix costs.</em> The problem they all address is <strong>N+1</strong>: one query loads N parents, then touching a lazy collection on each parent fires N more queries.</p>
+<table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>How it works</th>
+<th>Catch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lazy loading</strong> (default for collections)</td>
+<td>Loads the association on first access, through a proxy or collection wrapper</td>
+<td>N+1 when you iterate; <code>LazyInitializationException</code> outside the session</td>
+</tr>
+<tr>
+<td><strong><code>JOIN FETCH</code></strong> (JPQL)</td>
+<td>One query with a SQL join loads parent and association together</td>
+<td>Cartesian blowup with multiple collections; pagination applied in memory</td>
+</tr>
+<tr>
+<td><strong><code>@EntityGraph</code></strong></td>
+<td>Declares the fetch plan outside the query (annotation or <code>EntityManager</code> hint)</td>
+<td>Same SQL consequences as <code>JOIN FETCH</code>, but reusable per repository method</td>
+</tr>
+<tr>
+<td><strong>Batch fetching</strong> (<code>@BatchSize</code>, <code>hibernate.default_batch_fetch_size</code>)</td>
+<td>Lazy loads, but initializes up to K collections per query with <code>IN (?, ?, ...)</code></td>
+<td>N+1 becomes N/K + 1 queries; still more than one round trip</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="hljs" data-lang="java"><span class="hljs-comment">// One query, parent and children together.</span>
+<span class="hljs-meta">@Query(&quot;select o from Order o join fetch o.items where o.status = :s&quot;)</span>
+List&lt;Order&gt; <span class="hljs-title function_">findWithItems</span><span class="hljs-params">(<span class="hljs-meta">@Param(&quot;s&quot;)</span> Status s)</span>;
+
+<span class="hljs-comment">// Same intent, declared on the repository method.</span>
+<span class="hljs-meta">@EntityGraph(attributePaths = {&quot;items&quot;, &quot;customer&quot;})</span>
+List&lt;Order&gt; <span class="hljs-title function_">findByStatus</span><span class="hljs-params">(Status s)</span>;
+</code></pre>
+<p>The catches are specific and commonly probed:</p>
+<ul>
+<li><strong>Collection <code>JOIN FETCH</code> multiplies rows.</strong> An order with 10 items returns 10 rows, and Hibernate de-duplicates in memory. Fetching two <code>List</code> collections at once is a Cartesian product (orders x items x payments) and throws <code>MultipleBagFetchException</code>. Use <code>Set</code>, or fetch one collection per query.</li>
+<li><strong>Pagination with collection fetch breaks.</strong> <code>setMaxResults</code> cannot limit parents when the SQL returns multiple rows per parent, so Hibernate fetches <strong>everything</strong> and paginates in memory, logging <code>HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory</code>. On a million-row table this is an outage. The fix: paginate parent IDs first, then fetch the children for those IDs, or use batch fetching.</li>
+<li><strong><code>@ManyToOne</code> fetched with a join is fine</strong>, since it adds columns, not rows.</li>
+<li><strong>Lazy loading needs an open session.</strong> The usual escape is Open Session In View, which keeps the session open through view rendering and hides N+1 behind a working page. Disable it (<code>spring.jpa.open-in-view=false</code>) and fetch what you need explicitly.</li>
+</ul>
+<p>Practical default: leave associations lazy, set <code>default_batch_fetch_size</code> to 16 to 100 as a safety net, and use <code>JOIN FETCH</code> or an entity graph on queries where you know you need the data. Also consider DTO projections for read-only views, which skip the entity machinery entirely.</p>
+<p><strong>22. Why can EAGER fetching create serious production performance problems?</strong> <em>Testing whether you know EAGER is a global mapping decision that queries cannot override.</em> <code>FetchType.EAGER</code> on a mapping means &quot;always load this with the owner.&quot; It is fixed in the mapping, so every query on that entity pays for it, including the ones that never touch the association.</p>
+<p>The mechanics that hurt:</p>
+<ul>
+<li><strong><code>@ManyToOne</code> and <code>@OneToOne</code> default to EAGER</strong> in JPA, which surprises people. Add <code>fetch = LAZY</code> explicitly on every one of them.</li>
+<li><strong><code>em.find()</code> / <code>findById</code> honors EAGER with a join, but JPQL, Criteria, and Spring Data derived queries do not.</strong> They load the owners first, then Hibernate sees the EAGER associations and fires <strong>secondary selects</strong>, one per owner. A query returning 500 orders with an EAGER <code>customer</code> runs 501 queries, and nobody wrote that N+1; the mapping did.</li>
+<li><strong>It cascades.</strong> If <code>Customer</code> has an EAGER <code>Address</code> which has an EAGER <code>Region</code>, loading one order walks the whole graph. In a densely connected model, one load can pull a large part of the database into memory.</li>
+<li><strong>Join fetches can multiply rows</strong> when EAGER collections are involved, producing large result sets.</li>
+<li><strong>You cannot opt out per use case.</strong> A lazy mapping can be made eager for one query with <code>JOIN FETCH</code>; an eager mapping cannot be made lazy for one query. That asymmetry is why the rule is <strong>lazy in the mapping, eager per query</strong>.</li>
+</ul>
+<p>The symptoms in production: a simple endpoint with 800 SQL statements in the log, memory growth and long GC pauses from large object graphs in the persistence context, and slowness that grows with data volume while the code looks innocent. Detect it with <code>hibernate.generate_statistics</code>, a query-count assertion in tests (Hypersistence Utils or Hibernate's <code>StatementInspector</code>), and the <code>p6spy</code> or datasource-proxy SQL log. Fix by switching mappings to <code>LAZY</code> and loading explicitly where needed.</p>
+<p><strong>23. Explain Hibernate dirty checking.</strong> <em>Testing whether you know why you never call <code>save()</code> on a managed entity.</em> When Hibernate loads an entity into the persistence context, it keeps a <strong>snapshot</strong> of its property values (the &quot;loaded state&quot;) next to the live object. You modify the entity with plain setters. At <strong>flush</strong> time (before a query that could be affected, and at commit), Hibernate compares each managed entity's current values with its snapshot, and for every entity that differs it generates an <code>UPDATE</code>. That is why this works with no explicit save:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-meta">@Transactional</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">rename</span><span class="hljs-params">(Long id, String name)</span> {
+    <span class="hljs-type">Customer</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> customerRepo.findById(id).orElseThrow();   <span class="hljs-comment">// loaded and snapshotted</span>
+    c.setName(name);                                        <span class="hljs-comment">// no save() call</span>
+}   <span class="hljs-comment">// flush at commit: snapshot differs -&gt; UPDATE customer SET name=? ... WHERE id=?</span>
+</code></pre>
+<p>The catches:</p>
+<ul>
+<li><strong>The cost is O(managed entities x properties) per flush.</strong> Loading 50,000 entities in one transaction means 50,000 snapshot copies in memory and 50,000 comparisons at every flush, even if you changed one. Batch jobs that load a lot of entities slow down quadratically-ish and run out of heap. Mitigations: process in chunks and <code>flush()</code> then <code>clear()</code> the persistence context, use a stateless session, or skip entities altogether with bulk JPQL or JDBC.</li>
+<li><strong>Read-only transactions skip it.</strong> <code>@Transactional(readOnly = true)</code> makes Spring tell Hibernate to treat loaded entities as read-only: no snapshot is kept and no dirty check runs. Use it for query-only service methods; it is a real saving, not only a hint.</li>
+<li><strong>The <code>UPDATE</code> writes all columns by default</strong>, because the statement is cached at startup. <code>@DynamicUpdate</code> generates SQL with only the changed columns, at the cost of building SQL per update. It helps for wide rows or tables with large <code>TEXT</code> and <code>JSON</code> columns.</li>
+<li><strong>Bytecode enhancement</strong> (build-time) lets the entity track its own changes, avoiding the snapshot comparison.</li>
+<li><strong>Only managed entities are tracked.</strong> A detached entity (loaded in another transaction, or after <code>clear()</code>) changes silently do nothing until <code>merge()</code>. The flip side is that a change you did not intend, in a managed entity, is persisted.</li>
+<li><strong>Flush order surprises.</strong> Flush can fire before a JPQL query that touches the same table, so the update happens earlier than the end of the method.</li>
+</ul>
+<hr>
+<h2>Coding: median of two sorted arrays</h2>
+<p><strong>24. Design an algorithm to find the median of two sorted arrays in O(log(min(n, m))).</strong> <em>Testing whether you can find the binary search hidden in a problem, and handle the edge cases.</em> Merging both arrays is O(n + m), which is the answer to give first and then improve. The faster idea: the median splits the combined data into a left half and a right half of equal size, where every left element is at most every right element. So instead of merging, binary search for <strong>where to cut the shorter array</strong>.</p>
+<p>Take <code>a</code> as the shorter array (swap if not), with sizes m &lt;= n. Pick a cut <code>i</code> in <code>a</code> (so <code>a[0..i-1]</code> goes to the left half). The left half needs <code>half = (m + n + 1) / 2</code> elements in total, so the cut in <code>b</code> is forced: <code>j = half - i</code>. The cut is correct when both cross-conditions hold:</p>
+<pre><code class="hljs" data-lang="text">a[i-1] &lt;= b[j]     and     b[j-1] &lt;= a[i]
+</code></pre>
+<p>If <code>a[i-1] &gt; b[j]</code>, <code>a</code> contributes too many on the left, so move the cut left. If <code>b[j-1] &gt; a[i]</code>, move it right. Sentinels (negative and positive infinity) cover the cuts at the edges, where <code>i</code> or <code>j</code> is 0 or the full length.</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">static</span> <span class="hljs-type">double</span> <span class="hljs-title function_">median</span><span class="hljs-params">(<span class="hljs-type">int</span>[] a, <span class="hljs-type">int</span>[] b)</span> {
+    <span class="hljs-keyword">if</span> (a.length &gt; b.length) <span class="hljs-keyword">return</span> median(b, a);        <span class="hljs-comment">// binary search the shorter one</span>
+    <span class="hljs-type">int</span> <span class="hljs-variable">m</span> <span class="hljs-operator">=</span> a.length, n = b.length;
+    <span class="hljs-keyword">if</span> (m + n == <span class="hljs-number">0</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;both arrays empty&quot;</span>);
+    <span class="hljs-type">int</span> <span class="hljs-variable">half</span> <span class="hljs-operator">=</span> (m + n + <span class="hljs-number">1</span>) / <span class="hljs-number">2</span>;
+    <span class="hljs-type">int</span> <span class="hljs-variable">lo</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>, hi = m;
+    <span class="hljs-keyword">while</span> (lo &lt;= hi) {
+        <span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> (lo + hi) &gt;&gt;&gt; <span class="hljs-number">1</span>;                         <span class="hljs-comment">// cut in a</span>
+        <span class="hljs-type">int</span> <span class="hljs-variable">j</span> <span class="hljs-operator">=</span> half - i;                                <span class="hljs-comment">// cut in b</span>
+        <span class="hljs-type">int</span> <span class="hljs-variable">aLeft</span>  <span class="hljs-operator">=</span> (i == <span class="hljs-number">0</span>) ? Integer.MIN_VALUE : a[i - <span class="hljs-number">1</span>];
+        <span class="hljs-type">int</span> <span class="hljs-variable">aRight</span> <span class="hljs-operator">=</span> (i == m) ? Integer.MAX_VALUE : a[i];
+        <span class="hljs-type">int</span> <span class="hljs-variable">bLeft</span>  <span class="hljs-operator">=</span> (j == <span class="hljs-number">0</span>) ? Integer.MIN_VALUE : b[j - <span class="hljs-number">1</span>];
+        <span class="hljs-type">int</span> <span class="hljs-variable">bRight</span> <span class="hljs-operator">=</span> (j == n) ? Integer.MAX_VALUE : b[j];
+        <span class="hljs-keyword">if</span> (aLeft &lt;= bRight &amp;&amp; bLeft &lt;= aRight) {        <span class="hljs-comment">// valid partition</span>
+            <span class="hljs-type">int</span> <span class="hljs-variable">maxLeft</span> <span class="hljs-operator">=</span> Math.max(aLeft, bLeft);
+            <span class="hljs-keyword">if</span> (((m + n) &amp; <span class="hljs-number">1</span>) == <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> maxLeft;      <span class="hljs-comment">// odd: largest of the left half</span>
+            <span class="hljs-type">int</span> <span class="hljs-variable">minRight</span> <span class="hljs-operator">=</span> Math.min(aRight, bRight);
+            <span class="hljs-keyword">return</span> ((<span class="hljs-type">double</span>) maxLeft + minRight) / <span class="hljs-number">2.0</span>;  <span class="hljs-comment">// even: average the two middle values</span>
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (aLeft &gt; bRight) {
+            hi = i - <span class="hljs-number">1</span>;                                  <span class="hljs-comment">// took too many from a</span>
+        } <span class="hljs-keyword">else</span> {
+            lo = i + <span class="hljs-number">1</span>;                                  <span class="hljs-comment">// took too few from a</span>
+        }
+    }
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;inputs are not sorted&quot;</span>);
+}
+</code></pre>
+<p>Dry run with <code>a = [2]</code>, <code>b = [1, 3]</code> (already ordered shorter first, m = 1, n = 2, half = 2). First cut <code>i = 0</code>, <code>j = 2</code>: <code>aLeft = -inf</code>, <code>aRight = 2</code>, <code>bLeft = 3</code>, <code>bRight = +inf</code>. The check <code>bLeft &lt;= aRight</code> is <code>3 &lt;= 2</code>, false, and <code>aLeft &gt; bRight</code> is false, so move right: <code>lo = 1</code>. Next <code>i = 1</code>, <code>j = 1</code>: <code>aLeft = 2</code>, <code>aRight = +inf</code>, <code>bLeft = 1</code>, <code>bRight = 3</code>. Both conditions hold. Total length is odd, so the median is <code>max(2, 1) = 2</code>, which matches the merged array <code>[1, 2, 3]</code>.</p>
+<p>Complexity is O(log min(n, m)) time and O(1) space, because the search range is the shorter array only. The catches that interviewers check: <strong>swap so you search the shorter array</strong> (otherwise <code>j</code> can go negative or exceed <code>n</code>), use <strong><code>(m + n + 1) / 2</code></strong> so the left half holds the extra element for odd totals, use <code>&gt;&gt;&gt;</code> or <code>lo + (hi - lo) / 2</code> against overflow, cast to <code>double</code> before adding the two middle values (int overflow on large values), and handle one empty array (it works: <code>m = 0</code>, so <code>i</code> is always 0).</p>
+<hr>
+<h2>Coding: LRU cache</h2>
+<p><strong>25. Implement LRU Cache using HashMap + Doubly Linked List and explain concurrency concerns.</strong> <em>Testing O(1) design and whether you notice that a cache read is a write.</em> An LRU (least recently used) cache evicts the entry that has gone unused longest. Both <code>get</code> and <code>put</code> must be O(1), which needs two structures working together: a <code>HashMap&lt;K, Node&gt;</code> for O(1) lookup, and a doubly linked list ordered by recency (head = most recent, tail = least recent) so that moving a node to the front and removing the tail are O(1) pointer updates. A singly linked list cannot unlink a node without its predecessor; the <code>prev</code> pointer is what makes removal O(1).</p>
+<p>Two sentinel nodes (a dummy head and dummy tail) remove every null and edge-case check:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LruCache</span>&lt;K, V&gt; {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Node</span>&lt;K, V&gt; {
+        K key; V value; Node&lt;K, V&gt; prev, next;
+        Node(K k, V v) { key = k; value = v; }
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> capacity;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;K, Node&lt;K, V&gt;&gt; index = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Node&lt;K, V&gt; head = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Node</span>&lt;&gt;(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);   <span class="hljs-comment">// sentinel: most recent side</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Node&lt;K, V&gt; tail = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Node</span>&lt;&gt;(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);   <span class="hljs-comment">// sentinel: least recent side</span>
+
+    <span class="hljs-keyword">public</span> <span class="hljs-title function_">LruCache</span><span class="hljs-params">(<span class="hljs-type">int</span> capacity)</span> {
+        <span class="hljs-keyword">if</span> (capacity &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;capacity must be positive&quot;</span>);
+        <span class="hljs-built_in">this</span>.capacity = capacity;
+        head.next = tail;
+        tail.prev = head;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> V <span class="hljs-title function_">get</span><span class="hljs-params">(K key)</span> {
+        Node&lt;K, V&gt; n = index.get(key);
+        <span class="hljs-keyword">if</span> (n == <span class="hljs-literal">null</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+        unlink(n);
+        pushFront(n);                       <span class="hljs-comment">// a read reorders the list</span>
+        <span class="hljs-keyword">return</span> n.value;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">put</span><span class="hljs-params">(K key, V value)</span> {
+        Node&lt;K, V&gt; n = index.get(key);
+        <span class="hljs-keyword">if</span> (n != <span class="hljs-literal">null</span>) {
+            n.value = value;
+            unlink(n);
+            pushFront(n);
+            <span class="hljs-keyword">return</span>;
+        }
+        <span class="hljs-keyword">if</span> (index.size() == capacity) {
+            Node&lt;K, V&gt; lru = tail.prev;     <span class="hljs-comment">// least recently used</span>
+            unlink(lru);
+            index.remove(lru.key);          <span class="hljs-comment">// the node stores its key for exactly this reason</span>
+        }
+        n = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Node</span>&lt;&gt;(key, value);
+        index.put(key, n);
+        pushFront(n);
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">unlink</span><span class="hljs-params">(Node&lt;K, V&gt; n)</span> { n.prev.next = n.next; n.next.prev = n.prev; }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">pushFront</span><span class="hljs-params">(Node&lt;K, V&gt; n)</span> {
+        n.next = head.next; n.prev = head;
+        head.next.prev = n; head.next = n;
+    }
+}
+</code></pre>
+<p>The node stores its own key so that eviction can remove the map entry in O(1) when all it holds is the tail node. Every operation is a map lookup plus a constant number of pointer assignments.</p>
+<p>In production Java you would often write far less code, because <code>LinkedHashMap</code> is exactly this structure. Constructing it with <code>accessOrder = true</code> reorders entries on <code>get</code>, and overriding <code>removeEldestEntry</code> evicts automatically:</p>
+<pre><code class="hljs" data-lang="java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">SimpleLru</span>&lt;K, V&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title class_">LinkedHashMap</span>&lt;K, V&gt; {
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> capacity;
+    SimpleLru(<span class="hljs-type">int</span> capacity) { <span class="hljs-built_in">super</span>(<span class="hljs-number">16</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-literal">true</span>); <span class="hljs-built_in">this</span>.capacity = capacity; }   <span class="hljs-comment">// true = access order</span>
+    <span class="hljs-meta">@Override</span> <span class="hljs-keyword">protected</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">removeEldestEntry</span><span class="hljs-params">(Map.Entry&lt;K, V&gt; eldest)</span> { <span class="hljs-keyword">return</span> size() &gt; capacity; }
+}
+</code></pre>
+<p><strong>Concurrency is the real question.</strong> The synchronized version above is correct but has a hidden problem: <strong><code>get</code> mutates shared state</strong> (it reorders the list), so a cache that looks read-mostly is actually write-only from the locking perspective. You cannot use a read-write lock to let readers proceed in parallel, and a plain <code>ConcurrentHashMap</code> in front of an unsynchronized list corrupts the pointers. Options, in increasing order of sophistication:</p>
+<ul>
+<li><strong>One coarse lock</strong> (<code>synchronized</code> or <code>ReentrantLock</code>): simple and correct, the right answer up to moderate contention. Keep the critical section tiny and never call loaders or I/O while holding it.</li>
+<li><strong>Lock striping</strong>: split into N independent segments by <code>hash(key) % N</code>, each with its own lock and its own LRU list. Contention falls by about N, but eviction is now per segment, so global recency is approximate.</li>
+<li><strong>Record accesses in a buffer and apply them in batches.</strong> Reads append to a lock-free buffer and a single thread (or whoever holds the lock) replays them to reorder the list. This is how Caffeine works: reads never take the main lock, and its W-TinyLFU policy tracks frequency as well as recency, which gives a better hit rate than pure LRU on scan-heavy workloads.</li>
+<li><strong>Cache stampede.</strong> When many threads miss on the same key, they all call the loader. Use <code>computeIfAbsent</code>-style loading with per-key locking (Caffeine's <code>LoadingCache</code>), and keep loaders short, since a slow loader inside a coarse lock stalls the entire cache.</li>
+</ul>
+<p>The practical answer to say aloud: implement the O(1) design to show you understand it, then say that in production you would use Caffeine, with a size bound, an expiry, and <code>recordStats()</code> so the hit rate is observable. For the lock-free and memory-model background behind the buffered approach, see the Java Concurrency guide in this set.</p>
+<hr>
+<h2>Rapid-fire recap</h2>
+<p>One line per question, for the hour before the interview. Each line is the mechanism, then the catch.</p>
+<ol>
+<li><strong>Millions of temporaries:</strong> allocation is a TLAB pointer bump and dead objects are free; the cost is allocation rate (GC frequency) and premature promotion.</li>
+<li><strong>Escape analysis:</strong> C2 scalar-replaces and lock-elides objects that never escape, but only if everything is inlined, and it is invisible and fragile.</li>
+<li><strong>JIT:</strong> tiered interpreter, C1, C2 with profile-driven inlining and speculation; the catch is deoptimization and warmup.</li>
+<li><strong>ArrayList vs LinkedList:</strong> <code>ArrayList</code> (or <code>ArrayDeque</code>); contiguous memory and 4 bytes per element beat O(1) insert that needs an O(n) pointer walk.</li>
+<li><strong>CopyOnWriteArrayList:</strong> lock-free reads on a snapshot, full array copy on every write; bad when writes are frequent or the list is large.</li>
+<li><strong>Custom Collector:</strong> supplier, accumulator, combiner, finisher; the combiner must be associative and characteristics must be true.</li>
+<li><strong>Optional:</strong> a return type only; not a field, parameter, or collection element; <code>orElseGet</code> for lazy defaults.</li>
+<li><strong>Lambdas vs anonymous classes:</strong> <code>invokedynamic</code> and a hidden class versus a class file per instance; non-capturing lambdas are singletons and <code>this</code> means the enclosing instance.</li>
+<li><strong>Pool sizing:</strong> about N for CPU-bound, <code>N * (1 + wait/compute)</code> for I/O-bound, capped by the downstream resource; virtual threads for I/O plus a semaphore.</li>
+<li><strong>Full queue:</strong> core threads, then queue, then up to max, then the rejection handler; <code>newFixedThreadPool</code> has an unbounded queue and never rejects.</li>
+<li><strong>Propagation:</strong> <code>REQUIRED</code> joins, <code>REQUIRES_NEW</code> suspends and needs a second connection, <code>NESTED</code> is a savepoint, <code>MANDATORY</code> asserts; self-invocation skips the proxy.</li>
+<li><strong>Isolation:</strong> dirty, non-repeatable, phantom reads by level; PostgreSQL and MySQL differ from the standard, and write skew survives snapshot isolation.</li>
+<li><strong>Exception in <code>@Transactional</code>:</strong> rollback on unchecked only; an inner failure marks the shared transaction rollback-only, so a swallowed exception ends in <code>UnexpectedRollbackException</code>.</li>
+<li><strong>Rate limiting:</strong> layers (edge, gateway, app, concurrency limit); token bucket with shared state in Redis; return <code>429</code> with <code>Retry-After</code>.</li>
+<li><strong>Pagination:</strong> keyset with a unique tiebreaker and an opaque cursor; offset is O(offset); no random page jump or exact count.</li>
+<li><strong>Outbox:</strong> write the event in the same transaction as the data, relay by poller or CDC; at-least-once, so idempotent consumers.</li>
+<li><strong>Service auth:</strong> mTLS or client-credentials JWT with audience checks, short-lived and cached; token exchange for user context.</li>
+<li><strong>Tracing:</strong> W3C <code>traceparent</code> through Micrometer Tracing and OpenTelemetry; the failure is lost context across threads and sampling.</li>
+<li><strong>Poison messages:</strong> classify, retry a bounded number of times, dead-letter; <code>ErrorHandlingDeserializer</code> for bad bytes; a stuck record blocks the partition.</li>
+<li><strong>Retry topics and DLT:</strong> non-blocking retry through delayed topics, then the DLT; ordering is lost and handlers must be idempotent.</li>
+<li><strong>Fetching:</strong> lazy plus <code>JOIN FETCH</code>, entity graph, or batch size; collection fetch multiplies rows and breaks database pagination.</li>
+<li><strong>EAGER:</strong> fixed in the mapping, silently produces N+1 for JPQL queries, and cannot be made lazy per query.</li>
+<li><strong>Dirty checking:</strong> snapshot versus current state at flush; cost grows with managed entities; <code>readOnly = true</code> and chunked <code>clear()</code> help.</li>
+<li><strong>Median of two sorted arrays:</strong> binary search the cut in the shorter array with sentinels; O(log min(n, m)).</li>
+<li><strong>LRU cache:</strong> hash map plus doubly linked list with sentinels; <code>get</code> is a write, so use a coarse lock, striping, or Caffeine's buffered reads.</li>
+</ol>
+<hr>
+<h2>In the room</h2>
+<p>Treat this round as a conversation about trade-offs, and keep each answer to about ninety seconds: the mechanism in one or two sentences, the catch in one, then stop and let the interviewer pull on the thread they care about. Rambling through everything you know about <code>@Transactional</code> reads as unfocused, while one precise sentence about rollback-only transactions reads as someone who has been paged for it.</p>
+<p>A few habits that separate answers:</p>
+<ul>
+<li><strong>Lead with the recommendation, then the reason.</strong> &quot;ArrayList, because the node overhead and cache misses make LinkedList slower even for inserts&quot; beats starting from Big-O definitions.</li>
+<li><strong>Name what you would measure.</strong> For anything about performance (temporaries, EA, JIT, pool sizing), say how you would verify it: JMH with <code>-prof gc</code>, JFR, GC logs, queue depth metrics. It signals that you do not trust folklore.</li>
+<li><strong>Say what you would not do.</strong> &quot;I would not add object pooling here&quot; and &quot;I would not use <code>SERIALIZABLE</code>; I would use a unique constraint&quot; show judgment, which is the point of a senior round.</li>
+<li><strong>Flag version-dependent claims.</strong> Virtual-thread pinning changed in JDK 24, Spring Framework 7 added built-in retry and concurrency limiting, and PostgreSQL and MySQL differ on isolation. Naming the version beats a confident wrong answer.</li>
+<li><strong>On the coding questions, talk before you type.</strong> State the brute force and its cost, name the data structure or invariant that improves it, write it with sentinels, then dry run a tiny input out loud. For the median problem, saying &quot;I am binary searching the cut position in the shorter array&quot; in the first minute is most of the credit.</li>
+</ul>
+<p>If you are asked something outside this list, fall back to the mental model at the top: what does it cost, and what does it do at ten times the load? That question gets you to a defensible answer on almost any backend topic. For deeper background, the Java Concurrency guide covers the memory model and lock-free structures behind questions 5, 9, 10, and 25, the Java Classic guide covers JPA and transaction behavior in an application server, and the Kafka and Relational Database guides cover the messaging and isolation material in more depth.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>

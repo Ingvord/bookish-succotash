@@ -64,6 +64,7 @@ All colours pass WCAG AA contrast on white. The authoritative list is the palett
 | Bronze | `#7d4b13` | testing-tdd-prep |
 | Rust | `#a8431c` | python-data-libs-prep |
 | Fern | `#3d6b22` | vcluster-gateway-api-prep |
+| Mahogany | `#7c2f22` | java-backend-question-bank |
 
 ### Sanity-check after build
 
