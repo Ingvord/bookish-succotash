@@ -217,6 +217,14 @@ const GUIDES = [
     accent:   '#5c6b1f',  // moss
   },
   {
+    src:      '.claude/level-md/staff-platform-scenarios.md',
+    out:      'level/staff-platform-scenarios.html',
+    kicker:   'Interview Preparation · Staff Platform Engineer',
+    title:    'The Staff Platform Round: Scenario Questions',
+    subtitle: 'The open-ended questions that replace kubectl trivia at Staff level: the 45-minute deploy, three teams fighting over shared infra, the doubled cloud bill, and three more, each answered with one skeleton that shows prioritization, influence, and business translation.',
+    accent:   '#4a2a5c',  // aubergine
+  },
+  {
     src:      '.claude/level-md/leadership-prep.md',
     out:      'level/leadership-prep.html',
     kicker:   'Interview Preparation · Engineering Leadership',
@@ -340,6 +348,7 @@ const GUIDES = [
 //  iris        #4b4aa8   system-design-component-cheatsheet -- AA on white (7.4:1)
 //  fern        #3d6b22   vcluster-gateway-api-prep        -- AA on white (6.3:1)
 //  mahogany    #7c2f22   java-backend-question-bank       -- AA on white (9.2:1)
+//  aubergine   #4a2a5c   staff-platform-scenarios         -- AA on white (~12:1)
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------

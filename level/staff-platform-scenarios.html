@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Staff Platform Round: Scenario Questions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+
+:root {
+  --ink:          #1c1b19;
+  --muted:        #5f5c55;
+  --paper:        #ffffff;
+  --accent:       #4a2a5c;
+  --accent-soft:  #4a2a5c14;
+  --rule:         #e7e3da;
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e6ea;
+  --code-tag:     #eef1f4;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 1.72;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.wrap { max-width: 52rem; margin: 0 auto; padding: 3.5rem 1.6rem 6rem; }
+
+/* ---------- header ---------- */
+.doc-header {
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.6rem;
+}
+.kicker {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.7rem;
+  line-height: 1.08;
+  margin: .5rem 0 0;
+  letter-spacing: -.015em;
+}
+.doc-header .sub {
+  color: var(--muted);
+  font-size: 1.02rem;
+  margin-top: .85rem;
+  line-height: 1.55;
+}
+
+/* ---------- tip: header chip ---------- */
+.tip-chip {
+  display: inline-block;
+  margin-top: 1rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: .3em .8em;
+  text-decoration: none;
+}
+.tip-chip:hover { background: var(--accent); color: #fff; }
+
+/* ---------- tip: footer card ---------- */
+.tip-jar {
+  margin-top: 4rem;
+  padding: 1.8rem 1.9rem;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.tip-jar-lead {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 .5rem;
+}
+.tip-jar-body { color: var(--muted); font-size: .96rem; margin: 0 0 1.1rem; }
+.tip-jar-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  padding: .6em 1.1em;
+  border-radius: 8px;
+  border: none;
+  text-decoration: none;
+}
+.tip-jar-btn:hover { filter: brightness(1.08); }
+.tip-jar-fine { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
+
+/* ---------- callouts ---------- */
+.callout {
+  margin: 1.6rem 0;
+  padding: 1.1rem 1.4rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+}
+.callout-label {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout-warning { border-left-color: #a3372b; background: #a3372b14; }
+.callout-warning .callout-label { color: #a3372b; }
+.callout-insight { border-left-color: #2d6a44; background: #2d6a4414; }
+.callout-insight .callout-label { color: #2d6a44; }
+
+/* ---------- headings ---------- */
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.72rem;
+  margin: 3.2rem 0 1rem;
+  padding-bottom: .42rem;
+  border-bottom: 1px solid var(--rule);
+  letter-spacing: -.01em;
+}
+h3 {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  margin: 2.1rem 0 .55rem;
+}
+
+/* ---------- body copy ---------- */
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+strong { font-weight: 650; color: #141312; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin: .25rem 0; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.6rem 0; }
+
+/* ---------- inline code ---------- */
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  font-size: .84em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: .06em .34em;
+  color: var(--ink);
+}
+
+/* ---------- code blocks ---------- */
+pre {
+  position: relative;
+  margin: 1.1rem 0 1.5rem;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+pre code.hljs {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #24292e;
+  font-size: .8rem;
+  line-height: 1.6;
+  display: block;
+}
+pre code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--code-tag);
+  border: 1px solid var(--code-border);
+  border-top: none; border-right: none;
+  border-bottom-left-radius: 6px;
+  padding: .22em .6em;
+}
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; margin: 1.3rem 0; font-size: .86rem; }
+th, td {
+  border: 1px solid var(--rule);
+  padding: .5rem .68rem;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--accent);
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: .66rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+tbody tr:nth-child(even) { background: #faf9f6; }
+td code { font-size: .84em; }
+
+/* ---------- print ---------- */
+@page { margin: 16mm; }
+@media print {
+  body { font-size: 10.5pt; }
+  .wrap { max-width: none; padding: 0; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  a { color: var(--ink); border: none; }
+  /* wrap long lines so nothing clips at the page edge */
+  pre code.hljs { white-space: pre-wrap; word-break: break-word; }
+  pre, table { break-inside: auto; }
+  tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .tip-chip, .tip-jar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc-header">
+    <div class="kicker">Interview Preparation · Staff Platform Engineer</div>
+    <h1>The Staff Platform Round: Scenario Questions</h1>
+    <div class="sub">The open-ended questions that replace kubectl trivia at Staff level: the 45-minute deploy, three teams fighting over shared infra, the doubled cloud bill, and three more, each answered with one skeleton that shows prioritization, influence, and business translation.</div>
+    <a class="tip-chip" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Useful? Tip the author</a>
+  </header>
+  <main>
+<h2>Nobody asks for YAML at this level</h2>
+<p>You are in the loop for a Staff Platform Engineer role, and the interviewer has stopped asking how a Pod gets scheduled. They assume you know the tools. What they ask instead sounds like a meeting you would walk into on day one: &quot;Our deploy takes 45 minutes and devs ship once a week. You have six months and two engineers. What is your plan?&quot; &quot;Three teams are fighting over who owns shared infrastructure. How do you resolve it without making all three mad?&quot; &quot;The cloud bill doubled in six months and nobody knows why. Walk me through your first week.&quot;</p>
+<p>These are open on purpose. There is no correct configuration to recite. The interviewer is watching three things: whether you <strong>prioritize</strong> when everything looks urgent, whether you can <strong>influence</strong> people who do not report to you, and whether you can <strong>translate</strong> technical work into the language of money, risk, and time. A candidate who answers with a tool name (&quot;we would adopt Argo CD&quot;) has skipped the part being graded.</p>
+<p>This guide gives you one answer skeleton, then walks six scenarios through it: the three above plus three more that show up in the same loops. It does not repeat the story templates in &quot;The Senior Platform Engineer Interview&quot; (use those for your own past experience), the influence mechanics in &quot;The Engineering Leadership Interview&quot;, or the probing patterns in &quot;Depth That Survives Probing&quot;. Kubernetes specifics (requests and limits, tenancy, rollouts) are in &quot;Kubernetes: Diagnose It, Operate It&quot;.</p>
+<hr>
+<h2>The answer skeleton</h2>
+<p>Every scenario answer in this guide has the same five moves. The order matters, because each move earns the right to make the next one.</p>
+<ol>
+<li><strong>Clarify and bound.</strong> Ask two or three questions that change the answer, then state your assumptions out loud. &quot;Is the 45 minutes build time or total time to production? I will assume total.&quot;</li>
+<li><strong>Measure before deciding.</strong> Name the data you would collect and how long it takes. A plan built on a guess is a guess with a timeline.</li>
+<li><strong>Find the constraint.</strong> Most problems have one or two causes that dominate. Say which you expect and what would prove you wrong.</li>
+<li><strong>Sequence by leverage, and say what you will not do.</strong> The ordering is the answer. Naming what you will refuse to start shows prioritization better than any list of what you will do.</li>
+<li><strong>Land it with people, report it in business units.</strong> Who has to agree, who is afraid of what, and how you will say the result in hours saved, dollars saved, or incidents avoided.</li>
+</ol>
+<p>Here is the skeleton as a script you can keep in your head and say aloud.</p>
+<pre><code class="hljs" data-lang="text">1. &quot;Before I plan, three questions: ...&quot;          (clarify, bound)
+2. &quot;In week one I would measure ...&quot;              (data, not opinion)
+3. &quot;My hypothesis is the constraint is ..., and
+    I would be wrong if ...&quot;                      (falsifiable)
+4. &quot;In order: first ..., then ..., and I would
+    deliberately not ... because ...&quot;             (leverage, refusal)
+5. &quot;To make it stick I need X to agree, and I
+    would report it as ... per week / month.&quot;     (people, business units)
+</code></pre>
+<p>The skeleton is a script for thinking, not for reciting. Interviewers interrupt. If they cut in at move 2 with &quot;assume you have no data&quot;, that is a signal to describe how you would get it cheaply, not to skip it. The catch is the candidate who treats clarifying questions as a ritual and asks five of them. Two or three that visibly change your plan beat a long list that delays it.</p>
+<hr>
+<h2>★ Scenario 1: the 45-minute deploy</h2>
+<p><strong>The prompt.</strong> &quot;Our deploy takes 45 minutes. Devs deploy once a week because of it. You have six months and two engineers. What is your plan?&quot;</p>
+<p><strong>What they are really testing.</strong> Whether you diagnose before prescribing, whether you can size a plan to two people, and whether you notice that the cadence is a human problem as much as a pipeline problem.</p>
+<h3>Clarify and frame</h3>
+<p>Ask: &quot;Is the 45 minutes pipeline time, or does it include approvals and waiting? Is it one service or many? What happens when a deploy fails today?&quot; Then reframe the problem before touching it. Weekly deploys are a <strong>batch size</strong> problem. A slow deploy makes each one expensive, so teams batch changes. A bigger batch carries more risk, so failures are more painful and harder to debug, which makes everyone more afraid to deploy, which makes them batch more. The loop feeds itself, and shortening the pipeline alone does not break it.</p>
+<p>Give the loop a vocabulary the business recognizes. DORA's software delivery metrics are the standard: five of them, in two groups. Throughput is change lead time, deployment frequency, and failed deployment recovery time. Instability is change fail rate and deployment rework rate (rework rate was added in 2024; older material still teaches four metrics). Say which two you would move first: lead time and deployment frequency, while holding change fail rate flat. That last clause is the one that shows judgment.</p>
+<h3>Measure first</h3>
+<p>In week one, break the 45 minutes into stages with real timestamps from your CI system and rollout events: queue wait, build, tests, image push, rollout, and any manual gates. Expect the distribution to be lumpy. Two stages usually account for most of the time, and it is rarely the one the team blames.</p>
+<h3>The usual culprits, with mechanism</h3>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Typical cause</th>
+<th>Symptom you will see</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build</td>
+<td>No layer cache, or dependencies installed before source is copied</td>
+<td>Every build re-downloads the world; build time does not shrink on small changes</td>
+</tr>
+<tr>
+<td>Test</td>
+<td>One serial suite, shared test database</td>
+<td>Wall time equals the sum of all tests; flaky reruns double it</td>
+</tr>
+<tr>
+<td>Push and pull</td>
+<td>Large images, cold nodes</td>
+<td>Rollout waits on image pulls of hundreds of MB per new node</td>
+</tr>
+<tr>
+<td>Rollout</td>
+<td>Slow readiness probe times the number of surge batches, plus a large <code>minReadySeconds</code></td>
+<td>Rollout time = batches x (startup + probe delay + min ready)</td>
+</tr>
+<tr>
+<td>Orchestration</td>
+<td>Services deployed one after another, each waiting for the last</td>
+<td>Total time is additive across services that do not depend on each other</td>
+</tr>
+<tr>
+<td>Process</td>
+<td>Manual approval gate, change window</td>
+<td>Pipeline idle while a human is asleep</td>
+</tr>
+</tbody>
+</table>
+<p>A concrete example of the rollout row. A Deployment with 20 replicas, <code>maxSurge: 25%</code> and <code>maxUnavailable: 25%</code> replaces about 5 pods per batch, so 4 batches. If each pod takes 60 seconds to pass readiness and <code>minReadySeconds</code> is 30, that is 4 x 90 = 6 minutes for rollout alone. Tuning the probe and surge is cheap and shows up immediately.</p>
+<h3>The plan: six months, two engineers</h3>
+<pre><code class="hljs" data-lang="text">Month 1      Measure and quick wins
+             - stage timing dashboard (the baseline everyone trusts)
+             - layer cache, dependency cache, shrink the base image
+             - kill idle waits (queue capacity, approval timeouts)
+Months 2-3   Parallelize
+             - split and shard the test suite, run independent services concurrently
+             - tune probes, surge, and image pre-pull on the hot path
+Months 4-6   Make small deploys safe
+             - progressive delivery: canary with automatic rollback on SLO breach
+             - feature flags so deploying is separate from releasing
+             - retire the approval gate once rollback is proven
+</code></pre>
+<p>The ordering is by leverage and by trust. Month 1 produces a visible win in weeks, which buys patience for the rest. Progressive delivery comes last because it is what lets the team deploy ten times a day without fear, and it only earns trust once the pipeline is fast enough to use it.</p>
+<p>Say what you would not do. You would not rewrite the CI system, migrate CI vendors, or adopt a new deployment platform in the first quarter. With two engineers that is the plan that eats the six months and ships nothing.</p>
+<p><strong>The catch.</strong> Speed without a safety net raises change fail rate. If you cut the deploy to 8 minutes and rollback is still manual, the first bad release teaches the whole company that fast deploys are dangerous, and you have made the fear worse. The fix is the order above: canary and automatic rollback are not a luxury at the end, they are the thing that makes frequency safe.</p>
+<p><strong>In business terms.</strong> &quot;Lead time from merge to production goes from days to under an hour, so a bug fix or a customer-requested change reaches users the same day, and each release is small enough that a failure is cheap to undo.&quot;</p>
+<p><strong>Follow-ups to expect.</strong> &quot;What if the 45 minutes is mostly tests owned by other teams?&quot; (You cannot fix it alone: show the data to the owners, propose a shared test-time budget, and shard what you can.) &quot;How do you know it worked?&quot; (Lead time and deploy frequency up, change fail rate flat or down, measured from the same baseline.)</p>
+<hr>
+<h2>★ Scenario 2: three teams, one piece of shared infrastructure</h2>
+<p><strong>The prompt.</strong> &quot;Three teams are fighting over shared infra ownership. How do you resolve it without making all three mad?&quot;</p>
+<p><strong>What they are really testing.</strong> Influence without authority. Whether you treat this as a people problem or a structural one, and whether you can end up with something durable instead of a truce.</p>
+<h3>Clarify and diagnose</h3>
+<p>Ask: &quot;What is actually being fought over: who pays, who gets paged, who can change it, or who can block someone else's change? Is there an incident behind this?&quot; The answer is almost never &quot;they dislike each other&quot;. Ambiguous ownership produces conflict because every outage has three plausible owners and every change has three plausible vetoes. The bug is in the structure, and the people are reacting rationally to it.</p>
+<h3>The plan</h3>
+<p>Start with one-on-ones, not a meeting. In a group, each team defends a position. Alone, each tells you the underlying fear: one is afraid of being paged for someone else's change, one is afraid of being blocked, one is afraid of the bill. Positions conflict; fears usually do not, and a design can address all three.</p>
+<p>Then build the structure in this order:</p>
+<ol>
+<li><strong>Ownership map.</strong> List the shared components (ingress, cluster add-ons, node pools, observability, certificates) and give each a single accountable owner, plus who is consulted and who is informed. A one-page table is enough.</li>
+<li><strong>Separate the substrate from the tenants.</strong> A common resolution: the platform team owns the shared substrate and its upgrade cadence, each product team owns its namespace and workloads, and the boundary is enforced with RBAC, ResourceQuota, and a CODEOWNERS file on the configuration repository. Tenancy options (namespaces versus virtual clusters) are in the Kubernetes guide.</li>
+<li><strong>Give each shared component an SLO.</strong> An owner without a target is a janitor. A target gives the consumers something to hold the owner to and gives the owner something to defend.</li>
+<li><strong>Write it down as a decision.</strong> An ADR with the options considered and why this one won. People accept a decision they can argue with on paper more readily than one made in a hallway.</li>
+<li><strong>Set a trial and a review date.</strong> &quot;We try this for a quarter and revisit&quot; turns a win-lose negotiation into an experiment, and it lets the least happy team accept the change.</li>
+<li><strong>Agree how disputes escalate</strong>, in writing, before the next one happens.</li>
+</ol>
+<p>Notice what is missing: you did not pick a winner. The goal is that each team gets the thing it cares about most and gives up the thing it cares about least.</p>
+<p><strong>The catch.</strong> Two failure modes. The first is &quot;give everyone their own&quot;: it ends the argument today and triples cost and upgrade toil, because you now run three of everything and each drifts. The second is the consensus that nobody owns, where the meeting ends warmly with no accountable name. If you cannot point to one owner per component at the end, you have not resolved anything.</p>
+<p><strong>In business terms.</strong> &quot;Every shared system has one accountable owner and a target, so an outage has a clear first responder and a change has a clear approver. That cuts time-to-restore and removes the weeks lost to waiting for three teams to agree.&quot;</p>
+<p><strong>Follow-ups to expect.</strong> &quot;What if one team still refuses?&quot; (Escalate with a written proposal and the cost of the status quo, not a complaint.) &quot;What if you are wrong about the owner?&quot; (That is what the review date is for.) The mechanics of influence are in &quot;The Engineering Leadership Interview&quot;.</p>
+<hr>
+<h2>★ Scenario 3: the cloud bill doubled</h2>
+<p><strong>The prompt.</strong> &quot;Cloud bill doubled in six months. Nobody knows why. Walk me through your first week.&quot;</p>
+<p><strong>What they are really testing.</strong> Whether you start from data, whether you know where cloud money actually leaks, and whether your goal is a one-time cleanup or a system that stops it recurring.</p>
+<h3>Clarify and bound</h3>
+<p>Ask: &quot;Do I have access to billing data, and is anything tagged? Did traffic or headcount also double? Is there a committed-spend contract?&quot; If usage doubled with revenue, the story is different from usage flat and cost doubled. State that you will separate <strong>growth</strong> (expected) from <strong>waste</strong> (not).</p>
+<h3>Week one, day by day</h3>
+<pre><code class="hljs" data-lang="text">Day 1   Get billing export access (cost and usage report / billing export).
+        Group by service, account/project, region, and tag. Chart the 6 months.
+Day 2   Find the top 3 line items by growth, not by size. Costs are usually
+        concentrated: 3 items often explain most of the increase.
+Day 3   Allocate to owners. In clusters, break cost down by namespace and
+        label (OpenCost, a CNCF incubating project, or the provider&#x27;s
+        cost tool). Compare requested resources to actual usage.
+Day 4   Check the usual suspects (below) against the top items.
+Day 5   Write the one-pager: where the money went, three quick wins with
+        estimated savings, and why &quot;nobody knows&quot; (the visibility gap).
+</code></pre>
+<p>The comparison in day 3 is the one with the most Kubernetes content. The scheduler reserves capacity by <strong>requests</strong>, and you pay for nodes, not for usage. If pods request 4 CPUs and use 0.5, the cluster autoscaler keeps adding nodes to satisfy requests that are mostly empty. A quick way to see the gap on a live cluster:</p>
+<pre><code class="hljs" data-lang="bash"><span class="hljs-comment"># Requested vs actual, per node (needs metrics-server)</span>
+kubectl top nodes
+kubectl describe nodes | grep -A 8 <span class="hljs-string">&quot;Allocated resources&quot;</span>
+
+<span class="hljs-comment"># Actual usage per pod, to compare against each pod&#x27;s requests</span>
+kubectl top pods -A --sort-by=cpu
+</code></pre>
+<p>Those commands show the shape of the problem, not the answer. The aggregate view that persists is a cost tool such as OpenCost, which attributes spend to namespaces and workloads over time and can report the gap between requested and used. Read the output as: large requested-but-unused capacity means overprovisioning, which is the most common single cause in Kubernetes-heavy bills.</p>
+<h3>The usual suspects, with mechanism</h3>
+<ul>
+<li><strong>Data transfer.</strong> Cross-zone traffic between chatty services, and traffic through a NAT gateway (charged per GB processed, so a service pulling large images or datasets through it can dominate a bill). Symptom: a networking line item growing faster than compute.</li>
+<li><strong>Orphans.</strong> Unattached volumes, forgotten snapshots, idle load balancers left behind by deleted workloads. Symptom: storage and load balancer lines that never shrink.</li>
+<li><strong>Observability ingestion.</strong> Logs and metrics are billed on volume. A debug log level left on, or a metric with an unbounded label (high cardinality), multiplies cost with no change in traffic.</li>
+<li><strong>Autoscaler floors.</strong> A minimum replica or node count set high during an incident and never lowered.</li>
+<li><strong>Non-production running 24/7.</strong> Dev and staging at full size overnight and on weekends, roughly 70% of the hours in a week they sit idle.</li>
+<li><strong>Idle accelerators.</strong> GPU nodes are expensive per hour, so one reserved but unused node is a visible line.</li>
+<li><strong>Pricing mismatch.</strong> Everything on on-demand when stable load could be committed, or the reverse.</li>
+</ul>
+<h3>What the plan produces</h3>
+<p>By the end of the week: a one-page breakdown, three quick wins with estimated savings each, and the missing piece that explains the title question, which is almost always <strong>no tagging or allocation, so cost has no owner</strong>.</p>
+<p><strong>The catch.</strong> Three traps. Cutting requests blindly to save money causes OOMKills and CPU throttling (see the OOMKilled versus throttling scenario in the Kubernetes guide), so rightsizing needs usage data over a representative window, including peaks. Buying commitments (savings plans, reserved instances) before rightsizing locks in the waste for one to three years. And a one-time cleanup decays: the lasting fix is <strong>showback</strong> (each team sees its own spend, weekly) and budgets or alerts per owner, so the next doubling is noticed in a week instead of six months.</p>
+<p><strong>In business terms.</strong> &quot;In a week I can tell you where the increase came from and recover roughly X% of spend with no user impact. The ongoing fix is that every team sees its own bill, so cost becomes a design input and not a surprise.&quot;</p>
+<p><strong>Follow-ups to expect.</strong> &quot;What if the growth is legitimate?&quot; (Then the metric is unit cost: cost per request or per customer, which is what finance should track.) &quot;How do you get teams to care?&quot; (Showback first; chargeback only once the numbers are trusted.)</p>
+<hr>
+<h2>★ Scenario 4: everything is P0</h2>
+<p><strong>The prompt.</strong> &quot;You run a four-person platform team. Five teams each tell you their request is critical and due this quarter. How do you decide?&quot;</p>
+<p><strong>What they are really testing.</strong> Prioritization under pressure, and whether you will say no in a way that keeps relationships intact.</p>
+<h3>The plan</h3>
+<p>Do not rank by who shouts loudest or by who is most senior. Make the requests comparable first. For each, capture: who is affected and how many, what happens if it slips a quarter (the <strong>cost of delay</strong>), how risky and how reversible it is, and how much of your capacity it takes. Requests that look equal in urgency are rarely equal in cost of delay: a compliance deadline with a date and a penalty is different from a feature wanted sooner.</p>
+<p>Then sequence:</p>
+<ol>
+<li>Anything with a hard external deadline or a real reliability risk goes first.</li>
+<li>Next, work that unblocks the most other teams, since one unblock multiplies.</li>
+<li>Cheap, high-value items are batched so they do not each interrupt a larger effort.</li>
+<li>The rest is declined or deferred explicitly, with a date to revisit.</li>
+</ol>
+<p>Reserve a fixed slice of capacity for reliability and toil reduction (a common split is something like 20 to 30%), written down as policy, so urgent feature requests cannot quietly consume it. Then show the result as <strong>options</strong>, not a verdict: &quot;With four people we can do A, B and C this quarter, or A and D. Here is what each choice costs.&quot; Leadership chooses between visible trade-offs, and the decision becomes theirs, not yours.</p>
+<p><strong>The catch.</strong> Saying yes to everything is the failure that looks like helpfulness: five things are started, none finishes, and every team is unhappy on the same day. The related trap is quietly prioritizing by your own taste. Naming the criteria publicly is what makes a &quot;no&quot; fair.</p>
+<p><strong>In business terms.</strong> &quot;We ship the three items with the highest cost of delay and say plainly what slips, so the trade-off is a decision leadership made, not a surprise they discover in March.&quot;</p>
+<p><strong>Follow-ups to expect.</strong> &quot;What if a VP overrides you?&quot; (Show them the trade-off and what drops; if they still override, you have a recorded decision, not a conflict.)</p>
+<hr>
+<h2>★ Scenario 5: nobody uses the golden path</h2>
+<p><strong>The prompt.</strong> &quot;You built a paved road for deploying services. A year later about 20% of teams use it. What do you do?&quot;</p>
+<p><strong>What they are really testing.</strong> Whether you treat the platform as a product with customers, or as a mandate to enforce.</p>
+<h3>The plan</h3>
+<p>Treat low adoption as a signal about the product. Start by talking to the teams that did not adopt it, especially two or three who are respected: what did they try, what stopped them? Then measure friction instead of guessing. A strong metric is <strong>time to first production deploy</strong> for a new service on the path versus off it. If the path is slower than doing it by hand, no mandate will fix it for long.</p>
+<p>The usual findings, and the corresponding move:</p>
+<table>
+<thead>
+<tr>
+<th>What teams say</th>
+<th>The real issue</th>
+<th>The move</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&quot;It does not fit my service&quot;</td>
+<td>Path covers only the common case</td>
+<td>Add the two most-requested variants; document an escape hatch</td>
+</tr>
+<tr>
+<td>&quot;It is slower than what I have&quot;</td>
+<td>Friction in the path</td>
+<td>Cut the steps; measure time to first deploy weekly</td>
+</tr>
+<tr>
+<td>&quot;I do not trust it&quot;</td>
+<td>Opaque, breaks without explanation</td>
+<td>Make failures legible; give a named on-call for the path</td>
+</tr>
+<tr>
+<td>&quot;We did not know it existed&quot;</td>
+<td>Discovery</td>
+<td>Templates in the service generator, defaults in new repos</td>
+</tr>
+</tbody>
+</table>
+<p>Make the path the <strong>easiest</strong> option, not the only one. Keep an escape hatch for teams with real needs, but require them to say what the path lacked, because that feedback is your roadmap.</p>
+<p><strong>The catch.</strong> A mandate gets compliance without adoption: teams do the minimum, route around it, and resent it. A path that exists but is not the easiest is a document. And &quot;we can enforce it in CI&quot; is a tool, not a strategy: enforce the guardrails that matter for safety (security, cost tags) and let the rest compete on merit.</p>
+<p><strong>In business terms.</strong> &quot;Time from new service to first production deploy drops from X days to Y hours, and the share of services on the supported path rises, which means fewer one-off setups to secure, upgrade, and page for.&quot;</p>
+<p><strong>Follow-ups to expect.</strong> &quot;How do you measure the platform's success?&quot; (Adoption by choice, time to first deploy, and the number of support requests per team falling.)</p>
+<hr>
+<h2>★ Scenario 6: a platform change took production down</h2>
+<p><strong>The prompt.</strong> &quot;A platform change you shipped caused a production outage. Leadership asks what changes so it never happens again. What do you say?&quot;</p>
+<p><strong>What they are really testing.</strong> Ownership without blame, systemic thinking, and whether you can resist the overcorrection that makes a platform team useless.</p>
+<h3>The plan</h3>
+<p>Open by owning it and by being specific about impact: duration, who was affected, how it was detected. Then run a blameless review, which asks &quot;what in our system let one change do this?&quot; rather than &quot;who made the change&quot;. Look for the layered causes: why was the change not caught in review or test, why did it reach all clusters at once, why did detection take as long as it did, why was rollback slow?</p>
+<p>Propose durable, mechanical fixes, not reminders:</p>
+<ul>
+<li><strong>Smaller blast radius.</strong> Roll platform changes out in rings (a test cluster, a low-risk tenant, then everyone), with automatic halt on SLO breach.</li>
+<li><strong>Faster detection and rollback.</strong> An alert on the symptom, and a rollback that is one command and has been rehearsed.</li>
+<li><strong>Close the test gap</strong> that let it through, with a test that would have failed.</li>
+<li><strong>Frame the investment in error budgets and money.</strong> If the platform's own SLO was breached, that is the lever for prioritizing reliability work over new features, and the cost of the outage in revenue or engineer hours is the justification.</li>
+</ul>
+<p>Every action item needs one named owner and a date. A list without owners is the review's most common failure.</p>
+<p><strong>The catch.</strong> The overcorrection: &quot;freeze all changes&quot; or &quot;add an approval for everything&quot;. It feels responsible, but it slows every future change, raises batch sizes (back to Scenario 1), and makes the next failure larger. The better answer replaces the single big gate with guardrails that make small changes safe.</p>
+<p><strong>In business terms.</strong> &quot;Outage cost was X. The changes cap the blast radius of any single platform release to a small slice and cut time to recover from N minutes to M, so a similar failure becomes a minor incident instead of an outage.&quot;</p>
+<p><strong>Follow-ups to expect.</strong> &quot;Whose fault was it?&quot; (The system's: the answer is to describe the gap that let a normal change cause an outage, without naming a person.)</p>
+<hr>
+<h2>Practice: lightning prompts</h2>
+<p>Each of these is a shorter scenario. Answer aloud with the skeleton, then check against the sketch.</p>
+<p><strong>Justify a platform team's headcount.</strong> Do not argue from workload; argue from leverage. Count the engineers the platform serves, the hours it saves them per week (time to first deploy, toil removed), and the incidents or compliance work it prevents, then compare the product to the team's cost. The catch: if you cannot measure what the platform saves, the first budget cycle will cut it.</p>
+<p><strong>Leadership wants multi-cloud.</strong> Ask what problem it solves: outage risk, contract leverage, a regulatory requirement, or fashion. Multi-cloud costs real engineering (lowest-common-denominator services, doubled tooling and skills, cross-cloud egress charges), so it is justified by a specific risk. Often the better answer is multi-region on one cloud plus a tested exit plan for the pieces that matter.</p>
+<p><strong>Build versus buy for a managed service.</strong> Apply the differentiation rule: build what is specific to your company and gives an edge; buy undifferentiated infrastructure. Count total cost, including the on-call and upgrade burden you would own. The catch: &quot;we can run it cheaper&quot; usually leaves out the people-hours.</p>
+<p><strong>On-call is burning the team out.</strong> Measure first: pages per shift, share that are actionable, time to resolve. Fix the noisy alerts and the top recurring causes before adding people, and make the on-call load a tracked number with an agreed ceiling. The catch: adding people to a noisy rotation spreads the pain without removing it.</p>
+<p><strong>A senior engineer refuses the standard.</strong> Find out why before assuming obstruction; they may be right about a gap. If the standard is right, give them a role in improving it. If a safety guardrail is at stake, hold the line through the mechanism (a CI check), not through a confrontation.</p>
+<p><strong>A hard migration deadline with too little time.</strong> Separate must-move from can-wait, migrate the riskiest dependency first, keep a rollback for each step, and bring the trade-off to the deadline's owner early as options: reduce scope, extend the date, or add people, with what each costs.</p>
+<hr>
+<h2>Question bank</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>What they are testing</th>
+<th>Concise answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deploys take 45 minutes. First step?</td>
+<td>Measure before fixing</td>
+<td>Break the time into stages with real timestamps; two stages usually dominate.</td>
+</tr>
+<tr>
+<td>Why do slow deploys mean infrequent deploys?</td>
+<td>Systems thinking</td>
+<td>Batch size grows, risk grows with it, fear grows, so batches grow more.</td>
+</tr>
+<tr>
+<td>Which delivery metrics do you track?</td>
+<td>Business language</td>
+<td>DORA's five: change lead time, deployment frequency, failed deployment recovery time, change fail rate, deployment rework rate.</td>
+</tr>
+<tr>
+<td>How do you make fast deploys safe?</td>
+<td>The catch</td>
+<td>Canary with automatic rollback on SLO breach, plus feature flags to separate deploy from release.</td>
+</tr>
+<tr>
+<td>What would you refuse to do in a six-month, two-person plan?</td>
+<td>Prioritization</td>
+<td>Rewrite CI or switch platforms; the plan that eats the budget and ships nothing.</td>
+</tr>
+<tr>
+<td>Three teams dispute ownership. First move?</td>
+<td>Influence</td>
+<td>One-on-ones to find each team's underlying fear before any group meeting.</td>
+</tr>
+<tr>
+<td>What makes an ownership agreement stick?</td>
+<td>Durability</td>
+<td>One accountable owner and an SLO per component, written as a decision, with a review date.</td>
+</tr>
+<tr>
+<td>Why not give each team its own cluster?</td>
+<td>Trade-offs</td>
+<td>It ends the argument and triples cost, drift, and upgrade work.</td>
+</tr>
+<tr>
+<td>The bill doubled. What do you look at first?</td>
+<td>Data over guesses</td>
+<td>Billing export grouped by service and tag; find the top 3 items by growth.</td>
+</tr>
+<tr>
+<td>Where does Kubernetes cost hide?</td>
+<td>Domain depth</td>
+<td>Requested-but-unused capacity, cross-zone and NAT data transfer, orphaned volumes, log ingestion, idle non-prod and GPU nodes.</td>
+</tr>
+<tr>
+<td>Why not just cut resource requests?</td>
+<td>The catch</td>
+<td>Blind cuts cause OOMKills and throttling; rightsize from usage over a window that includes peaks.</td>
+</tr>
+<tr>
+<td>Why not buy a savings plan on day one?</td>
+<td>Sequencing</td>
+<td>It locks in waste for one to three years; rightsize first.</td>
+</tr>
+<tr>
+<td>How do you stop the next doubling?</td>
+<td>Systemic fix</td>
+<td>Showback per team, tagging policy, and budget alerts per owner.</td>
+</tr>
+<tr>
+<td>Five teams say P0. How do you choose?</td>
+<td>Prioritization</td>
+<td>Compare by cost of delay, risk, and capacity; show leadership explicit options.</td>
+</tr>
+<tr>
+<td>Golden path adoption is low. What do you do?</td>
+<td>Product thinking</td>
+<td>Treat it as a product: interview non-adopters, measure time to first deploy, make it the easiest path, keep an escape hatch.</td>
+</tr>
+<tr>
+<td>After an outage, leadership wants a change freeze.</td>
+<td>Overcorrection</td>
+<td>Replace the blanket gate with smaller blast radius, faster rollback, and guardrails.</td>
+</tr>
+<tr>
+<td>How do you justify the platform team's cost?</td>
+<td>Business translation</td>
+<td>Engineers served times hours saved, plus incidents and compliance work avoided, versus team cost.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>In the room</h2>
+<p>The strongest Staff answers sound like a plan from someone who has done it before, and the structure is what carries that. Say your assumptions out loud: &quot;I will assume the 45 minutes is end to end.&quot; Ask two or three clarifying questions, then commit; an interviewer cannot grade a plan you never gave. Use numbers, even rough ones, because &quot;reduce lead time from days to under an hour&quot; lands where &quot;make it faster&quot; does not.</p>
+<p>Say what you would deprioritize. Anyone can list work; naming what you would not start, and why, is the clearest evidence of judgment. Close each answer in business units: hours returned to engineers, dollars saved, incidents avoided, or time to recover.</p>
+<p>Keep a real story behind each scenario. These prompts are hypothetical, but the follow-up is nearly always &quot;have you done this?&quot;, and an answer that moves from the plan to &quot;at my last company, we saw this pattern, and here is what changed&quot; is far stronger. The adaptable templates in &quot;The Senior Platform Engineer Interview&quot; give you the shape, and &quot;Depth That Survives Probing&quot; shows how to back each claim with the mechanism that made it real.</p>
+<p>Finally, be honest about scope. If you have run the cost review but not the ownership negotiation, say so and describe what you would do and what you would check, rather than claiming experience you cannot defend for two more questions.</p>
+
+  </main>
+  <footer class="tip-jar">
+    <p class="tip-jar-lead">Found this useful?</p>
+    <p class="tip-jar-body">These guides are written with Claude, and each one burns real API tokens to research, draft, and fact-check. There is no paywall and no signup. If this helped you walk into an interview better prepared, you can chip in toward the next guide. One-off tip, any amount, your call.</p>
+    <a class="tip-jar-btn" href="https://ko-fi.com/ingvord" target="_blank" rel="noopener noreferrer">&#x2615; Tip on Ko-fi</a>
+    <p class="tip-jar-fine">Thank you, and good luck in the room.</p>
+  </footer>
+</div>
+</body>
+</html>
